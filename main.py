@@ -547,8 +547,11 @@ function showTab(tab){
   var el=document.getElementById(m[tab]); if(el) el.classList.add('active');
   var text=out[tab]||'';
   if(!text){document.getElementById('outBody').innerHTML='<div class="ph"><div class="ph-icon">&#x25A4;</div><div class="ph-title">No output</div></div>';return;}
-  var iisRtl=(text.match(/[א-ת]/g)||[]).length>2;?'rtl':'ltr';
-  var lines=text.split('\\n').map(function(l){return esc(l);}).join('<br>');
+  var heCount=0;
+  for(var i=0;i<text.length;i++){var code=text.charCodeAt(i);if(code>=0x05D0&&code<=0x05EA)heCount++;}
+  var isRtl=heCount>2;
+  var dir=isRtl?'rtl':'ltr';
+  var lines=text.split('\n').map(function(l){return esc(l);}).join('<br>');
   window._ct=text;
   document.getElementById('outBody').innerHTML=
     '<div class="otext" style="direction:'+dir+';text-align:'+(isRtl?'right':'left')+'">'+lines+'</div>'+
@@ -557,7 +560,6 @@ function showTab(tab){
     '<button class="oabtn" onclick="doCopy(this)">&#x1F4CB; Copy</button>'+
     '</div>';
 }
-
 function doSpeak(){
   var btn=document.getElementById('spkBtn');
   if(isSpeaking){window.speechSynthesis.cancel();isSpeaking=false;btn.className='oabtn';btn.innerHTML='&#x1F50A; Listen';return;}
