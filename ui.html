@@ -23,7 +23,7 @@ nav{display:flex;align-items:center;padding:0 40px;height:60px;border-bottom:1px
 .sec.grow{border-bottom:none;flex:1;display:flex;flex-direction:column}
 .lbl{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:14px}
 .tabs{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px;gap:2px}
-.tab{flex:1;padding:8px;text-align:center;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;border-radius:6px;border:none;background:transparent;transition:all .15s}
+.tab{flex:1;padding:8px;text-align:center;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;border-radius:6px;border:none;background:transparent}
 .tab.active{background:var(--bg3);color:var(--green);border:1px solid var(--border2)}
 .dz{flex:1;border:1px dashed var(--border2);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .2s;position:relative;min-height:160px;background:var(--bg)}
 .dz:hover,.dz.over{border-color:var(--green);background:rgba(0,200,117,.03)}
@@ -165,7 +165,7 @@ nav{display:flex;align-items:center;padding:0 40px;height:60px;border-bottom:1px
   </div>
 </div>
 <script>
-var mode='upload',selFiles=[],feats={eli12:false,translate:false},out={ocr:'',eli12:'',translation:''},isSpeaking=false,curTab='ocr';
+var mode='upload',selFiles=[],feats={eli12:false,translate:false},out={ocr:'',eli12:'',translation:''},isSpeaking=false;
 fetch('/health').then(function(r){if(r.ok){document.getElementById('dot').className='dot on';document.getElementById('sl').textContent='Online';}}).catch(function(){});
 function setMode(m){
   mode=m;
@@ -226,9 +226,7 @@ async function runAsync(){
     var r=await fetch(ep+'?mode=text',{method:'POST',body:fd});
     if(!r.ok){var e=await r.json();throw new Error(Array.isArray(e.detail)?e.detail.map(function(x){return x.msg;}).join(', '):e.detail);}
     var d=await r.json();
-    txt=mode==='batch'?d.results.map(function(x){return x.text;}).join('
----
-'):d.text;
+    txt=mode==='batch'?d.results.map(function(x){return x.text;}).join('\n---\n'):d.text;
   }
   setStep(1,'done');out.ocr=txt;
   await sleep(200);setStep(2,'active');await sleep(300);setStep(2,'done');
@@ -272,7 +270,6 @@ function renderResults(){
   document.getElementById('meta').textContent=wc+' words';
 }
 function showTab(tab){
-  curTab=tab;
   document.querySelectorAll('.otab').forEach(function(t){t.classList.remove('active');});
   var ids={ocr:'tab0',eli12:'tab1',translation:'tab2'};
   var el=document.getElementById(ids[tab]);if(el)el.classList.add('active');
@@ -284,8 +281,7 @@ function showTab(tab){
   var heCount=0;
   for(var i=0;i<text.length;i++){var code=text.charCodeAt(i);if(code>=1488&&code<=1514)heCount++;}
   var isRtl=heCount>2;
-  var lines=text.split('
-').map(function(l){return esc(l);}).join('<br>');
+  var lines=text.split('\n').map(function(l){return esc(l);}).join('<br>');
   window._ct=text;
   document.getElementById('outBody').innerHTML=
     '<div class="otext" style="direction:'+(isRtl?'rtl':'ltr')+';text-align:'+(isRtl?'right':'left')+'">'+lines+'</div>'+
