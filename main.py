@@ -74,16 +74,36 @@ def _run_ocr(image):
     return best.strip()
 
 async def _ocr_from_bytes(data):
+    import base64, cv2 as _cv2
+    if ANTHROPIC_API_KEY:
+        try:
+            loop = asyncio.get_event_loop()
+            img = await loop.run_in_executor(None, _preprocess, data)
+            _, buf = _cv2.imencode(".jpg", img, [_cv2.IMWRITE_JPEG_QUALITY, 95])
+            b64 = base64.b64encode(buf.tobytes()).decode()
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                resp = await client.post(
+                    "https://api.anthropic.com/v1/messages",
+                    headers={"x-api-key": ANTHROPIC_API_KEY,
+                             "anthropic-version": "2023-06-01",
+                             "content-type": "application/json"},
+                    json={"model": "claude-sonnet-4-6", "max_tokens": 4096,
+                          "messages": [{"role": "user", "content": [
+                              {"type": "image", "source": {"type": "base64",
+                               "media_type": "image/jpeg", "data": b64}},
+                              {"type": "text", "text": "Extract ALL text from this image exactly as it appears. Preserve the original language (Hebrew, English, or mixed). Preserve line breaks, numbers, and structure. Output ONLY the extracted text, nothing else."}
+                          ]}]}
+                )
+            if resp.status_code == 200:
+                return _clean_text(resp.json()["content"][0]["text"].strip())
+            log.warning(f"Claude Vision {resp.status_code}, falling back to Tesseract")
+        except Exception as e:
+            log.warning(f"Claude Vision failed: {e}, falling back to Tesseract")
     loop = asyncio.get_event_loop()
     gray = await loop.run_in_executor(None, _preprocess, data)
     raw = await loop.run_in_executor(None, _run_ocr, gray)
-    cleaned = _clean_text(raw)
-    enhanced = await _ai_correct(cleaned)
-    return enhanced
+    return _clean_text(await _ai_correct(raw))
 
-# ---------------------------------------------------------------------------
-# Claude AI helpers
-# ---------------------------------------------------------------------------
 async def _claude(prompt: str, max_tokens: int = 2048) -> str:
     if not ANTHROPIC_API_KEY:
         raise HTTPException(503, "מפתח API לא מוגדר — פנה למנהל המערכת.")
