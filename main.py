@@ -52,6 +52,10 @@ def _fix_rtl_line(line):
     return line
 
 def _clean_text(raw):
+    import re as _re
+    # Replace lone O at start of lines (OCR misread of bullet points)
+    raw = _re.sub(r'^O\s+', '• ', raw, flags=_re.MULTILINE)
+    raw = _re.sub(r'^0\s+', '• ', raw, flags=_re.MULTILINE)
     lines = raw.splitlines()
     cleaned = [_fix_rtl_line(re.sub(r"[^\S\n]+"," ",l).strip()) for l in lines]
     return re.sub(r"\n{3,}","\n\n","\n".join(cleaned)).strip()
