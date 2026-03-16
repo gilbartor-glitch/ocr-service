@@ -2,7 +2,7 @@ from __future__ import annotations
 import asyncio, logging, re, cv2, httpx, numpy as np
 from contextlib import asynccontextmanager
 from typing import Annotated, Literal
-import easyocr, pytesseract, os
+import pytesseract, os
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
