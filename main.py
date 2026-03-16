@@ -547,8 +547,7 @@ function showTab(tab){
   var el=document.getElementById(m[tab]); if(el) el.classList.add('active');
   var text=out[tab]||'';
   if(!text){document.getElementById('outBody').innerHTML='<div class="ph"><div class="ph-icon">&#x25A4;</div><div class="ph-title">No output</div></div>';return;}
-  var isRtl=/[א-ת؀-ۿ]/.test(text);
-  var dir=isRtl?'rtl':'ltr';
+  var isRtl=(text.match(/[א-ת]/g)||[]).length>2;sRtl?'rtl':'ltr';
   var lines=text.split('\\n').map(function(l){return esc(l);}).join('<br>');
   window._ct=text;
   document.getElementById('outBody').innerHTML=
