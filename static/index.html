@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OCR Service</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--border:#2a2a2a;--amber:#f5a623;--amber-dim:#7a5312;--green:#39d353;--red:#ff4d4d;--text:#e8e8e8;--text-dim:#666;--radius:4px;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;display:grid;grid-template-rows:auto 1fr auto}
+  header{border-bottom:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;gap:16px}
+  .logo{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--amber)}
+  .logo-sep{color:var(--border);margin:0 4px}
+  .logo-version{font-family:var(--mono);font-size:10px;color:var(--text-dim);font-weight:300}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:var(--text-dim);margin-left:auto;transition:background .3s}
+  .status-dot.online{background:var(--green);box-shadow:0 0 6px var(--green)}
+  .status-label{font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:.1em}
+  main{display:grid;grid-template-columns:1fr 1fr;height:calc(100vh - 57px - 41px)}
+  .panel-left{border-right:1px solid var(--border);display:flex;flex-direction:column}
+  .panel-section{border-bottom:1px solid var(--border);padding:20px 24px}
+  .panel-section:last-child{border-bottom:none;flex:1;display:flex;flex-direction:column}
+  .section-label{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:14px}
+  .tabs{display:flex;gap:2px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:3px}
+  .tab{flex:1;padding:7px 12px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.08em;text-align:center;cursor:pointer;border-radius:2px;color:var(--text-dim);transition:all .15s;border:none;background:transparent;user-select:none}
+  .tab:hover{color:var(--text)}
+  .tab.active{background:var(--bg3);color:var(--amber)}
+  .options-row{display:flex;gap:10px;flex-wrap:wrap}
+  .option-chip{display:flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .15s;background:transparent;color:var(--text-dim);user-select:none}
+  .option-chip:hover{border-color:var(--amber-dim);color:var(--text)}
+  .option-chip.selected{border-color:var(--amber);color:var(--amber);background:rgba(245,166,35,.06)}
+  .option-chip .dot{width:6px;height:6px;border-radius:50%;border:1px solid currentColor;transition:background .15s}
+  .option-chip.selected .dot{background:var(--amber)}
+  .url-input-wrap{display:flex;gap:8px}
+  .url-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;transition:border-color .15s}
+  .url-input:focus{border-color:var(--amber)}
+  .url-input::placeholder{color:var(--text-dim)}
+  .drop-zone{flex:1;border:1px dashed var(--border);border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;min-height:160px}
+  .drop-zone:hover,.drop-zone.drag-over{border-color:var(--amber);background:rgba(245,166,35,.03)}
+  .drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+  .drop-icon{font-size:28px;opacity:.35;pointer-events:none}
+  .drop-text{font-family:var(--mono);font-size:11px;color:var(--text-dim);text-align:center;pointer-events:none;line-height:1.8}
+  .drop-text strong{color:var(--amber);font-weight:500}
+  .thumb-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .thumb{width:56px;height:56px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+  .thumb img{width:100%;height:100%;object-fit:cover}
+  .thumb-count{font-family:var(--mono);font-size:10px;color:var(--text-dim);padding:4px 0}
+  .run-btn{width:100%;padding:12px;background:var(--amber);color:#000;border:none;border-radius:var(--radius);font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .15s;margin-top:14px}
+  .run-btn:hover{background:#ffb93e}
+  .run-btn:disabled{background:var(--bg3);color:var(--text-dim);cursor:not-allowed}
+  .run-btn.loading{background:var(--amber-dim);color:var(--amber);cursor:wait}
+  .panel-right{display:flex;flex-direction:column}
+  .output-header{border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px}
+  .output-title{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim)}
+  .output-meta{font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-left:auto}
+  .copy-btn{background:transparent;border:1px solid var(--border);border-radius:var(--radius);padding:5px 12px;font-family:var(--mono);font-size:10px;color:var(--text-dim);cursor:pointer;letter-spacing:.08em;transition:all .15s}
+  .copy-btn:hover{border-color:var(--amber);color:var(--amber)}
+  .view-tabs{display:flex;border-bottom:1px solid var(--border)}
+  .view-tab{padding:10px 20px;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;border:none;background:transparent;margin-bottom:-1px}
+  .view-tab:hover{color:var(--text)}
+  .view-tab.active{color:var(--amber);border-bottom:2px solid var(--amber)}
+  .result-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:10px 24px;border-bottom:1px solid var(--border)}
+  .result-tab{font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid var(--border);border-radius:2px;cursor:pointer;color:var(--text-dim);background:transparent;transition:all .15s;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .result-tab:hover{border-color:var(--amber-dim);color:var(--text)}
+  .result-tab.active{border-color:var(--amber);color:var(--amber);background:rgba(245,166,35,.06)}
+  .output-body{flex:1;overflow-y:auto;padding:20px 24px}
+  .output-body::-webkit-scrollbar{width:4px}
+  .output-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+  .output-text{font-family:var(--mono);font-size:13px;font-weight:300;line-height:1.8;white-space:pre-wrap;color:var(--text)}
+  .placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--text-dim)}
+  .placeholder-icon{font-size:36px;opacity:.2}
+  .placeholder-text{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  .struct-section{margin-bottom:24px}
+  .struct-section-title{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+  .struct-line{font-family:var(--mono);font-size:12px;color:var(--text);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03);line-height:1.6}
+  .kv-row{display:grid;grid-template-columns:200px 1fr;gap:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+  .kv-key{font-family:var(--mono);font-size:11px;color:var(--amber);font-weight:500}
+  .kv-val{font-family:var(--mono);font-size:12px;color:var(--text)}
+  .stats-row{display:flex;gap:12px}
+  .stat{display:flex;flex-direction:column;gap:4px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);flex:1}
+  .stat-val{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--amber)}
+  .stat-lbl{font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase}
+  .error-box{background:rgba(255,77,77,.07);border:1px solid rgba(255,77,77,.3);border-radius:var(--radius);padding:14px 16px;font-family:var(--mono);font-size:12px;color:var(--red);line-height:1.6}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--amber-dim);border-top-color:var(--amber);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:7px}
+  footer{border-top:1px solid var(--border);padding:10px 32px;display:flex;align-items:center;gap:16px}
+  .footer-text{font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:.08em}
+  .footer-link{font-family:var(--mono);font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:.08em;margin-left:auto;transition:color .15s}
+  .footer-link:hover{color:var(--amber)}
+  .rtl{direction:rtl;text-align:right}
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">OCR<span class="logo-sep">/</span>Service</span>
+  <span class="logo-version">v2.0.0 · en + he</span>
+  <span class="status-label" id="statusLabel">CONNECTING</span>
+  <span class="status-dot" id="statusDot"></span>
+</header>
+<main>
+  <div class="panel-left">
+    <div class="panel-section">
+      <div class="section-label">Input mode</div>
+      <div class="tabs">
+        <button class="tab active" data-mode="upload" onclick="switchInputMode('upload')">Upload</button>
+        <button class="tab" data-mode="batch" onclick="switchInputMode('batch')">Batch</button>
+        <button class="tab" data-mode="url" onclick="switchInputMode('url')">URL</button>
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="section-label">Output format</div>
+      <div class="options-row">
+        <button class="option-chip selected" data-out="text" onclick="selectOutput('text')"><span class="dot"></span>Raw text</button>
+        <button class="option-chip" data-out="structured" onclick="selectOutput('structured')"><span class="dot"></span>Structured</button>
+      </div>
+    </div>
+    <div class="panel-section" id="dropSection">
+      <div class="section-label">Image</div>
+      <div class="drop-zone" id="dropZone" ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
+        <input type="file" id="fileInput" accept="image/*" onchange="onFileSelect(event)"/>
+        <div class="drop-icon">⌗</div>
+        <div class="drop-text"><strong>Drop image here</strong><br/>or click to browse<br/>JPEG · PNG · WEBP · TIFF · BMP</div>
+      </div>
+      <div class="thumb-row" id="thumbRow"></div>
+    </div>
+    <div class="panel-section" id="urlSection" style="display:none">
+      <div class="section-label">Image URL</div>
+      <div class="url-input-wrap">
+        <input class="url-input" id="urlInput" type="url" placeholder="https://example.com/image.jpg"/>
+      </div>
+    </div>
+    <div style="padding:0 24px 24px">
+      <button class="run-btn" id="runBtn" onclick="runOCR()">Run OCR</button>
+    </div>
+  </div>
+  <div class="panel-right">
+    <div class="output-header">
+      <span class="output-title">Output</span>
+      <span class="output-meta" id="outputMeta"></span>
+      <button class="copy-btn" id="copyBtn" onclick="copyOutput()" style="display:none">Copy</button>
+    </div>
+    <div class="view-tabs" id="viewTabs" style="display:none">
+      <button class="view-tab active" data-view="text" onclick="switchView('text')">Text</button>
+      <button class="view-tab" data-view="structured" onclick="switchView('structured')">Structured</button>
+    </div>
+    <div class="result-tabs" id="resultTabs" style="display:none"></div>
+    <div class="output-body" id="outputBody">
+      <div class="placeholder"><div class="placeholder-icon">▤</div><div class="placeholder-text">Awaiting input</div></div>
+    </div>
+  </div>
+</main>
+<footer>
+  <span class="footer-text">EasyOCR · FastAPI · Docker</span>
+  <a class="footer-link" href="/docs" target="_blank">API docs →</a>
+</footer>
+<script>
+let inputMode='upload',outputMode='text',viewMode='text',selectedFiles=[],results=[],activeResult=0;
+async function checkHealth(){try{const r=await fetch('/health');if(r.ok){document.getElementById('statusDot').className='status-dot online';document.getElementById('statusLabel').textContent='ONLINE'}}catch{}}
+checkHealth();
+function switchInputMode(mode){inputMode=mode;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.mode===mode));const isUrl=mode==='url';document.getElementById('dropSection').style.display=isUrl?'none':'';document.getElementById('urlSection').style.display=isUrl?'':'none';document.getElementById('fileInput').multiple=mode==='batch';selectedFiles=[];renderThumbs()}
+function selectOutput(mode){outputMode=mode;document.querySelectorAll('.option-chip').forEach(c=>c.classList.toggle('selected',c.dataset.out===mode))}
+function onFileSelect(e){selectedFiles=Array.from(e.target.files);renderThumbs()}
+function onDragOver(e){e.preventDefault();document.getElementById('dropZone').classList.add('drag-over')}
+function onDragLeave(){document.getElementById('dropZone').classList.remove('drag-over')}
+function onDrop(e){e.preventDefault();document.getElementById('dropZone').classList.remove('drag-over');selectedFiles=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));renderThumbs()}
+function renderThumbs(){const row=document.getElementById('thumbRow');row.innerHTML='';if(!selectedFiles.length)return;selectedFiles.slice(0,8).forEach(f=>{const d=document.createElement('div');d.className='thumb';const i=document.createElement('img');i.src=URL.createObjectURL(f);d.appendChild(i);row.appendChild(d)});if(selectedFiles.length>8){const e=document.createElement('div');e.className='thumb-count';e.textContent=`+${selectedFiles.length-8} more`;row.appendChild(e)}}
+async function runOCR(){const btn=document.getElementById('runBtn');btn.disabled=true;btn.className='run-btn loading';btn.innerHTML='<span class="spinner"></span>Processing…';setOutputLoading();try{const mode=outputMode;if(inputMode==='url'){const url=document.getElementById('urlInput').value.trim();if(!url)throw new Error('Please enter an image URL.');const r=await fetch(`/ocr/url?mode=${mode}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});if(!r.ok){const e=await r.json();throw new Error(e.detail||r.statusText)}results=[await r.json()]}else if(inputMode==='batch'&&selectedFiles.length){const fd=new FormData();selectedFiles.forEach(f=>fd.append('files',f));const r=await fetch(`/ocr/batch?mode=${mode}`,{method:'POST',body:fd});if(!r.ok){const e=await r.json();throw new Error(e.detail||r.statusText)}const data=await r.json();results=data.results}else{if(!selectedFiles.length)throw new Error('Please select an image file.');const fd=new FormData();fd.append('file',selectedFiles[0]);const r=await fetch(`/ocr/upload?mode=${mode}`,{method:'POST',body:fd});if(!r.ok){const e=await r.json();throw new Error(e.detail||r.statusText)}results=[await r.json()]}activeResult=0;renderResults()}catch(err){showError(err.message)}finally{btn.disabled=false;btn.className='run-btn';btn.textContent='Run OCR'}}
+function setOutputLoading(){document.getElementById('outputBody').innerHTML='<div class="placeholder"><span class="spinner" style="width:18px;height:18px"></span></div>';document.getElementById('copyBtn').style.display='none';document.getElementById('outputMeta').textContent='';document.getElementById('viewTabs').style.display='none';document.getElementById('resultTabs').style.display='none'}
+function showError(msg){document.getElementById('outputBody').innerHTML=`<div class="error-box">⚠ ${escHtml(msg)}</div>`}
+function renderResults(){if(!results.length)return;const tabsEl=document.getElementById('resultTabs');if(results.length>1){tabsEl.style.display='flex';tabsEl.innerHTML=results.map((r,i)=>`<button class="result-tab ${i===activeResult?'active':''}" onclick="selectResult(${i})" title="${escHtml(r.filename)}">${escHtml(r.filename)}</button>`).join('')}else{tabsEl.style.display='none'}const cur=results[activeResult];const hasStructured=cur.structured!==null;const vtEl=document.getElementById('viewTabs');vtEl.style.display=hasStructured?'flex':'none';if(!hasStructured)viewMode='text';vtEl.querySelectorAll('.view-tab').forEach(t=>t.classList.toggle('active',t.dataset.view===viewMode));const meta=document.getElementById('outputMeta');if(cur.structured){const s=cur.structured.stats;meta.textContent=`${s.line_count} lines · ${s.word_count} words · ${s.char_count} chars`}else{const words=cur.text.split(/\s+/).filter(Boolean).length;meta.textContent=`${words} words · ${cur.text.length} chars`}document.getElementById('copyBtn').style.display='';const body=document.getElementById('outputBody');if(viewMode==='structured'&&cur.structured){renderStructured(body,cur.structured)}else{const isRtl=/[\u0590-\u05FF]/.test(cur.text);body.innerHTML=`<pre class="output-text ${isRtl?'rtl':''}">${escHtml(cur.text)}</pre>`}}
+function renderStructured(body,s){let html=`<div class="struct-section"><div class="struct-section-title">Stats</div><div class="stats-row"><div class="stat"><div class="stat-val">${s.stats.line_count}</div><div class="stat-lbl">Lines</div></div><div class="stat"><div class="stat-val">${s.stats.word_count}</div><div class="stat-lbl">Words</div></div><div class="stat"><div class="stat-val">${s.stats.char_count}</div><div class="stat-lbl">Chars</div></div></div></div>`;if(Object.keys(s.key_value_pairs).length){html+=`<div class="struct-section"><div class="struct-section-title">Key — Value pairs</div>`;for(const[k,v]of Object.entries(s.key_value_pairs)){html+=`<div class="kv-row"><div class="kv-key">${escHtml(k)}</div><div class="kv-val">${escHtml(v)}</div></div>`}html+=`</div>`}html+=`<div class="struct-section"><div class="struct-section-title">Lines (${s.lines.length})</div>`;s.lines.forEach((ln,i)=>{const isRtl=/[\u0590-\u05FF]/.test(ln);html+=`<div class="struct-line ${isRtl?'rtl':''}"><span style="color:var(--text-dim);margin-right:12px;font-size:10px">${String(i+1).padStart(3,'0')}</span>${escHtml(ln)}</div>`});html+=`</div>`;body.innerHTML=html}
+function selectResult(i){activeResult=i;document.querySelectorAll('.result-tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));renderResults()}
+function switchView(v){viewMode=v;renderResults()}
+function copyOutput(){if(!results.length)return;navigator.clipboard.writeText(results[activeResult].text).then(()=>{const btn=document.getElementById('copyBtn');btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',1500)})}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+</script>
+</body>
+</html>
