@@ -284,7 +284,7 @@ function showTab(tab){
   var lines=text.split('\n').map(function(l){return esc(l);}).join('<br>');
   window._ct=text;
   document.getElementById('outBody').innerHTML=
-    '<div class="otext" style="direction:'+(isRtl?'rtl':'ltr')+';text-align:'+(isRtl?'right':'left')+'">'+lines+'</div>'+
+    '<div class="otext" style="direction:'+(isRtl?'rtl':'ltr')+';text-align:'+(isRtl?'right':'left')+';unicode-bidi:plaintext'">'+lines+'</div>'+
     '<div class="oacts">'+
     '<button class="oabtn" id="spkBtn" onclick="doSpeak()">&#x1F50A; Listen</button>'+
     '<button class="oabtn" onclick="doCopy(this)">&#x1F4CB; Copy</button>'+
