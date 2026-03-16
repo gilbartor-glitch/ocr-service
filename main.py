@@ -246,408 +246,359 @@ async def translate(body: AIRequest):
 # ---------------------------------------------------------------------------
 # UI
 # ---------------------------------------------------------------------------
+
 _UI_HTML = """<!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>גישה פשוטה — הבנת מסמכים</title>
+<title>SimpliScan — Document Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #f5f0e8;
-    --card: #ffffff;
-    --border: #d4c9b0;
-    --primary: #2c5f8a;
-    --primary-light: #e8f0f8;
-    --accent: #e07b2a;
-    --text: #2a2a2a;
-    --text-dim: #666;
-    --green: #2d7a4a;
-    --radius: 12px;
-    --shadow: 0 2px 12px rgba(0,0,0,0.08);
-    --font: "Heebo", sans-serif;
-    --font-size-base: 18px;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font);
-    font-size: var(--font-size-base);
-    min-height: 100vh;
-    direction: rtl;
-  }
-  header {
-    background: var(--primary);
-    color: white;
-    padding: 20px 32px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    box-shadow: var(--shadow);
-  }
-  .logo-icon { font-size: 36px; }
-  .logo-text h1 { font-size: 24px; font-weight: 700; }
-  .logo-text p { font-size: 14px; opacity: 0.85; margin-top: 2px; }
-  .status-pill {
-    margin-right: auto;
-    background: rgba(255,255,255,0.2);
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #aaa; }
-  .status-dot.online { background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+:root {
+  --bg: #0c0c0c;
+  --bg2: #141414;
+  --bg3: #1c1c1c;
+  --border: #2a2a2a;
+  --border2: #383838;
+  --text: #f0f0f0;
+  --text2: #999;
+  --text3: #555;
+  --green: #00c875;
+  --green-dim: #003d21;
+  --orange: #ff6b35;
+  --blue: #4d9fff;
+  --radius: 12px;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 15px; min-height: 100vh; }
 
-  main {
-    max-width: 960px;
-    margin: 32px auto;
-    padding: 0 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
+/* NAV */
+nav {
+  display: flex; align-items: center; padding: 0 40px; height: 60px;
+  border-bottom: 1px solid var(--border); background: var(--bg);
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-logo { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: -.3px; }
+.nav-logo em { font-style: normal; color: var(--green); }
+.nav-status { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); transition: all .3s; }
+.status-dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
+.nav-app-link { margin-left: 24px; font-size: 12px; color: var(--text2); text-decoration: none; padding: 6px 14px; border: 1px solid var(--border2); border-radius: 6px; transition: all .15s; }
+.nav-app-link:hover { border-color: var(--green); color: var(--green); }
 
-  .card {
-    background: var(--card);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-    overflow: hidden;
-  }
-  .card-header {
-    background: var(--primary-light);
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .card-header h2 {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--primary);
-  }
-  .card-icon { font-size: 22px; }
-  .card-body { padding: 24px; }
+/* LAYOUT */
+.app-layout { display: grid; grid-template-columns: 420px 1fr; min-height: calc(100vh - 60px); }
 
-  /* Upload area */
-  .drop-zone {
-    border: 2px dashed var(--border);
-    border-radius: var(--radius);
-    padding: 40px 24px;
-    text-align: center;
-    cursor: pointer;
-    transition: all .2s;
-    position: relative;
-    background: #faf8f4;
-  }
-  .drop-zone:hover, .drop-zone.drag-over {
-    border-color: var(--primary);
-    background: var(--primary-light);
-  }
-  .drop-zone input[type=file] {
-    position: absolute; inset: 0; opacity: 0; cursor: pointer;
-  }
-  .drop-icon { font-size: 48px; margin-bottom: 12px; }
-  .drop-text { font-size: 18px; font-weight: 500; color: var(--primary); }
-  .drop-hint { font-size: 14px; color: var(--text-dim); margin-top: 6px; }
-  .thumb-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; justify-content: center; }
-  .thumb { width: 72px; height: 72px; border-radius: 8px; overflow: hidden; border: 2px solid var(--border); }
-  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+/* LEFT PANEL */
+.left-panel { border-right: 1px solid var(--border); display: flex; flex-direction: column; background: var(--bg2); }
 
-  /* Mode tabs */
-  .mode-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-  .mode-tab {
-    flex: 1; padding: 12px; border: 2px solid var(--border);
-    border-radius: 10px; font-family: var(--font); font-size: 16px;
-    cursor: pointer; background: white; color: var(--text-dim);
-    transition: all .15s; text-align: center; font-weight: 500;
-  }
-  .mode-tab:hover { border-color: var(--primary); color: var(--primary); }
-  .mode-tab.active { border-color: var(--primary); background: var(--primary); color: white; }
+.panel-section { border-bottom: 1px solid var(--border); padding: 24px; }
+.panel-section:last-of-type { border-bottom: none; flex: 1; display: flex; flex-direction: column; }
 
-  /* URL input */
-  .url-input {
-    width: 100%; padding: 14px 16px; border: 2px solid var(--border);
-    border-radius: 10px; font-family: var(--font); font-size: 16px;
-    outline: none; transition: border-color .15s;
-  }
-  .url-input:focus { border-color: var(--primary); }
+.section-label {
+  font-family: var(--font-display); font-size: 10px; font-weight: 600;
+  letter-spacing: .15em; text-transform: uppercase; color: var(--text3);
+  margin-bottom: 16px;
+}
 
-  /* Options */
-  .options-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-  .option-btn {
-    padding: 10px 18px; border: 2px solid var(--border);
-    border-radius: 10px; font-family: var(--font); font-size: 15px;
-    cursor: pointer; background: white; color: var(--text-dim);
-    transition: all .15s; font-weight: 500;
-  }
-  .option-btn:hover { border-color: var(--primary); color: var(--primary); }
-  .option-btn.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+/* Mode tabs */
+.mode-tabs { display: flex; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 2px; }
+.mode-tab {
+  flex: 1; padding: 8px 10px; text-align: center;
+  font-family: var(--font-body); font-size: 12px; font-weight: 500;
+  color: var(--text2); cursor: pointer; border-radius: 6px;
+  border: none; background: transparent; transition: all .15s; letter-spacing: .02em;
+}
+.mode-tab:hover { color: var(--text); }
+.mode-tab.active { background: var(--bg3); color: var(--green); border: 1px solid var(--border2); }
 
-  /* Language selector */
-  .lang-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
-  .lang-label { font-size: 16px; font-weight: 500; white-space: nowrap; }
-  .lang-select {
-    padding: 10px 14px; border: 2px solid var(--border); border-radius: 10px;
-    font-family: var(--font); font-size: 15px; background: white;
-    outline: none; cursor: pointer; min-width: 160px;
-  }
-  .lang-select:focus { border-color: var(--primary); }
+/* Drop zone */
+.drop-zone {
+  flex: 1; border: 1px dashed var(--border2); border-radius: var(--radius);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; cursor: pointer; transition: all .2s; position: relative;
+  min-height: 180px; background: var(--bg);
+}
+.drop-zone:hover, .drop-zone.drag-over { border-color: var(--green); background: rgba(0,200,117,.03); }
+.drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.drop-icon { font-size: 32px; opacity: .5; pointer-events: none; }
+.drop-text { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--text2); pointer-events: none; }
+.drop-hint { font-size: 11px; color: var(--text3); pointer-events: none; }
+.thumb-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.thumb { width: 60px; height: 60px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
 
-  /* Run button */
-  .run-btn {
-    width: 100%; padding: 18px; background: var(--accent); color: white;
-    border: none; border-radius: var(--radius); font-family: var(--font);
-    font-size: 20px; font-weight: 700; cursor: pointer; transition: all .15s;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-  }
-  .run-btn:hover { background: #c96d20; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(224,123,42,0.3); }
-  .run-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+/* URL input */
+.url-input {
+  width: 100%; padding: 10px 14px; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 8px;
+  font-family: var(--font-body); font-size: 13px; color: var(--text);
+  outline: none; transition: border-color .15s;
+}
+.url-input:focus { border-color: var(--green); }
+.url-input::placeholder { color: var(--text3); }
 
-  .secondary-btns { display: flex; gap: 10px; margin-top: 10px; }
-  .secondary-btn {
-    flex: 1; padding: 12px; background: white; color: var(--text-dim);
-    border: 2px solid var(--border); border-radius: 10px; font-family: var(--font);
-    font-size: 15px; cursor: pointer; transition: all .15s; font-weight: 500;
-  }
-  .secondary-btn:hover { border-color: var(--primary); color: var(--primary); }
+/* Feature toggles */
+.feature-toggles { display: flex; flex-direction: column; gap: 8px; }
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; cursor: pointer; transition: all .15s;
+}
+.toggle-row:hover { border-color: var(--border2); }
+.toggle-row.active { border-color: var(--green); background: rgba(0,200,117,.04); }
+.toggle-label { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; }
+.toggle-icon { font-size: 15px; }
+.toggle-switch {
+  width: 36px; height: 20px; border-radius: 10px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  position: relative; transition: all .2s; flex-shrink: 0;
+}
+.toggle-switch::after {
+  content: ''; position: absolute; width: 14px; height: 14px;
+  background: var(--text3); border-radius: 50%; top: 2px; left: 2px; transition: all .2s;
+}
+.toggle-row.active .toggle-switch { background: var(--green-dim); border-color: var(--green); }
+.toggle-row.active .toggle-switch::after { background: var(--green); left: 18px; }
+.toggle-desc { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
-  /* Output */
-  .output-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 0; }
-  .output-tab {
-    padding: 14px 20px; font-family: var(--font); font-size: 16px;
-    font-weight: 600; color: var(--text-dim); cursor: pointer;
-    border-bottom: 3px solid transparent; margin-bottom: -2px;
-    transition: all .15s; background: none; border-top: none;
-    border-left: none; border-right: none;
-  }
-  .output-tab:hover { color: var(--primary); }
-  .output-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+/* Language select */
+.lang-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
+.lang-label { font-size: 12px; color: var(--text2); white-space: nowrap; }
+.lang-select {
+  flex: 1; background: transparent; border: none; color: var(--text);
+  font-family: var(--font-body); font-size: 13px; outline: none; cursor: pointer;
+}
+.lang-select option { background: var(--bg2); }
 
-  .output-panel { display: none; padding: 24px; }
-  .output-panel.active { display: block; }
+/* Run button */
+.run-btn {
+  width: 100%; padding: 14px; background: var(--green); color: #000;
+  border: none; border-radius: var(--radius); font-family: var(--font-display);
+  font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  cursor: pointer; transition: all .15s; display: flex; align-items: center;
+  justify-content: center; gap: 8px;
+}
+.run-btn:hover { background: #00e688; transform: translateY(-1px); }
+.run-btn:disabled { background: var(--bg3); color: var(--text3); cursor: not-allowed; transform: none; }
+.run-btn.loading { background: var(--green-dim); color: var(--green); cursor: wait; }
 
-  .output-text {
-    font-size: 18px; line-height: 1.9; white-space: pre-wrap;
-    color: var(--text); direction: rtl;
-  }
-  .output-actions {
-    display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap;
-    padding-top: 16px; border-top: 1px solid var(--border);
-  }
-  .action-btn {
-    padding: 10px 18px; background: var(--primary-light); color: var(--primary);
-    border: 2px solid var(--primary); border-radius: 10px; font-family: var(--font);
-    font-size: 15px; cursor: pointer; font-weight: 600; transition: all .15s;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .action-btn:hover { background: var(--primary); color: white; }
-  .action-btn.speaking { background: var(--accent); color: white; border-color: var(--accent); }
+.action-btns { display: flex; gap: 8px; margin-top: 8px; }
+.action-btn {
+  flex: 1; padding: 10px; background: transparent; color: var(--text2);
+  border: 1px solid var(--border); border-radius: 8px; font-family: var(--font-body);
+  font-size: 12px; cursor: pointer; transition: all .15s; letter-spacing: .03em;
+}
+.action-btn:hover { border-color: var(--border2); color: var(--text); }
 
-  .placeholder {
-    text-align: center; padding: 48px 24px; color: var(--text-dim);
-  }
-  .placeholder-icon { font-size: 56px; margin-bottom: 16px; }
-  .placeholder-text { font-size: 18px; }
+/* RIGHT PANEL */
+.right-panel { display: flex; flex-direction: column; background: var(--bg); }
 
-  .error-box {
-    background: #fff0f0; border: 2px solid #ffaaaa; border-radius: 10px;
-    padding: 16px 20px; color: #c00; font-size: 16px; line-height: 1.6;
-  }
+.output-header {
+  border-bottom: 1px solid var(--border); padding: 0 32px;
+  display: flex; align-items: center; height: 48px; gap: 0;
+}
+.output-tab {
+  height: 100%; padding: 0 16px; font-family: var(--font-body);
+  font-size: 12px; font-weight: 500; color: var(--text3);
+  border: none; background: transparent; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: all .15s; letter-spacing: .04em; text-transform: uppercase;
+}
+.output-tab:hover { color: var(--text2); }
+.output-tab.active { color: var(--green); border-bottom-color: var(--green); }
+.output-tab[style*="none"] { display: none !important; }
 
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .spinner {
-    display: inline-block; width: 20px; height: 20px;
-    border: 3px solid rgba(255,255,255,0.4);
-    border-top-color: white; border-radius: 50%;
-    animation: spin .7s linear infinite;
-  }
+.output-meta { margin-left: auto; font-size: 11px; color: var(--text3); }
 
-  .processing-steps {
-    background: var(--primary-light); border-radius: 10px;
-    padding: 20px 24px; margin-bottom: 16px;
-  }
-  .step { display: flex; align-items: center; gap: 12px; padding: 8px 0; font-size: 16px; }
-  .step-icon { font-size: 20px; width: 28px; text-align: center; }
-  .step.done .step-icon::after { content: " ✅"; }
-  .step.active { color: var(--primary); font-weight: 600; }
-  .step.waiting { color: var(--text-dim); }
+.output-body { flex: 1; overflow-y: auto; padding: 32px; }
+.output-body::-webkit-scrollbar { width: 4px; }
+.output-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  footer {
-    text-align: center; padding: 24px; color: var(--text-dim);
-    font-size: 14px; border-top: 1px solid var(--border);
-    margin-top: 16px;
-  }
+.output-text {
+  font-family: var(--font-body); font-size: 15px; line-height: 1.85;
+  color: var(--text); white-space: pre-wrap;
+}
 
-  @media (max-width: 600px) {
-    header { padding: 16px; }
-    .logo-text h1 { font-size: 20px; }
-    main { margin: 16px auto; padding: 0 12px; }
-    .card-body { padding: 16px; }
-    .run-btn { font-size: 18px; padding: 16px; }
-  }
+.output-actions { display: flex; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+.out-action-btn {
+  padding: 8px 16px; background: var(--bg2); color: var(--text2);
+  border: 1px solid var(--border); border-radius: 8px; font-family: var(--font-body);
+  font-size: 12px; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px;
+}
+.out-action-btn:hover { border-color: var(--green); color: var(--green); }
+.out-action-btn.speaking { background: var(--green-dim); color: var(--green); border-color: var(--green); }
+
+.placeholder {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; gap: 16px; color: var(--text3); text-align: center;
+}
+.placeholder-icon { font-size: 48px; opacity: .3; }
+.placeholder-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--text2); }
+.placeholder-sub { font-size: 13px; line-height: 1.6; max-width: 320px; }
+
+.error-box {
+  background: rgba(255,60,60,.06); border: 1px solid rgba(255,60,60,.25);
+  border-radius: var(--radius); padding: 16px 20px;
+  font-size: 13px; color: #ff6b6b; line-height: 1.6;
+}
+
+/* Processing */
+.processing-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 24px; max-width: 400px; margin: 0 auto;
+}
+.proc-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; margin-bottom: 20px; color: var(--text2); letter-spacing: .05em; text-transform: uppercase; }
+.proc-step { display: flex; align-items: center; gap: 12px; padding: 10px 0; font-size: 13px; }
+.proc-step + .proc-step { border-top: 1px solid var(--border); }
+.step-icon { font-size: 16px; width: 28px; text-align: center; }
+.proc-step.done { color: var(--green); }
+.proc-step.active { color: var(--text); }
+.proc-step.waiting { color: var(--text3); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--green-dim); border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
+
+@media (max-width: 800px) {
+  .app-layout { grid-template-columns: 1fr; }
+  .left-panel { border-right: none; border-bottom: 1px solid var(--border); }
+  nav { padding: 0 20px; }
+}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo-icon">📄</div>
-  <div class="logo-text">
-    <h1>גישה פשוטה</h1>
-    <p>הבנת מסמכים לכולם</p>
-  </div>
-  <div class="status-pill">
+<nav>
+  <span class="nav-logo">Simpli<em>Scan</em></span>
+  <div class="nav-status">
     <span class="status-dot" id="statusDot"></span>
-    <span id="statusLabel">מתחבר...</span>
+    <span id="statusLabel">Connecting</span>
   </div>
-</header>
+  <a href="/landing" class="nav-app-link">About →</a>
+</nav>
 
-<main>
+<div class="app-layout">
 
-  <!-- Upload Card -->
-  <div class="card">
-    <div class="card-header">
-      <span class="card-icon">📸</span>
-      <h2>העלאת מסמך</h2>
-    </div>
-    <div class="card-body">
-      <!-- Mode tabs -->
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+
+    <!-- Input mode -->
+    <div class="panel-section">
+      <div class="section-label">Input mode</div>
       <div class="mode-tabs">
-        <button class="mode-tab active" onclick="switchMode(\\'upload\\')">📎 העלאת קובץ</button>
-        <button class="mode-tab" onclick="switchMode(\\'batch\\')">📚 מספר קבצים</button>
-        <button class="mode-tab" onclick="switchMode(\\'url\\')">🔗 קישור</button>
-      </div>
-
-      <!-- Upload zone -->
-      <div id="uploadSection">
-        <div class="drop-zone" id="dropZone"
-             ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
-          <input type="file" id="fileInput" accept="image/*" onchange="onFileSelect(event)"/>
-          <div class="drop-icon">🖼️</div>
-          <div class="drop-text">גררו תמונה לכאן או לחצו לבחירה</div>
-          <div class="drop-hint">תומך ב: JPEG, PNG, WEBP, TIFF, BMP</div>
-        </div>
-        <div class="thumb-row" id="thumbRow"></div>
-      </div>
-
-      <!-- URL input -->
-      <div id="urlSection" style="display:none">
-        <input class="url-input" id="urlInput" type="url" placeholder="הדביקו כאן קישור לתמונה..."/>
+        <button class="mode-tab active" onclick="switchMode('upload')">Upload</button>
+        <button class="mode-tab" onclick="switchMode('batch')">Batch</button>
+        <button class="mode-tab" onclick="switchMode('url')">URL</button>
       </div>
     </div>
-  </div>
 
-  <!-- Options Card -->
-  <div class="card">
-    <div class="card-header">
-      <span class="card-icon">⚙️</span>
-      <h2>אפשרויות עיבוד</h2>
+    <!-- File drop -->
+    <div class="panel-section" id="uploadSection" style="flex:1;display:flex;flex-direction:column;">
+      <div class="section-label">Document</div>
+      <div class="drop-zone" id="dropZone"
+           ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
+        <input type="file" id="fileInput" accept="image/*" onchange="onFileSelect(event)"/>
+        <div class="drop-icon">⌗</div>
+        <div class="drop-text">Drop image here</div>
+        <div class="drop-hint">JPEG · PNG · WEBP · TIFF · BMP &nbsp;·&nbsp; max 20MB</div>
+      </div>
+      <div class="thumb-row" id="thumbRow"></div>
     </div>
-    <div class="card-body">
 
-      <!-- AI Features -->
-      <div style="margin-bottom: 16px;">
-        <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px; color: var(--primary);">🤖 תכונות בינה מלאכותית</div>
-        <div class="options-grid">
-          <button class="option-btn active" id="btnOCR" onclick="toggleOpt(\\'ocr\\')">📖 זיהוי טקסט (OCR)</button>
-          <button class="option-btn" id="btnELI12" onclick="toggleOpt(\\'eli12\\')">🧒 הסבר פשוט</button>
-          <button class="option-btn" id="btnTranslate" onclick="toggleOpt(\\'translate\\')">🌐 תרגום</button>
+    <!-- URL input -->
+    <div class="panel-section" id="urlSection" style="display:none;">
+      <div class="section-label">Image URL</div>
+      <input class="url-input" id="urlInput" type="url" placeholder="https://example.com/document.jpg"/>
+    </div>
+
+    <!-- AI features -->
+    <div class="panel-section">
+      <div class="section-label">AI features</div>
+      <div class="feature-toggles">
+        <div class="toggle-row active" id="toggleOCR">
+          <div>
+            <div class="toggle-label"><span class="toggle-icon">📖</span> OCR extraction</div>
+            <div class="toggle-desc">Always enabled</div>
+          </div>
+          <div class="toggle-switch"></div>
+        </div>
+        <div class="toggle-row" id="toggleELI12" onclick="toggleFeature('eli12')">
+          <div>
+            <div class="toggle-label"><span class="toggle-icon">🧒</span> Plain language</div>
+            <div class="toggle-desc">Simplify complex text</div>
+          </div>
+          <div class="toggle-switch"></div>
+        </div>
+        <div class="toggle-row" id="toggleTranslate" onclick="toggleFeature('translate')">
+          <div>
+            <div class="toggle-label"><span class="toggle-icon">🌐</span> Translate</div>
+            <div class="toggle-desc">Convert to another language</div>
+          </div>
+          <div class="toggle-switch"></div>
         </div>
       </div>
-
-      <!-- Translation language -->
-      <div class="lang-row" id="langRow" style="display:none">
-        <span class="lang-label">🌍 תרגם ל:</span>
+      <div class="lang-row" id="langRow" style="display:none;">
+        <span class="lang-label">Translate to</span>
         <select class="lang-select" id="targetLang">
-          <option value="עברית">עברית</option>
+          <option value="Hebrew">עברית Hebrew</option>
           <option value="English">English</option>
-          <option value="Arabic">عربي</option>
-          <option value="Russian">Русский</option>
-          <option value="French">Français</option>
-          <option value="Spanish">Español</option>
-          <option value="Amharic">አማርኛ</option>
-          <option value="Tigrinya">ትግርኛ</option>
+          <option value="Arabic">عربي Arabic</option>
+          <option value="Russian">Русский Russian</option>
+          <option value="French">Français French</option>
+          <option value="Spanish">Español Spanish</option>
+          <option value="Amharic">አማርኛ Amharic</option>
+          <option value="Tigrinya">ትግርኛ Tigrinya</option>
         </select>
       </div>
+    </div>
 
-      <!-- Run button -->
+    <!-- Run -->
+    <div class="panel-section">
       <button class="run-btn" id="runBtn" onclick="runOCR()">
-        <span>🚀</span> <span>עבד מסמך</span>
+        <span>▶</span>&nbsp; Process document
       </button>
-      <div class="secondary-btns">
-        <button class="secondary-btn" onclick="resetAll()">🔄 איפוס</button>
-        <button class="secondary-btn" onclick="location.reload()">↺ רענן</button>
+      <div class="action-btns">
+        <button class="action-btn" onclick="resetAll()">Reset</button>
+        <button class="action-btn" onclick="location.reload()">Refresh</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="output-header">
+      <button class="output-tab active" onclick="switchTab('ocr')" id="tabOCR">Extracted text</button>
+      <button class="output-tab" onclick="switchTab('eli12')" id="tabELI12" style="display:none">Plain language</button>
+      <button class="output-tab" onclick="switchTab('translation')" id="tabTranslation" style="display:none">Translation</button>
+      <span class="output-meta" id="outputMeta"></span>
+    </div>
+    <div class="output-body" id="outputBody">
+      <div class="placeholder">
+        <div class="placeholder-icon">▤</div>
+        <div class="placeholder-title">No document loaded</div>
+        <div class="placeholder-sub">Upload an image or paste a URL, then click Process document to extract text.</div>
       </div>
     </div>
   </div>
 
-  <!-- Output Card -->
-  <div class="card" id="outputCard" style="display:none">
-    <div class="card-header">
-      <span class="card-icon">📋</span>
-      <h2>תוצאות</h2>
-    </div>
-
-    <!-- Processing steps -->
-    <div id="processingSteps" style="display:none; padding: 20px 24px;">
-      <div class="processing-steps">
-        <div class="step waiting" id="step1"><span class="step-icon">📖</span> זיהוי טקסט (OCR)</div>
-        <div class="step waiting" id="step2"><span class="step-icon">🤖</span> תיקון שגיאות AI</div>
-        <div class="step waiting" id="step3"><span class="step-icon">🧒</span> הסבר פשוט</div>
-        <div class="step waiting" id="step4"><span class="step-icon">🌐</span> תרגום</div>
-      </div>
-    </div>
-
-    <!-- Output tabs -->
-    <div class="output-tabs" id="outputTabs" style="display:none">
-      <button class="output-tab active" onclick="switchOutputTab(\\'ocr\\')" id="tabOCR">📖 טקסט מקורי</button>
-      <button class="output-tab" onclick="switchOutputTab(\\'eli12\\')" id="tabELI12" style="display:none">🧒 הסבר פשוט</button>
-      <button class="output-tab" onclick="switchOutputTab(\\'translation\\')" id="tabTranslation" style="display:none">🌐 תרגום</button>
-    </div>
-
-    <!-- OCR panel -->
-    <div class="output-panel active" id="panelOCR">
-      <div class="placeholder" id="placeholderMsg">
-        <div class="placeholder-icon">⬆️</div>
-        <div class="placeholder-text">העלו מסמך ולחצו "עבד מסמך"</div>
-      </div>
-    </div>
-
-    <!-- ELI12 panel -->
-    <div class="output-panel" id="panelELI12"></div>
-
-    <!-- Translation panel -->
-    <div class="output-panel" id="panelTranslation"></div>
-  </div>
-
-</main>
-
-<footer>
-  גישה פשוטה — OCR + AI לכולם &nbsp;|&nbsp; EasyOCR · Tesseract · Claude AI
-</footer>
+</div>
 
 <script>
-let inputMode = "upload";
-let selectedFiles = [];
-let opts = { ocr: true, eli12: false, translate: false };
-let currentOutput = { ocr: "", eli12: "", translation: "" };
-let speaking = false;
-let speechUtterance = null;
+let inputMode = "upload", selectedFiles = [], features = {eli12:false, translate:false};
+let results = {ocr:"", eli12:"", translation:""};
+let speaking = false, activeTab = "ocr";
 
-// Status check
 async function checkHealth() {
   try {
     const r = await fetch("/health");
     if (r.ok) {
       document.getElementById("statusDot").className = "status-dot online";
-      document.getElementById("statusLabel").textContent = "מוכן";
+      document.getElementById("statusLabel").textContent = "Online";
     }
   } catch {}
 }
@@ -655,234 +606,177 @@ checkHealth();
 
 function switchMode(mode) {
   inputMode = mode;
-  document.querySelectorAll(".mode-tab").forEach((t, i) => {
-    t.classList.toggle("active", ["upload","batch","url"][i] === mode);
-  });
-  document.getElementById("uploadSection").style.display = mode !== "url" ? "" : "none";
-  document.getElementById("urlSection").style.display = mode === "url" ? "" : "none";
-  document.getElementById("fileInput").multiple = mode === "batch";
-  selectedFiles = [];
-  renderThumbs();
+  document.querySelectorAll(".mode-tab").forEach((t,i) => t.classList.toggle("active", ["upload","batch","url"][i]===mode));
+  document.getElementById("uploadSection").style.display = mode!=="url" ? "flex" : "none";
+  document.getElementById("urlSection").style.display = mode==="url" ? "" : "none";
+  document.getElementById("fileInput").multiple = mode==="batch";
+  selectedFiles=[]; renderThumbs();
 }
 
-function toggleOpt(key) {
-  if (key === "ocr") return; // OCR always on
-  opts[key] = !opts[key];
-  document.getElementById("btn" + key.charAt(0).toUpperCase() + key.slice(1))
-    .classList.toggle("active", opts[key]);
-  if (key === "translate") {
-    document.getElementById("langRow").style.display = opts.translate ? "flex" : "none";
-  }
-  // Show/hide ELI12 step
-  document.getElementById("step3").style.display = opts.eli12 ? "" : "none";
-  document.getElementById("step4").style.display = opts.translate ? "" : "none";
+function toggleFeature(key) {
+  features[key] = !features[key];
+  document.getElementById("toggle"+key.charAt(0).toUpperCase()+key.slice(1))
+    .classList.toggle("active", features[key]);
+  if (key==="translate") document.getElementById("langRow").style.display = features.translate ? "flex" : "none";
 }
 
-function onFileSelect(e) { selectedFiles = Array.from(e.target.files); renderThumbs(); }
+function onFileSelect(e) { selectedFiles=Array.from(e.target.files); renderThumbs(); }
 function onDragOver(e) { e.preventDefault(); document.getElementById("dropZone").classList.add("drag-over"); }
 function onDragLeave() { document.getElementById("dropZone").classList.remove("drag-over"); }
 function onDrop(e) {
-  e.preventDefault();
-  document.getElementById("dropZone").classList.remove("drag-over");
-  selectedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/"));
-  renderThumbs();
+  e.preventDefault(); document.getElementById("dropZone").classList.remove("drag-over");
+  selectedFiles=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith("image/")); renderThumbs();
 }
 function renderThumbs() {
-  const row = document.getElementById("thumbRow");
-  row.innerHTML = "";
-  selectedFiles.slice(0, 6).forEach(f => {
-    const d = document.createElement("div"); d.className = "thumb";
-    const i = document.createElement("img"); i.src = URL.createObjectURL(f);
+  const row=document.getElementById("thumbRow"); row.innerHTML="";
+  selectedFiles.slice(0,8).forEach(f=>{
+    const d=document.createElement("div"); d.className="thumb";
+    const i=document.createElement("img"); i.src=URL.createObjectURL(f);
     d.appendChild(i); row.appendChild(d);
   });
 }
 
-function setStep(n, state) {
-  const el = document.getElementById("step" + n);
-  if (!el) return;
-  el.className = "step " + state;
-}
-
 async function runOCR() {
-  const btn = document.getElementById("runBtn");
-  btn.disabled = true;
-  btn.innerHTML = "<span class=\\"spinner\\"></span> מעבד...";
-
-  // Show output card and processing steps
-  document.getElementById("outputCard").style.display = "";
-  document.getElementById("processingSteps").style.display = "";
-  document.getElementById("outputTabs").style.display = "none";
-  document.getElementById("panelOCR").innerHTML = "";
-  document.getElementById("panelELI12").innerHTML = "";
-  document.getElementById("panelTranslation").innerHTML = "";
-  document.getElementById("panelOCR").className = "output-panel active";
-  document.getElementById("panelELI12").className = "output-panel";
-  document.getElementById("panelTranslation").className = "output-panel";
-
-  setStep(1, "active"); setStep(2, "waiting"); setStep(3, "waiting"); setStep(4, "waiting");
+  const btn=document.getElementById("runBtn");
+  btn.disabled=true; btn.className="run-btn loading";
+  btn.innerHTML='<span class="spinner"></span> Processing...';
+  showProcessing();
 
   try {
     // Step 1: OCR
-    let ocrText = "";
-    if (inputMode === "url") {
-      const url = document.getElementById("urlInput").value.trim();
-      if (!url) throw new Error("נא להזין קישור לתמונה");
-      const r = await fetch("/ocr/url?mode=text", {
-        method: "POST", headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({url})
-      });
-      if (!r.ok) { const e = await r.json(); throw new Error(e.detail || r.statusText); }
-      ocrText = (await r.json()).text;
+    setStep(1,"active");
+    let ocrText="";
+    if (inputMode==="url") {
+      const url=document.getElementById("urlInput").value.trim();
+      if (!url) throw new Error("Please enter an image URL.");
+      const r=await fetch("/ocr/url?mode=text",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});
+      if (!r.ok){const e=await r.json();throw new Error(Array.isArray(e.detail)?e.detail.map(x=>x.msg).join(", "):e.detail);}
+      ocrText=(await r.json()).text;
     } else {
-      if (!selectedFiles.length) throw new Error("נא לבחור קובץ");
-      const fd = new FormData();
-      if (inputMode === "batch") selectedFiles.forEach(f => fd.append("files", f));
-      else fd.append("file", selectedFiles[0]);
-      const endpoint = inputMode === "batch" ? "/ocr/batch" : "/ocr/upload";
-      const r = await fetch(endpoint + "?mode=text", {method:"POST", body:fd});
-      if (!r.ok) { const e = await r.json(); throw new Error(Array.isArray(e.detail) ? e.detail.map(x=>x.msg).join(", ") : e.detail); }
-      const data = await r.json();
-      ocrText = inputMode === "batch" ? data.results.map(r => r.text).join("\\n---\\n") : data.text;
+      if (!selectedFiles.length) throw new Error("Please select an image file.");
+      const fd=new FormData();
+      if (inputMode==="batch") selectedFiles.forEach(f=>fd.append("files",f));
+      else fd.append("file",selectedFiles[0]);
+      const ep=inputMode==="batch"?"/ocr/batch":"/ocr/upload";
+      const r=await fetch(ep+"?mode=text",{method:"POST",body:fd});
+      if (!r.ok){const e=await r.json();throw new Error(Array.isArray(e.detail)?e.detail.map(x=>x.msg).join(", "):e.detail);}
+      const d=await r.json();
+      ocrText=inputMode==="batch"?d.results.map(r=>r.text).join("\\n---\\n"):d.text;
+    }
+    setStep(1,"done"); results.ocr=ocrText;
+    await delay(200); setStep(2,"active");
+    await delay(300); setStep(2,"done");
+
+    if (features.eli12) {
+      setStep(3,"active");
+      const r=await fetch("/ai/eli12",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:ocrText})});
+      if (!r.ok) throw new Error("AI simplification failed.");
+      results.eli12=(await r.json()).result;
+      setStep(3,"done");
     }
 
-    setStep(1, "done"); setStep(2, "active");
-    currentOutput.ocr = ocrText;
-
-    // Step 2: OCR text is already AI-corrected by the backend
-    await new Promise(r => setTimeout(r, 300));
-    setStep(2, "done");
-
-    // Show OCR result
-    showOutput("ocr", ocrText);
-
-    // Step 3: ELI12
-    if (opts.eli12) {
-      setStep(3, "active");
-      const eli12 = await callAI("eli12", ocrText);
-      currentOutput.eli12 = eli12;
-      showOutput("eli12", eli12);
-      setStep(3, "done");
+    if (features.translate) {
+      setStep(4,"active");
+      const lang=document.getElementById("targetLang").value;
+      const src=features.eli12?results.eli12:ocrText;
+      const r=await fetch("/ai/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:src,language:lang})});
+      if (!r.ok) throw new Error("Translation failed.");
+      results.translation=(await r.json()).result;
+      setStep(4,"done");
     }
 
-    // Step 4: Translation
-    if (opts.translate) {
-      setStep(4, "active");
-      const lang = document.getElementById("targetLang").value;
-      const sourceText = opts.eli12 ? currentOutput.eli12 : ocrText;
-      const translation = await callAI("translate", sourceText, lang);
-      currentOutput.translation = translation;
-      showOutput("translation", translation);
-      setStep(4, "done");
-    }
-
-    document.getElementById("processingSteps").style.display = "none";
-    document.getElementById("outputTabs").style.display = "flex";
-
-    // Show first available tab
-    if (opts.translate) switchOutputTab("translation");
-    else if (opts.eli12) switchOutputTab("eli12");
-    else switchOutputTab("ocr");
-
+    renderResults();
   } catch(err) {
-    document.getElementById("panelOCR").innerHTML =
-      `<div class="error-box">⚠️ ${escHtml(err.message)}</div>`;
-    document.getElementById("processingSteps").style.display = "none";
-    document.getElementById("outputTabs").style.display = "flex";
+    document.getElementById("outputBody").innerHTML=`<div class="error-box">⚠ ${escHtml(err.message)}</div>`;
   } finally {
-    btn.disabled = false;
-    btn.innerHTML = "<span>🚀</span> <span>עבד מסמך</span>";
+    btn.disabled=false; btn.className="run-btn";
+    btn.innerHTML="<span>▶</span>&nbsp; Process document";
   }
 }
 
-async function callAI(type, text, lang) {
-  const r = await fetch("/ai/" + type, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({text, language: lang || ""})
+function delay(ms) { return new Promise(r=>setTimeout(r,ms)); }
+
+function showProcessing() {
+  const eli12Visible=features.eli12, transVisible=features.translate;
+  document.getElementById("outputBody").innerHTML=`
+    <div class="processing-card">
+      <div class="proc-title">Processing</div>
+      <div class="proc-step waiting" id="s1"><span class="step-icon">📖</span> OCR extraction</div>
+      <div class="proc-step waiting" id="s2"><span class="step-icon">🤖</span> AI correction</div>
+      ${eli12Visible?'<div class="proc-step waiting" id="s3"><span class="step-icon">🧒</span> Plain language</div>':''}
+      ${transVisible?'<div class="proc-step waiting" id="s4"><span class="step-icon">🌐</span> Translation</div>':''}
+    </div>`;
+  document.getElementById("outputMeta").textContent="";
+  ["tabELI12","tabTranslation"].forEach(id=>{
+    const t=document.getElementById(id);
+    if(t) t.style.display="none";
   });
-  if (!r.ok) {
-    const e = await r.json();
-    throw new Error(e.detail || "שגיאת AI");
-  }
-  return (await r.json()).result;
 }
 
-function showOutput(type, text) {
-  const panel = document.getElementById("panel" + type.charAt(0).toUpperCase() + type.slice(1).replace("12","12"));
-  const tabId = "tab" + type.charAt(0).toUpperCase() + type.slice(1).replace("12","12");
+function setStep(n, state) {
+  const el=document.getElementById("s"+n);
+  if(el) el.className="proc-step "+state;
+}
 
-  // Fix panel id lookup
-  const panelMap = {ocr: "panelOCR", eli12: "panelELI12", translation: "panelTranslation"};
-  const tabMap = {ocr: "tabOCR", eli12: "tabELI12", translation: "tabTranslation"};
-  const p = document.getElementById(panelMap[type]);
-  const t = document.getElementById(tabMap[type]);
-  if (t) t.style.display = "";
+function renderResults() {
+  const tabIds = {ocr:"tabOCR", eli12:"tabELI12", translation:"tabTranslation"};
+  Object.keys(tabIds).forEach(k => {
+    const t=document.getElementById(tabIds[k]);
+    if(t) t.style.display = (k==="ocr"||(k==="eli12"&&features.eli12)||(k==="translation"&&features.translate)) ? "" : "none";
+  });
 
-  const isHe = /[\\u05d0-\\u05ea]/.test(text);
-  p.innerHTML = `
-    <pre class="output-text" style="direction:${isHe?"rtl":"ltr"}">${escHtml(text)}</pre>
+  if (features.translate) switchTab("translation");
+  else if (features.eli12) switchTab("eli12");
+  else switchTab("ocr");
+
+  const words = results.ocr.split(/\\s+/).filter(Boolean).length;
+  document.getElementById("outputMeta").textContent = `${words} words`;
+}
+
+function switchTab(tab) {
+  activeTab=tab;
+  document.querySelectorAll(".output-tab").forEach(t => t.classList.remove("active"));
+  const tabMap={ocr:"tabOCR", eli12:"tabELI12", translation:"tabTranslation"};
+  const activeEl=document.getElementById(tabMap[tab]);
+  if(activeEl) activeEl.classList.add("active");
+
+  const text=results[tab]||"";
+  if (!text) { document.getElementById("outputBody").innerHTML='<div class="placeholder"><div class="placeholder-icon">▤</div><div class="placeholder-title">No output yet</div></div>'; return; }
+
+  const isRtl=/[\\u05d0-\\u05ea\\u0600-\\u06ff]/.test(text);
+  document.getElementById("outputBody").innerHTML=`
+    <pre class="output-text" style="direction:${isRtl?"rtl":"ltr"};text-align:${isRtl?"right":"left"}">${escHtml(text)}</pre>
     <div class="output-actions">
-      <button class="action-btn" onclick="speakText(\\`${escHtml(text).replace(/\\`/g,"\\\\`")}\\`, this)">
-        🔊 האזן
-      </button>
-      <button class="action-btn" onclick="copyText(\\`${escHtml(text).replace(/\\`/g,"\\\\`")}\\`, this)">
-        📋 העתק
-      </button>
+      <button class="out-action-btn" id="speakBtn" onclick="speakText(this, ${JSON.stringify(text)})">🔊 Listen</button>
+      <button class="out-action-btn" onclick="copyText(this, ${JSON.stringify(text)})">📋 Copy</button>
     </div>`;
 }
 
-function switchOutputTab(type) {
-  const panelMap = {ocr: "panelOCR", eli12: "panelELI12", translation: "panelTranslation"};
-  const tabMap = {ocr: "tabOCR", eli12: "tabELI12", translation: "tabTranslation"};
-  Object.keys(panelMap).forEach(k => {
-    document.getElementById(panelMap[k]).className = "output-panel" + (k === type ? " active" : "");
-    const tab = document.getElementById(tabMap[k]);
-    if (tab) tab.classList.toggle("active", k === type);
-  });
-}
-
-function speakText(text, btn) {
-  if (speaking) {
-    window.speechSynthesis.cancel();
-    speaking = false;
-    document.querySelectorAll(".action-btn.speaking").forEach(b => {
-      b.className = "action-btn"; b.textContent = "🔊 האזן";
-    });
-    return;
-  }
-  const isHe = /[\\u05d0-\\u05ea]/.test(text);
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = isHe ? "he-IL" : "en-US";
-  utter.rate = 0.85;
-  utter.onend = () => {
-    speaking = false;
-    btn.className = "action-btn"; btn.innerHTML = "🔊 האזן";
-  };
-  speaking = true;
-  btn.className = "action-btn speaking"; btn.innerHTML = "⏹ עצור";
+function speakText(btn, text) {
+  if(speaking){window.speechSynthesis.cancel();speaking=false;btn.className="out-action-btn";btn.innerHTML="🔊 Listen";return;}
+  const isHe=/[\\u05d0-\\u05ea]/.test(text), isAr=/[\\u0600-\\u06ff]/.test(text);
+  const utter=new SpeechSynthesisUtterance(text);
+  utter.lang=isHe?"he-IL":isAr?"ar-SA":"en-US"; utter.rate=0.88;
+  utter.onend=()=>{speaking=false;btn.className="out-action-btn";btn.innerHTML="🔊 Listen";};
+  speaking=true; btn.className="out-action-btn speaking"; btn.innerHTML="⏹ Stop";
   window.speechSynthesis.speak(utter);
 }
 
-function copyText(text, btn) {
-  navigator.clipboard.writeText(text).then(() => {
-    btn.innerHTML = "✅ הועתק!";
-    setTimeout(() => btn.innerHTML = "📋 העתק", 1500);
-  });
+function copyText(btn, text) {
+  navigator.clipboard.writeText(text).then(()=>{btn.innerHTML="✅ Copied";setTimeout(()=>btn.innerHTML="📋 Copy",1500);});
 }
 
 function resetAll() {
-  selectedFiles = [];
-  document.getElementById("fileInput").value = "";
-  document.getElementById("urlInput").value = "";
-  document.getElementById("thumbRow").innerHTML = "";
-  document.getElementById("outputCard").style.display = "none";
-  currentOutput = {ocr:"", eli12:"", translation:""};
-  if (speaking) { window.speechSynthesis.cancel(); speaking = false; }
+  selectedFiles=[]; results={ocr:"",eli12:"",translation:""};
+  document.getElementById("fileInput").value="";
+  document.getElementById("urlInput").value="";
+  document.getElementById("thumbRow").innerHTML="";
+  document.getElementById("outputBody").innerHTML='<div class="placeholder"><div class="placeholder-icon">▤</div><div class="placeholder-title">No document loaded</div><div class="placeholder-sub">Upload an image or paste a URL, then click Process document to extract text.</div></div>';
+  document.getElementById("outputMeta").textContent="";
+  if(speaking){window.speechSynthesis.cancel();speaking=false;}
 }
 
-function escHtml(s) {
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
+function escHtml(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 </script>
 </body>
 </html>"""
@@ -890,540 +784,3 @@ function escHtml(s) {
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
 async def serve_ui():
     return HTMLResponse(_UI_HTML)
-
-
-_LANDING = """<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SimpliScan — OCR API for Everyone</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-:root {
-  --ink: #0d0d0d;
-  --ink2: #3a3a3a;
-  --muted: #888;
-  --bg: #fafaf8;
-  --surface: #ffffff;
-  --border: #e8e4dc;
-  --accent: #1a6b4a;
-  --accent2: #e85d2f;
-  --accent-light: #e8f5ee;
-  --radius: 16px;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
-/* NAV */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  display: flex; align-items: center; padding: 18px 60px;
-  background: rgba(250,250,248,0.92); backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-}
-.nav-logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--ink); text-decoration: none; }
-.nav-logo span { color: var(--accent); }
-.nav-links { display: flex; gap: 32px; margin: 0 auto; }
-.nav-links a { font-size: 14px; font-weight: 500; color: var(--ink2); text-decoration: none; transition: color .15s; }
-.nav-links a:hover { color: var(--accent); }
-.nav-cta {
-  background: var(--ink); color: #fff; padding: 10px 22px;
-  border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none;
-  transition: background .15s;
-}
-.nav-cta:hover { background: var(--accent); }
-
-/* HERO */
-.hero {
-  padding: 160px 60px 100px;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
-  max-width: 1200px; margin: 0 auto;
-}
-.hero-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: var(--accent-light); color: var(--accent);
-  padding: 6px 14px; border-radius: 100px; font-size: 13px; font-weight: 500;
-  margin-bottom: 24px; border: 1px solid #b8dfc9;
-}
-.hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
-.hero h1 {
-  font-family: 'Syne', sans-serif;
-  font-size: 58px; font-weight: 800; line-height: 1.08;
-  letter-spacing: -1.5px; margin-bottom: 24px;
-}
-.hero h1 em { font-style: normal; color: var(--accent); }
-.hero p {
-  font-size: 18px; color: var(--ink2); line-height: 1.7;
-  margin-bottom: 40px; max-width: 480px;
-}
-.hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
-.btn-primary {
-  background: var(--accent); color: #fff;
-  padding: 14px 28px; border-radius: 10px;
-  font-size: 16px; font-weight: 500; text-decoration: none;
-  transition: all .15s; display: inline-flex; align-items: center; gap: 8px;
-}
-.btn-primary:hover { background: #14543a; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(26,107,74,0.25); }
-.btn-secondary {
-  background: var(--surface); color: var(--ink);
-  padding: 14px 28px; border-radius: 10px; border: 1.5px solid var(--border);
-  font-size: 16px; font-weight: 500; text-decoration: none;
-  transition: all .15s; display: inline-flex; align-items: center; gap: 8px;
-}
-.btn-secondary:hover { border-color: var(--ink); transform: translateY(-1px); }
-
-/* Demo window */
-.demo-window {
-  background: var(--surface); border-radius: var(--radius);
-  border: 1.5px solid var(--border); overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.08);
-}
-.demo-bar {
-  background: #f0ede6; padding: 12px 16px;
-  display: flex; align-items: center; gap: 8px;
-  border-bottom: 1px solid var(--border);
-}
-.demo-dot { width: 10px; height: 10px; border-radius: 50%; }
-.demo-body { padding: 24px; font-family: 'DM Sans', monospace; font-size: 13px; }
-.demo-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 8px; }
-.demo-img-placeholder {
-  background: #f5f2eb; border-radius: 8px;
-  height: 80px; margin-bottom: 16px;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--muted); font-size: 13px; border: 1.5px dashed var(--border);
-}
-.demo-arrow { text-align: center; color: var(--accent); font-size: 18px; margin: 8px 0; }
-.demo-output {
-  background: var(--accent-light); border-radius: 8px;
-  padding: 14px 16px; border: 1px solid #b8dfc9;
-}
-.demo-output-text { font-size: 13px; line-height: 1.8; color: var(--ink); }
-.demo-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-.demo-tag {
-  background: #fff; border: 1px solid #b8dfc9;
-  border-radius: 6px; padding: 3px 10px; font-size: 11px;
-  color: var(--accent); font-weight: 500;
-}
-
-/* STATS */
-.stats-bar {
-  background: var(--ink); color: #fff;
-  display: grid; grid-template-columns: repeat(4, 1fr);
-  max-width: 1200px; margin: 0 auto 80px; border-radius: var(--radius);
-}
-.stat { padding: 40px 32px; border-right: 1px solid rgba(255,255,255,0.1); }
-.stat:last-child { border-right: none; }
-.stat-num { font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 800; line-height: 1; margin-bottom: 8px; }
-.stat-num span { color: var(--accent2); }
-.stat-label { font-size: 14px; color: rgba(255,255,255,0.6); }
-
-/* FEATURES */
-.section { max-width: 1200px; margin: 0 auto 100px; padding: 0 60px; }
-.section-header { margin-bottom: 56px; }
-.section-eyebrow {
-  font-size: 12px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: .12em; color: var(--accent); margin-bottom: 16px;
-}
-.section-title {
-  font-family: 'Syne', sans-serif; font-size: 42px;
-  font-weight: 800; line-height: 1.15; letter-spacing: -1px;
-}
-.section-sub { font-size: 18px; color: var(--ink2); margin-top: 12px; max-width: 560px; }
-
-.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-.feature-card {
-  background: var(--surface); border-radius: var(--radius);
-  border: 1.5px solid var(--border); padding: 32px 28px;
-  transition: all .2s;
-}
-.feature-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.06); }
-.feature-icon {
-  width: 48px; height: 48px; border-radius: 12px;
-  background: var(--accent-light); display: flex; align-items: center;
-  justify-content: center; font-size: 22px; margin-bottom: 20px;
-}
-.feature-card h3 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 10px; }
-.feature-card p { font-size: 14px; color: var(--ink2); line-height: 1.7; }
-
-/* HOW IT WORKS */
-.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
-.steps::before {
-  content: ''; position: absolute;
-  top: 28px; left: 10%; right: 10%;
-  height: 1.5px; background: var(--border);
-}
-.step { text-align: center; padding: 0 16px; }
-.step-num {
-  width: 56px; height: 56px; border-radius: 50%;
-  background: var(--surface); border: 2px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800;
-  margin: 0 auto 20px; position: relative; z-index: 1; color: var(--accent);
-}
-.step h3 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 8px; }
-.step p { font-size: 13px; color: var(--ink2); line-height: 1.6; }
-
-/* LANGUAGES */
-.lang-grid { display: flex; flex-wrap: wrap; gap: 12px; }
-.lang-pill {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 100px; padding: 8px 20px; font-size: 14px; font-weight: 500;
-  display: flex; align-items: center; gap: 8px; transition: all .15s;
-}
-.lang-pill:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-.lang-flag { font-size: 18px; }
-
-/* USE CASES */
-.use-cases { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.use-case {
-  background: var(--surface); border-radius: var(--radius);
-  border: 1.5px solid var(--border); padding: 32px;
-  display: flex; gap: 20px; align-items: flex-start;
-  transition: all .2s;
-}
-.use-case:hover { border-color: var(--accent); box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
-.use-case-icon {
-  font-size: 32px; flex-shrink: 0;
-  width: 56px; height: 56px; background: var(--accent-light);
-  border-radius: 12px; display: flex; align-items: center; justify-content: center;
-}
-.use-case h3 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-.use-case p { font-size: 14px; color: var(--ink2); line-height: 1.7; }
-
-/* CTA */
-.cta-section {
-  background: var(--ink); border-radius: 24px;
-  max-width: 1200px; margin: 0 auto 100px; padding: 80px 60px;
-  display: grid; grid-template-columns: 1fr auto; gap: 60px; align-items: center;
-  position: relative; overflow: hidden;
-}
-.cta-section::before {
-  content: ''; position: absolute;
-  width: 400px; height: 400px; border-radius: 50%;
-  background: rgba(26,107,74,0.2); top: -100px; right: -100px;
-}
-.cta-section::after {
-  content: ''; position: absolute;
-  width: 200px; height: 200px; border-radius: 50%;
-  background: rgba(232,93,47,0.15); bottom: -60px; left: 200px;
-}
-.cta-section h2 {
-  font-family: 'Syne', sans-serif; font-size: 46px;
-  font-weight: 800; color: #fff; line-height: 1.1;
-  letter-spacing: -1px; position: relative; z-index: 1;
-}
-.cta-section h2 em { font-style: normal; color: #6ee7b7; }
-.cta-section p { color: rgba(255,255,255,0.65); font-size: 16px; margin-top: 14px; position: relative; z-index: 1; }
-.cta-btns { display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; }
-.cta-btn-main {
-  background: var(--accent2); color: #fff;
-  padding: 16px 32px; border-radius: 10px;
-  font-size: 16px; font-weight: 500; text-decoration: none;
-  text-align: center; white-space: nowrap; transition: all .15s;
-}
-.cta-btn-main:hover { background: #c94d24; }
-.cta-btn-docs {
-  background: rgba(255,255,255,0.1); color: #fff;
-  padding: 14px 32px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2);
-  font-size: 15px; font-weight: 500; text-decoration: none;
-  text-align: center; transition: all .15s;
-}
-.cta-btn-docs:hover { background: rgba(255,255,255,0.2); }
-
-/* FOOTER */
-footer {
-  border-top: 1px solid var(--border);
-  padding: 40px 60px; max-width: 1200px; margin: 0 auto;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.footer-logo { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; }
-.footer-logo span { color: var(--accent); }
-.footer-links { display: flex; gap: 24px; }
-.footer-links a { font-size: 13px; color: var(--muted); text-decoration: none; }
-.footer-links a:hover { color: var(--ink); }
-
-/* ANIMATIONS */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.fade-up { animation: fadeUp .6s ease forwards; }
-.fade-up-2 { animation: fadeUp .6s .1s ease forwards; opacity: 0; }
-.fade-up-3 { animation: fadeUp .6s .2s ease forwards; opacity: 0; }
-.fade-up-4 { animation: fadeUp .6s .3s ease forwards; opacity: 0; }
-
-@media (max-width: 900px) {
-  nav { padding: 16px 24px; }
-  .nav-links { display: none; }
-  .hero { grid-template-columns: 1fr; padding: 120px 24px 60px; gap: 48px; }
-  .hero h1 { font-size: 40px; }
-  .stats-bar { grid-template-columns: repeat(2,1fr); margin: 0 24px 60px; }
-  .section { padding: 0 24px; }
-  .features-grid { grid-template-columns: 1fr; }
-  .steps { grid-template-columns: repeat(2,1fr); }
-  .steps::before { display: none; }
-  .use-cases { grid-template-columns: 1fr; }
-  .cta-section { grid-template-columns: 1fr; padding: 48px 32px; margin: 0 24px 60px; }
-  footer { padding: 32px 24px; flex-direction: column; gap: 16px; }
-}
-</style>
-</head>
-<body>
-
-<nav>
-  <a href="#" class="nav-logo">Simpli<span>Scan</span></a>
-  <div class="nav-links">
-    <a href="#features">Features</a>
-    <a href="#how">How it works</a>
-    <a href="#languages">Languages</a>
-    <a href="#usecases">Use cases</a>
-  </div>
-  <a href="https://ocr-service-4e7i.onrender.com" class="nav-cta" target="_blank">Try it free →</a>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <div>
-    <div class="hero-badge fade-up">
-      <span class="hero-badge-dot"></span>
-      Now with Claude AI correction
-    </div>
-    <h1 class="fade-up-2">OCR that actually <em>understands</em> your documents</h1>
-    <p class="fade-up-3">Extract, simplify, and translate text from any image — in Hebrew, English, Arabic, and more. Built for seniors, immigrants, and anyone facing a complex document.</p>
-    <div class="hero-btns fade-up-4">
-      <a href="https://ocr-service-4e7i.onrender.com" class="btn-primary" target="_blank">🚀 Try it live</a>
-      <a href="https://ocr-service-4e7i.onrender.com/docs" class="btn-secondary" target="_blank">📖 API docs</a>
-    </div>
-  </div>
-  <div class="demo-window fade-up-3">
-    <div class="demo-bar">
-      <div class="demo-dot" style="background:#ff5f56"></div>
-      <div class="demo-dot" style="background:#ffbd2e"></div>
-      <div class="demo-dot" style="background:#27c93f"></div>
-      <span style="margin-right:auto;margin-left:12px;font-size:12px;color:#888">simpliscan.app</span>
-    </div>
-    <div class="demo-body">
-      <div class="demo-label">Input — government letter (image)</div>
-      <div class="demo-img-placeholder">📄 מכתב מביטוח לאומי — תמונה</div>
-      <div class="demo-arrow">↓ OCR + AI simplification</div>
-      <div class="demo-output">
-        <div class="demo-label">Output — simplified text</div>
-        <div class="demo-output-text">
-          קיבלת הודעה מביטוח לאומי.<br>
-          עליך לשלם <strong>₪340</strong> עד לתאריך <strong>15.04.2026</strong>.<br>
-          לתשלום — לחץ כאן או התקשר: <strong>*6050</strong>
-        </div>
-        <div class="demo-tags">
-          <span class="demo-tag">✓ Hebrew OCR</span>
-          <span class="demo-tag">✓ AI simplified</span>
-          <span class="demo-tag">✓ Key dates extracted</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- STATS -->
-<div style="max-width:1200px;margin:0 auto 80px;padding:0 60px;">
-  <div class="stats-bar">
-    <div class="stat">
-      <div class="stat-num">99<span>%</span></div>
-      <div class="stat-label">Hebrew + English accuracy</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">8<span>+</span></div>
-      <div class="stat-label">Languages supported</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">3<span>s</span></div>
-      <div class="stat-label">Average processing time</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">$0</div>
-      <div class="stat-label">Free to use — no signup</div>
-    </div>
-  </div>
-</div>
-
-<!-- FEATURES -->
-<section class="section" id="features">
-  <div class="section-header">
-    <div class="section-eyebrow">Features</div>
-    <h2 class="section-title">Everything you need to read any document</h2>
-    <p class="section-sub">From raw scanning to AI explanation — one platform handles it all.</p>
-  </div>
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">📖</div>
-      <h3>Smart OCR</h3>
-      <p>Advanced text recognition using Tesseract with custom Hebrew preprocessing. Handles skewed, low-res, and noisy scans.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🤖</div>
-      <h3>AI correction</h3>
-      <p>Claude AI automatically fixes garbled characters, fills in missing words, and reconstructs damaged text from context.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🧒</div>
-      <h3>Explain like I'm 12</h3>
-      <p>Complex legal, medical, or bureaucratic language translated into plain, simple sentences anyone can understand.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🌐</div>
-      <h3>Instant translation</h3>
-      <p>Translate extracted text into Hebrew, English, Arabic, Russian, French, Spanish, Amharic, and Tigrinya.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🔊</div>
-      <h3>Text-to-speech</h3>
-      <p>Listen to your document read aloud. Auto-detects language and uses the correct voice for Hebrew or English.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📦</div>
-      <h3>Batch processing</h3>
-      <p>Upload up to 20 images at once. Process entire document folders in a single API call or drag-and-drop session.</p>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="section" id="how">
-  <div class="section-header">
-    <div class="section-eyebrow">How it works</div>
-    <h2 class="section-title">From image to understanding in seconds</h2>
-  </div>
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <h3>Upload</h3>
-      <p>Drop an image, paste a URL, or send via API. Supports JPEG, PNG, WEBP, TIFF, BMP.</p>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <h3>Extract</h3>
-      <p>Tesseract OCR reads the text. Hebrew and English are processed simultaneously.</p>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <h3>Enhance</h3>
-      <p>Claude AI fixes errors, simplifies language, and optionally translates — all automatically.</p>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <h3>Use</h3>
-      <p>Copy the text, listen via TTS, or receive clean JSON via the REST API.</p>
-    </div>
-  </div>
-</section>
-
-<!-- LANGUAGES -->
-<section class="section" id="languages">
-  <div class="section-header">
-    <div class="section-eyebrow">Languages</div>
-    <h2 class="section-title">Built for a multilingual world</h2>
-    <p class="section-sub">Native support for Hebrew and English OCR, with AI translation into 8 languages.</p>
-  </div>
-  <div class="lang-grid">
-    <div class="lang-pill"><span class="lang-flag">🇮🇱</span> עברית — OCR + Translation</div>
-    <div class="lang-pill"><span class="lang-flag">🇺🇸</span> English — OCR + Translation</div>
-    <div class="lang-pill"><span class="lang-flag">🇸🇦</span> عربي — Translation</div>
-    <div class="lang-pill"><span class="lang-flag">🇷🇺</span> Русский — Translation</div>
-    <div class="lang-pill"><span class="lang-flag">🇫🇷</span> Français — Translation</div>
-    <div class="lang-pill"><span class="lang-flag">🇪🇸</span> Español — Translation</div>
-    <div class="lang-pill"><span class="lang-flag">🇪🇹</span> አማርኛ — Translation</div>
-    <div class="lang-pill"><span class="lang-flag">🇪🇷</span> ትግርኛ — Translation</div>
-  </div>
-</section>
-
-<!-- USE CASES -->
-<section class="section" id="usecases">
-  <div class="section-header">
-    <div class="section-eyebrow">Use cases</div>
-    <h2 class="section-title">Who it's built for</h2>
-  </div>
-  <div class="use-cases">
-    <div class="use-case">
-      <div class="use-case-icon">👴</div>
-      <div>
-        <h3>Senior citizens</h3>
-        <p>Scan a letter from Bituach Leumi, get a plain-language explanation read aloud. No tech skills required.</p>
-      </div>
-    </div>
-    <div class="use-case">
-      <div class="use-case-icon">✈️</div>
-      <div>
-        <h3>New immigrants</h3>
-        <p>Understand official Israeli documents in your native language — Arabic, Russian, Amharic, or English.</p>
-      </div>
-    </div>
-    <div class="use-case">
-      <div class="use-case-icon">⚖️</div>
-      <div>
-        <h3>Legal & bureaucratic documents</h3>
-        <p>Dense government letters, rental contracts, or medical forms simplified into plain, actionable language.</p>
-      </div>
-    </div>
-    <div class="use-case">
-      <div class="use-case-icon">🏥</div>
-      <div>
-        <h3>Medical documents</h3>
-        <p>Extract and explain diagnoses, prescriptions, and discharge letters in simple terms patients can understand.</p>
-      </div>
-    </div>
-    <div class="use-case">
-      <div class="use-case-icon">🎓</div>
-      <div>
-        <h3>Academic articles</h3>
-        <p>Scan research papers and get a plain-language summary — perfect for students or curious readers.</p>
-      </div>
-    </div>
-    <div class="use-case">
-      <div class="use-case-icon">🏢</div>
-      <div>
-        <h3>Developers & businesses</h3>
-        <p>REST API with JSON output. Integrate document understanding into any app in minutes.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<div style="padding:0 60px;">
-  <div class="cta-section">
-    <div>
-      <h2>Ready to make documents <em>accessible</em> to everyone?</h2>
-      <p>Free to use. No account required. Deployed and ready now.</p>
-    </div>
-    <div class="cta-btns">
-      <a href="https://ocr-service-4e7i.onrender.com" class="cta-btn-main" target="_blank">Open the app →</a>
-      <a href="https://ocr-service-4e7i.onrender.com/docs" class="cta-btn-docs" target="_blank">View API docs</a>
-    </div>
-  </div>
-</div>
-
-<footer>
-  <div class="footer-logo">Simpli<span>Scan</span></div>
-  <div class="footer-links">
-    <a href="https://ocr-service-4e7i.onrender.com">App</a>
-    <a href="https://ocr-service-4e7i.onrender.com/docs">API</a>
-    <a href="https://github.com/gilbartor-glitch/ocr-service">GitHub</a>
-  </div>
-</footer>
-
-</body>
-</html>
-"""
-
-@app.get("/landing", include_in_schema=False, response_class=HTMLResponse)
-async def serve_landing():
-    return HTMLResponse(_LANDING)
