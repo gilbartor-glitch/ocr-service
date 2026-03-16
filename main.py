@@ -262,13 +262,13 @@ _UI_HTML = """<!DOCTYPE html>
 <title>SimpliScan</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0c0c0c;--bg2:#141414;--bg3:#1c1c1c;--border:#2a2a2a;--border2:#383838;--text:#f0f0f0;--text2:#999;--text3:#555;--green:#00c875;--green-dim:#003d21;--r:12px;--fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif}
+:root{--bg:#0c0c0c;--bg2:#141414;--bg3:#1c1c1c;--border:#2a2a2a;--border2:#383838;--text:#f0f0f0;--text2:#999;--text3:#555;--green:#00c875;--gdim:#003d21;--r:12px}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:15px;min-height:100vh}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;min-height:100vh}
 nav{display:flex;align-items:center;padding:0 40px;height:60px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100}
-.logo{font-family:var(--fd);font-size:18px;font-weight:800}
+.logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:800}
 .logo em{font-style:normal;color:var(--green)}
-.nstat{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.nst{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--text3)}
 .dot.on{background:var(--green);box-shadow:0 0 8px var(--green)}
 .nlink{margin-left:20px;font-size:12px;color:var(--text2);text-decoration:none;padding:5px 12px;border:1px solid var(--border2);border-radius:6px}
@@ -277,76 +277,74 @@ nav{display:flex;align-items:center;padding:0 40px;height:60px;border-bottom:1px
 .left{border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2)}
 .sec{border-bottom:1px solid var(--border);padding:20px 24px}
 .sec.grow{border-bottom:none;flex:1;display:flex;flex-direction:column}
-.lbl{font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:14px}
+.lbl{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:14px}
 .tabs{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px;gap:2px}
 .tab{flex:1;padding:8px;text-align:center;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;border-radius:6px;border:none;background:transparent;transition:all .15s}
 .tab.active{background:var(--bg3);color:var(--green);border:1px solid var(--border2)}
 .dz{flex:1;border:1px dashed var(--border2);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .2s;position:relative;min-height:160px;background:var(--bg)}
 .dz:hover,.dz.over{border-color:var(--green);background:rgba(0,200,117,.03)}
 .dz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.dz-icon{font-size:28px;opacity:.4;pointer-events:none}
-.dz-text{font-size:13px;font-weight:500;color:var(--text2);pointer-events:none}
-.dz-hint{font-size:11px;color:var(--text3);pointer-events:none}
+.dzi{font-size:28px;opacity:.4;pointer-events:none}
+.dzt{font-size:13px;font-weight:500;color:var(--text2);pointer-events:none}
+.dzh{font-size:11px;color:var(--text3);pointer-events:none}
 .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .thumb{width:56px;height:56px;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
 .thumb img{width:100%;height:100%;object-fit:cover}
-.urlin{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-family:var(--fb);font-size:13px;color:var(--text);outline:none}
+.urlin{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);outline:none}
 .urlin:focus{border-color:var(--green)}
 .urlin::placeholder{color:var(--text3)}
-.toggles{display:flex;flex-direction:column;gap:8px}
-.tog{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s}
+.togs{display:flex;flex-direction:column;gap:8px}
+.tog{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer}
 .tog.on{border-color:var(--green);background:rgba(0,200,117,.04)}
 .tlbl{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500}
 .tdesc{font-size:11px;color:var(--text3);margin-top:2px}
 .sw{width:34px;height:19px;border-radius:10px;background:var(--bg3);border:1px solid var(--border2);position:relative;transition:all .2s;flex-shrink:0}
 .sw::after{content:'';position:absolute;width:13px;height:13px;background:var(--text3);border-radius:50%;top:2px;left:2px;transition:all .2s}
-.tog.on .sw{background:var(--green-dim);border-color:var(--green)}
+.tog.on .sw{background:var(--gdim);border-color:var(--green)}
 .tog.on .sw::after{background:var(--green);left:17px}
 .lrow{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px}
 .llbl{font-size:12px;color:var(--text2);white-space:nowrap}
-.lsel{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--fb);font-size:13px;outline:none;cursor:pointer}
+.lsel{flex:1;background:transparent;border:none;color:var(--text);font-size:13px;outline:none;cursor:pointer}
 .lsel option{background:var(--bg2)}
-.runbtn{width:100%;padding:13px;background:var(--green);color:#000;border:none;border-radius:var(--r);font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.runbtn{width:100%;padding:13px;background:var(--green);color:#000;border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
 .runbtn:hover{background:#00e688}
 .runbtn:disabled{background:var(--bg3);color:var(--text3);cursor:not-allowed}
 .abts{display:flex;gap:8px;margin-top:8px}
-.abt{flex:1;padding:9px;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:8px;font-family:var(--fb);font-size:12px;cursor:pointer;transition:all .15s}
+.abt{flex:1;padding:9px;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer}
 .abt:hover{border-color:var(--border2);color:var(--text)}
 .right{display:flex;flex-direction:column;background:var(--bg)}
 .ohdr{border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;height:48px}
-.otab{height:100%;padding:0 16px;font-family:var(--fb);font-size:11px;font-weight:500;color:var(--text3);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;letter-spacing:.06em;text-transform:uppercase}
+.otab{height:100%;padding:0 16px;font-size:11px;font-weight:500;color:var(--text3);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;letter-spacing:.06em;text-transform:uppercase}
 .otab.active{color:var(--green);border-bottom-color:var(--green)}
 .ometa{margin-left:auto;font-size:11px;color:var(--text3)}
 .obody{flex:1;overflow-y:auto;padding:32px}
 .obody::-webkit-scrollbar{width:4px}
 .obody::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.otext{font-family:var(--fb);font-size:15px;line-height:1.9;color:var(--text)}
+.otext{font-size:15px;line-height:1.9;color:var(--text)}
 .oacts{display:flex;gap:10px;margin-top:20px;padding-top:18px;border-top:1px solid var(--border)}
-.oabtn{padding:8px 16px;background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:8px;font-family:var(--fb);font-size:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
+.oabtn{padding:8px 16px;background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px}
 .oabtn:hover{border-color:var(--green);color:var(--green)}
-.oabtn.spk{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+.oabtn.spk{background:var(--gdim);color:var(--green);border-color:var(--green)}
 .ph{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;color:var(--text3);text-align:center}
 .ph-icon{font-size:44px;opacity:.25}
-.ph-title{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--text2)}
+.ph-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text2)}
 .ph-sub{font-size:13px;line-height:1.6;max-width:300px}
 .err{background:rgba(255,60,60,.06);border:1px solid rgba(255,60,60,.2);border-radius:var(--r);padding:16px;font-size:13px;color:#ff6b6b;line-height:1.6}
 .pcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:24px;max-width:380px;margin:0 auto}
-.ptitle{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:18px}
+.ptitle{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:18px}
 .pstep{display:flex;align-items:center;gap:12px;padding:10px 0;font-size:13px}
 .pstep+.pstep{border-top:1px solid var(--border)}
-.pstep.done{color:var(--green)}
-.pstep.active{color:var(--text)}
-.pstep.waiting{color:var(--text3)}
+.pstep.done{color:var(--green)}.pstep.active{color:var(--text)}.pstep.waiting{color:var(--text3)}
 .si{font-size:15px;width:24px;text-align:center}
 @keyframes spin{to{transform:rotate(360deg)}}
-.spin{display:inline-block;width:13px;height:13px;border:2px solid var(--green-dim);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid var(--gdim);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
 @media(max-width:800px){.wrap{grid-template-columns:1fr}.left{border-right:none;border-bottom:1px solid var(--border)}nav{padding:0 16px}}
 </style>
 </head>
 <body>
 <nav>
   <span class="logo">Simpli<em>Scan</em></span>
-  <div class="nstat"><span class="dot" id="dot"></span><span id="sl">Connecting</span></div>
+  <div class="nst"><span class="dot" id="dot"></span><span id="sl">Connecting</span></div>
   <a href="/landing" class="nlink">About</a>
 </nav>
 <div class="wrap">
@@ -354,18 +352,18 @@ nav{display:flex;align-items:center;padding:0 40px;height:60px;border-bottom:1px
     <div class="sec">
       <div class="lbl">Input mode</div>
       <div class="tabs">
-        <button class="tab active" onclick="setMode('upload')">Upload</button>
-        <button class="tab" onclick="setMode('batch')">Batch</button>
-        <button class="tab" onclick="setMode('url')">URL</button>
+        <button class="tab active" id="tabUp" onclick="setMode('upload')">Upload</button>
+        <button class="tab" id="tabBa" onclick="setMode('batch')">Batch</button>
+        <button class="tab" id="tabUr" onclick="setMode('url')">URL</button>
       </div>
     </div>
     <div class="sec grow" id="upSec">
       <div class="lbl">Document</div>
       <div class="dz" id="dz" ondragover="dzOver(event)" ondragleave="dzLeave()" ondrop="dzDrop(event)">
         <input type="file" id="fileIn" accept="image/*" onchange="fileChange(event)"/>
-        <div class="dz-icon">&#x2317;</div>
-        <div class="dz-text">Drop image here or click to browse</div>
-        <div class="dz-hint">JPEG &middot; PNG &middot; WEBP &middot; TIFF &middot; BMP</div>
+        <div class="dzi">&#x2317;</div>
+        <div class="dzt">Drop image here or click to browse</div>
+        <div class="dzh">JPEG &middot; PNG &middot; WEBP &middot; TIFF &middot; BMP</div>
       </div>
       <div class="thumbs" id="thumbs"></div>
     </div>
@@ -375,7 +373,7 @@ nav{display:flex;align-items:center;padding:0 40px;height:60px;border-bottom:1px
     </div>
     <div class="sec">
       <div class="lbl">AI features</div>
-      <div class="toggles">
+      <div class="togs">
         <div class="tog on" style="cursor:default">
           <div><div class="tlbl">&#x1F4D6; OCR extraction</div><div class="tdesc">Always on</div></div>
           <div class="sw"></div>
@@ -392,18 +390,18 @@ nav{display:flex;align-items:center;padding:0 40px;height:60px;border-bottom:1px
       <div class="lrow" id="lrow" style="display:none">
         <span class="llbl">Translate to</span>
         <select class="lsel" id="langSel">
-          <option value="Hebrew">&#x05E2;&#x05D1;&#x05E8;&#x05D9;&#x05EA; Hebrew</option>
+          <option value="Hebrew">Hebrew</option>
           <option value="English">English</option>
-          <option value="Arabic">&#x0639;&#x0631;&#x0628;&#x064A; Arabic</option>
-          <option value="Russian">&#x0420;&#x0443;&#x0441;&#x0441;&#x043A;&#x0438;&#x0439; Russian</option>
-          <option value="French">Fran&#xe7;ais French</option>
-          <option value="Spanish">Espa&#xf1;ol Spanish</option>
-          <option value="Amharic">&#x12A0;&#x121B;&#x122D;&#x129B; Amharic</option>
+          <option value="Arabic">Arabic</option>
+          <option value="Russian">Russian</option>
+          <option value="French">French</option>
+          <option value="Spanish">Spanish</option>
+          <option value="Amharic">Amharic</option>
         </select>
       </div>
     </div>
     <div class="sec">
-      <button class="runbtn" id="runBtn" onclick="doRun()">&#x25B6; &nbsp;Process document</button>
+      <button class="runbtn" id="runBtn" onclick="doRun()">&#x25B6; Process document</button>
       <div class="abts">
         <button class="abt" onclick="doReset()">Reset</button>
         <button class="abt" onclick="location.reload()">Refresh</button>
@@ -412,9 +410,9 @@ nav{display:flex;align-items:center;padding:0 40px;height:60px;border-bottom:1px
   </div>
   <div class="right">
     <div class="ohdr">
-      <button class="otab active" onclick="showTab('ocr')" id="tab0">Extracted text</button>
-      <button class="otab" onclick="showTab('eli12')" id="tab1" style="display:none">Plain language</button>
-      <button class="otab" onclick="showTab('translation')" id="tab2" style="display:none">Translation</button>
+      <button class="otab active" id="tab0" onclick="showTab('ocr')">Extracted text</button>
+      <button class="otab" id="tab1" onclick="showTab('eli12')" style="display:none">Plain language</button>
+      <button class="otab" id="tab2" onclick="showTab('translation')" style="display:none">Translation</button>
       <span class="ometa" id="meta"></span>
     </div>
     <div class="obody" id="outBody">
@@ -423,138 +421,130 @@ nav{display:flex;align-items:center;padding:0 40px;height:60px;border-bottom:1px
   </div>
 </div>
 <script>
-var mode='upload', selFiles=[], feats={eli12:false,translate:false}, out={ocr:'',eli12:'',translation:''}, isSpeaking=false, curTab='ocr';
-
+var mode='upload',selFiles=[],feats={eli12:false,translate:false},out={ocr:'',eli12:'',translation:''},isSpeaking=false,curTab='ocr';
 fetch('/health').then(function(r){if(r.ok){document.getElementById('dot').className='dot on';document.getElementById('sl').textContent='Online';}}).catch(function(){});
-
 function setMode(m){
   mode=m;
-  var tabs=document.querySelectorAll('.tab');
-  tabs[0].classList.toggle('active',m==='upload');
-  tabs[1].classList.toggle('active',m==='batch');
-  tabs[2].classList.toggle('active',m==='url');
+  document.getElementById('tabUp').classList.toggle('active',m==='upload');
+  document.getElementById('tabBa').classList.toggle('active',m==='batch');
+  document.getElementById('tabUr').classList.toggle('active',m==='url');
   document.getElementById('upSec').style.display=m!=='url'?'flex':'none';
   document.getElementById('urlSec').style.display=m==='url'?'':'none';
   document.getElementById('fileIn').multiple=(m==='batch');
-  selFiles=[]; renderThumbs();
+  selFiles=[];renderThumbs();
 }
-
 function togFeat(k){
   feats[k]=!feats[k];
   document.getElementById(k==='eli12'?'togELI':'togTR').classList.toggle('on',feats[k]);
-  if(k==='translate') document.getElementById('lrow').style.display=feats.translate?'flex':'none';
+  if(k==='translate')document.getElementById('lrow').style.display=feats.translate?'flex':'none';
 }
-
-function fileChange(e){ selFiles=Array.from(e.target.files); renderThumbs(); }
-function dzOver(e){ e.preventDefault(); document.getElementById('dz').classList.add('over'); }
-function dzLeave(){ document.getElementById('dz').classList.remove('over'); }
+function fileChange(e){selFiles=Array.from(e.target.files);renderThumbs();}
+function dzOver(e){e.preventDefault();document.getElementById('dz').classList.add('over');}
+function dzLeave(){document.getElementById('dz').classList.remove('over');}
 function dzDrop(e){
-  e.preventDefault(); document.getElementById('dz').classList.remove('over');
+  e.preventDefault();document.getElementById('dz').classList.remove('over');
   selFiles=Array.from(e.dataTransfer.files).filter(function(f){return f.type.indexOf('image/')===0;});
   renderThumbs();
 }
 function renderThumbs(){
-  var row=document.getElementById('thumbs'); row.innerHTML='';
+  var row=document.getElementById('thumbs');row.innerHTML='';
   selFiles.slice(0,8).forEach(function(f){
-    var d=document.createElement('div'); d.className='thumb';
-    var i=document.createElement('img'); i.src=URL.createObjectURL(f);
-    d.appendChild(i); row.appendChild(d);
+    var d=document.createElement('div');d.className='thumb';
+    var i=document.createElement('img');i.src=URL.createObjectURL(f);
+    d.appendChild(i);row.appendChild(d);
   });
 }
-
 function doRun(){
   var btn=document.getElementById('runBtn');
-  btn.disabled=true; btn.innerHTML='<span class="spin"></span> Processing...';
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Processing...';
   showProcessing();
-  doRunAsync().catch(function(e){
+  runAsync().catch(function(e){
     document.getElementById('outBody').innerHTML='<div class="err">&#x26A0; '+esc(e.message)+'</div>';
   }).finally(function(){
-    btn.disabled=false; btn.innerHTML='&#x25B6; &nbsp;Process document';
+    btn.disabled=false;btn.innerHTML='&#x25B6; Process document';
   });
 }
-
-async function doRunAsync(){
+async function runAsync(){
   setStep(1,'active');
   var txt='';
   if(mode==='url'){
     var u=document.getElementById('urlIn').value.trim();
-    if(!u) throw new Error('Please enter an image URL.');
+    if(!u)throw new Error('Please enter an image URL.');
     var r=await fetch('/ocr/url?mode=text',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:u})});
     if(!r.ok){var e=await r.json();throw new Error(e.detail||r.statusText);}
     txt=(await r.json()).text;
   } else {
-    if(!selFiles.length) throw new Error('Please select an image file.');
+    if(!selFiles.length)throw new Error('Please select an image file.');
     var fd=new FormData();
-    if(mode==='batch') selFiles.forEach(function(f){fd.append('files',f);});
+    if(mode==='batch')selFiles.forEach(function(f){fd.append('files',f);});
     else fd.append('file',selFiles[0]);
     var ep=mode==='batch'?'/ocr/batch':'/ocr/upload';
     var r=await fetch(ep+'?mode=text',{method:'POST',body:fd});
     if(!r.ok){var e=await r.json();throw new Error(Array.isArray(e.detail)?e.detail.map(function(x){return x.msg;}).join(', '):e.detail);}
     var d=await r.json();
-    txt=mode==='batch'?d.results.map(function(x){return x.text;}).join('\\n---\\n'):d.text;
+    txt=mode==='batch'?d.results.map(function(x){return x.text;}).join('
+---
+'):d.text;
   }
-  setStep(1,'done'); out.ocr=txt;
-  await sleep(200); setStep(2,'active'); await sleep(300); setStep(2,'done');
-
+  setStep(1,'done');out.ocr=txt;
+  await sleep(200);setStep(2,'active');await sleep(300);setStep(2,'done');
   if(feats.eli12){
     setStep(3,'active');
     var r=await fetch('/ai/eli12',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:txt})});
-    if(!r.ok) throw new Error('AI simplification failed.');
-    out.eli12=(await r.json()).result; setStep(3,'done');
+    if(!r.ok)throw new Error('AI simplification failed.');
+    out.eli12=(await r.json()).result;setStep(3,'done');
   }
   if(feats.translate){
     setStep(4,'active');
     var lang=document.getElementById('langSel').value;
     var src=feats.eli12?out.eli12:txt;
     var r=await fetch('/ai/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:src,language:lang})});
-    if(!r.ok) throw new Error('Translation failed.');
-    out.translation=(await r.json()).result; setStep(4,'done');
+    if(!r.ok)throw new Error('Translation failed.');
+    out.translation=(await r.json()).result;setStep(4,'done');
   }
   renderResults();
 }
-
 function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
-
 function showProcessing(){
   var h='<div class="pcard"><div class="ptitle">Processing</div>';
-  h+='<div class="pstep waiting" id="s1"><span class="si">&#x1F4D6;</span>OCR extraction</div>';
-  h+='<div class="pstep waiting" id="s2"><span class="si">&#x1F916;</span>AI correction</div>';
-  if(feats.eli12) h+='<div class="pstep waiting" id="s3"><span class="si">&#x1F9D2;</span>Plain language</div>';
-  if(feats.translate) h+='<div class="pstep waiting" id="s4"><span class="si">&#x1F310;</span>Translation</div>';
+  h+='<div class="pstep waiting" id="s1"><span class="si">&#x1F4D6;</span> OCR extraction</div>';
+  h+='<div class="pstep waiting" id="s2"><span class="si">&#x1F916;</span> AI correction</div>';
+  if(feats.eli12)h+='<div class="pstep waiting" id="s3"><span class="si">&#x1F9D2;</span> Plain language</div>';
+  if(feats.translate)h+='<div class="pstep waiting" id="s4"><span class="si">&#x1F310;</span> Translation</div>';
   h+='</div>';
   document.getElementById('outBody').innerHTML=h;
   document.getElementById('meta').textContent='';
   document.getElementById('tab1').style.display='none';
   document.getElementById('tab2').style.display='none';
 }
-
 function setStep(n,s){var el=document.getElementById('s'+n);if(el)el.className='pstep '+s;}
-
 function renderResults(){
   document.getElementById('tab1').style.display=feats.eli12?'':'none';
   document.getElementById('tab2').style.display=feats.translate?'':'none';
-  if(feats.translate) showTab('translation');
-  else if(feats.eli12) showTab('eli12');
+  if(feats.translate)showTab('translation');
+  else if(feats.eli12)showTab('eli12');
   else showTab('ocr');
   var wc=out.ocr.split(/\\s+/).filter(function(w){return w.length>0;}).length;
   document.getElementById('meta').textContent=wc+' words';
 }
-
 function showTab(tab){
   curTab=tab;
   document.querySelectorAll('.otab').forEach(function(t){t.classList.remove('active');});
-  var m={ocr:'tab0',eli12:'tab1',translation:'tab2'};
-  var el=document.getElementById(m[tab]); if(el) el.classList.add('active');
+  var ids={ocr:'tab0',eli12:'tab1',translation:'tab2'};
+  var el=document.getElementById(ids[tab]);if(el)el.classList.add('active');
   var text=out[tab]||'';
-  if(!text){document.getElementById('outBody').innerHTML='<div class="ph"><div class="ph-icon">&#x25A4;</div><div class="ph-title">No output</div></div>';return;}
+  if(!text){
+    document.getElementById('outBody').innerHTML='<div class="ph"><div class="ph-icon">&#x25A4;</div><div class="ph-title">No output</div></div>';
+    return;
+  }
   var heCount=0;
-  for(var i=0;i<text.length;i++){var code=text.charCodeAt(i);if(code>=0x05D0&&code<=0x05EA)heCount++;}
+  for(var i=0;i<text.length;i++){var code=text.charCodeAt(i);if(code>=1488&&code<=1514)heCount++;}
   var isRtl=heCount>2;
-  var dir=isRtl?'rtl':'ltr';
-  var lines=text.split('\n').map(function(l){return esc(l);}).join('<br>');
+  var lines=text.split('
+').map(function(l){return esc(l);}).join('<br>');
   window._ct=text;
   document.getElementById('outBody').innerHTML=
-    '<div class="otext" style="direction:'+dir+';text-align:'+(isRtl?'right':'left')+'">'+lines+'</div>'+
+    '<div class="otext" style="direction:'+(isRtl?'rtl':'ltr')+';text-align:'+(isRtl?'right':'left')+'">'+lines+'</div>'+
     '<div class="oacts">'+
     '<button class="oabtn" id="spkBtn" onclick="doSpeak()">&#x1F50A; Listen</button>'+
     '<button class="oabtn" onclick="doCopy(this)">&#x1F4CB; Copy</button>'+
@@ -564,23 +554,20 @@ function doSpeak(){
   var btn=document.getElementById('spkBtn');
   if(isSpeaking){window.speechSynthesis.cancel();isSpeaking=false;btn.className='oabtn';btn.innerHTML='&#x1F50A; Listen';return;}
   var text=window._ct||'';
-  var isHe=/[א-ת]/.test(text);
-  var isAr=/[؀-ۿ]/.test(text);
+  var heC=0;for(var i=0;i<text.length;i++){var c=text.charCodeAt(i);if(c>=1488&&c<=1514)heC++;}
   var u=new SpeechSynthesisUtterance(text);
-  u.lang=isHe?'he-IL':isAr?'ar-SA':'en-US'; u.rate=0.88;
+  u.lang=heC>2?'he-IL':'en-US';u.rate=0.88;
   u.onend=function(){isSpeaking=false;var b=document.getElementById('spkBtn');if(b){b.className='oabtn';b.innerHTML='&#x1F50A; Listen';}};
-  isSpeaking=true; btn.className='oabtn spk'; btn.innerHTML='&#x23F9; Stop';
+  isSpeaking=true;btn.className='oabtn spk';btn.innerHTML='&#x23F9; Stop';
   window.speechSynthesis.speak(u);
 }
-
 function doCopy(btn){
   navigator.clipboard.writeText(window._ct||'').then(function(){
-    btn.innerHTML='&#x2705; Copied'; setTimeout(function(){btn.innerHTML='&#x1F4CB; Copy';},1500);
+    btn.innerHTML='&#x2705; Copied';setTimeout(function(){btn.innerHTML='&#x1F4CB; Copy';},1500);
   });
 }
-
 function doReset(){
-  selFiles=[]; out={ocr:'',eli12:'',translation:''};
+  selFiles=[];out={ocr:'',eli12:'',translation:''};
   document.getElementById('fileIn').value='';
   document.getElementById('urlIn').value='';
   document.getElementById('thumbs').innerHTML='';
@@ -588,7 +575,6 @@ function doReset(){
   document.getElementById('meta').textContent='';
   if(isSpeaking){window.speechSynthesis.cancel();isSpeaking=false;}
 }
-
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 </script>
 </body>
