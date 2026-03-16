@@ -217,7 +217,7 @@ async function runAsync(){
     var r=await fetch('/ocr/url?mode=text',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:u})});
     if(!r.ok){var e=await r.json();throw new Error(e.detail||r.statusText);}
     txt=(await r.json()).text;
-  } else {
+  }else{
     if(!selFiles.length)throw new Error('Please select an image file.');
     var fd=new FormData();
     if(mode==='batch')selFiles.forEach(function(f){fd.append('files',f);});
@@ -274,17 +274,14 @@ function showTab(tab){
   var ids={ocr:'tab0',eli12:'tab1',translation:'tab2'};
   var el=document.getElementById(ids[tab]);if(el)el.classList.add('active');
   var text=out[tab]||'';
-  if(!text){
-    document.getElementById('outBody').innerHTML='<div class="ph"><div class="ph-icon">&#x25A4;</div><div class="ph-title">No output</div></div>';
-    return;
-  }
+  if(!text){document.getElementById('outBody').innerHTML='<div class="ph"><div class="ph-icon">&#x25A4;</div><div class="ph-title">No output</div></div>';return;}
   var heCount=0;
   for(var i=0;i<text.length;i++){var code=text.charCodeAt(i);if(code>=1488&&code<=1514)heCount++;}
   var isRtl=heCount>2;
   var lines=text.split('\n').map(function(l){return esc(l);}).join('<br>');
   window._ct=text;
   document.getElementById('outBody').innerHTML=
-    '<div class="otext" style="direction:'+(isRtl?'rtl':'ltr')+';text-align:'+(isRtl?'right':'left')+';unicode-bidi:plaintext'">'+lines+'</div>'+
+    '<div class="otext" style="direction:'+(isRtl?'rtl':'ltr')+';text-align:'+(isRtl?'right':'left')+';unicode-bidi:plaintext">'+lines+'</div>'+
     '<div class="oacts">'+
     '<button class="oabtn" id="spkBtn" onclick="doSpeak()">&#x1F50A; Listen</button>'+
     '<button class="oabtn" onclick="doCopy(this)">&#x1F4CB; Copy</button>'+
