@@ -254,296 +254,146 @@ _UI_HTML = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>SimpliScan — Document Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0c0c0c;
-  --bg2: #141414;
-  --bg3: #1c1c1c;
-  --border: #2a2a2a;
-  --border2: #383838;
-  --text: #f0f0f0;
-  --text2: #999;
-  --text3: #555;
-  --green: #00c875;
-  --green-dim: #003d21;
-  --orange: #ff6b35;
-  --blue: #4d9fff;
-  --radius: 12px;
-  --font-display: 'Syne', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 15px; min-height: 100vh; }
-
-/* NAV */
-nav {
-  display: flex; align-items: center; padding: 0 40px; height: 60px;
-  border-bottom: 1px solid var(--border); background: var(--bg);
-  position: sticky; top: 0; z-index: 100;
-}
-.nav-logo { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: -.3px; }
-.nav-logo em { font-style: normal; color: var(--green); }
-.nav-status { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
-.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); transition: all .3s; }
-.status-dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
-.nav-app-link { margin-left: 24px; font-size: 12px; color: var(--text2); text-decoration: none; padding: 6px 14px; border: 1px solid var(--border2); border-radius: 6px; transition: all .15s; }
-.nav-app-link:hover { border-color: var(--green); color: var(--green); }
-
-/* LAYOUT */
-.app-layout { display: grid; grid-template-columns: 420px 1fr; min-height: calc(100vh - 60px); }
-
-/* LEFT PANEL */
-.left-panel { border-right: 1px solid var(--border); display: flex; flex-direction: column; background: var(--bg2); }
-
-.panel-section { border-bottom: 1px solid var(--border); padding: 24px; }
-.panel-section:last-of-type { border-bottom: none; flex: 1; display: flex; flex-direction: column; }
-
-.section-label {
-  font-family: var(--font-display); font-size: 10px; font-weight: 600;
-  letter-spacing: .15em; text-transform: uppercase; color: var(--text3);
-  margin-bottom: 16px;
-}
-
-/* Mode tabs */
-.mode-tabs { display: flex; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 2px; }
-.mode-tab {
-  flex: 1; padding: 8px 10px; text-align: center;
-  font-family: var(--font-body); font-size: 12px; font-weight: 500;
-  color: var(--text2); cursor: pointer; border-radius: 6px;
-  border: none; background: transparent; transition: all .15s; letter-spacing: .02em;
-}
-.mode-tab:hover { color: var(--text); }
-.mode-tab.active { background: var(--bg3); color: var(--green); border: 1px solid var(--border2); }
-
-/* Drop zone */
-.drop-zone {
-  flex: 1; border: 1px dashed var(--border2); border-radius: var(--radius);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 10px; cursor: pointer; transition: all .2s; position: relative;
-  min-height: 180px; background: var(--bg);
-}
-.drop-zone:hover, .drop-zone.drag-over { border-color: var(--green); background: rgba(0,200,117,.03); }
-.drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-.drop-icon { font-size: 32px; opacity: .5; pointer-events: none; }
-.drop-text { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--text2); pointer-events: none; }
-.drop-hint { font-size: 11px; color: var(--text3); pointer-events: none; }
-.thumb-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-.thumb { width: 60px; height: 60px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
-.thumb img { width: 100%; height: 100%; object-fit: cover; }
-
-/* URL input */
-.url-input {
-  width: 100%; padding: 10px 14px; background: var(--bg);
-  border: 1px solid var(--border); border-radius: 8px;
-  font-family: var(--font-body); font-size: 13px; color: var(--text);
-  outline: none; transition: border-color .15s;
-}
-.url-input:focus { border-color: var(--green); }
-.url-input::placeholder { color: var(--text3); }
-
-/* Feature toggles */
-.feature-toggles { display: flex; flex-direction: column; gap: 8px; }
-.toggle-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 14px; background: var(--bg); border: 1px solid var(--border);
-  border-radius: 8px; cursor: pointer; transition: all .15s;
-}
-.toggle-row:hover { border-color: var(--border2); }
-.toggle-row.active { border-color: var(--green); background: rgba(0,200,117,.04); }
-.toggle-label { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; }
-.toggle-icon { font-size: 15px; }
-.toggle-switch {
-  width: 36px; height: 20px; border-radius: 10px;
-  background: var(--bg3); border: 1px solid var(--border2);
-  position: relative; transition: all .2s; flex-shrink: 0;
-}
-.toggle-switch::after {
-  content: ''; position: absolute; width: 14px; height: 14px;
-  background: var(--text3); border-radius: 50%; top: 2px; left: 2px; transition: all .2s;
-}
-.toggle-row.active .toggle-switch { background: var(--green-dim); border-color: var(--green); }
-.toggle-row.active .toggle-switch::after { background: var(--green); left: 18px; }
-.toggle-desc { font-size: 11px; color: var(--text3); margin-top: 2px; }
-
-/* Language select */
-.lang-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
-.lang-label { font-size: 12px; color: var(--text2); white-space: nowrap; }
-.lang-select {
-  flex: 1; background: transparent; border: none; color: var(--text);
-  font-family: var(--font-body); font-size: 13px; outline: none; cursor: pointer;
-}
-.lang-select option { background: var(--bg2); }
-
-/* Run button */
-.run-btn {
-  width: 100%; padding: 14px; background: var(--green); color: #000;
-  border: none; border-radius: var(--radius); font-family: var(--font-display);
-  font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-  cursor: pointer; transition: all .15s; display: flex; align-items: center;
-  justify-content: center; gap: 8px;
-}
-.run-btn:hover { background: #00e688; transform: translateY(-1px); }
-.run-btn:disabled { background: var(--bg3); color: var(--text3); cursor: not-allowed; transform: none; }
-.run-btn.loading { background: var(--green-dim); color: var(--green); cursor: wait; }
-
-.action-btns { display: flex; gap: 8px; margin-top: 8px; }
-.action-btn {
-  flex: 1; padding: 10px; background: transparent; color: var(--text2);
-  border: 1px solid var(--border); border-radius: 8px; font-family: var(--font-body);
-  font-size: 12px; cursor: pointer; transition: all .15s; letter-spacing: .03em;
-}
-.action-btn:hover { border-color: var(--border2); color: var(--text); }
-
-/* RIGHT PANEL */
-.right-panel { display: flex; flex-direction: column; background: var(--bg); }
-
-.output-header {
-  border-bottom: 1px solid var(--border); padding: 0 32px;
-  display: flex; align-items: center; height: 48px; gap: 0;
-}
-.output-tab {
-  height: 100%; padding: 0 16px; font-family: var(--font-body);
-  font-size: 12px; font-weight: 500; color: var(--text3);
-  border: none; background: transparent; cursor: pointer;
-  border-bottom: 2px solid transparent; margin-bottom: -1px;
-  transition: all .15s; letter-spacing: .04em; text-transform: uppercase;
-}
-.output-tab:hover { color: var(--text2); }
-.output-tab.active { color: var(--green); border-bottom-color: var(--green); }
-.output-tab[style*="none"] { display: none !important; }
-
-.output-meta { margin-left: auto; font-size: 11px; color: var(--text3); }
-
-.output-body { flex: 1; overflow-y: auto; padding: 32px; }
-.output-body::-webkit-scrollbar { width: 4px; }
-.output-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-.output-text {
-  font-family: var(--font-body); font-size: 15px; line-height: 1.85;
-  color: var(--text); white-space: pre-wrap;
-}
-
-.output-actions { display: flex; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
-.out-action-btn {
-  padding: 8px 16px; background: var(--bg2); color: var(--text2);
-  border: 1px solid var(--border); border-radius: 8px; font-family: var(--font-body);
-  font-size: 12px; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px;
-}
-.out-action-btn:hover { border-color: var(--green); color: var(--green); }
-.out-action-btn.speaking { background: var(--green-dim); color: var(--green); border-color: var(--green); }
-
-.placeholder {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 100%; gap: 16px; color: var(--text3); text-align: center;
-}
-.placeholder-icon { font-size: 48px; opacity: .3; }
-.placeholder-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--text2); }
-.placeholder-sub { font-size: 13px; line-height: 1.6; max-width: 320px; }
-
-.error-box {
-  background: rgba(255,60,60,.06); border: 1px solid rgba(255,60,60,.25);
-  border-radius: var(--radius); padding: 16px 20px;
-  font-size: 13px; color: #ff6b6b; line-height: 1.6;
-}
-
-/* Processing */
-.processing-card {
-  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 24px; max-width: 400px; margin: 0 auto;
-}
-.proc-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; margin-bottom: 20px; color: var(--text2); letter-spacing: .05em; text-transform: uppercase; }
-.proc-step { display: flex; align-items: center; gap: 12px; padding: 10px 0; font-size: 13px; }
-.proc-step + .proc-step { border-top: 1px solid var(--border); }
-.step-icon { font-size: 16px; width: 28px; text-align: center; }
-.proc-step.done { color: var(--green); }
-.proc-step.active { color: var(--text); }
-.proc-step.waiting { color: var(--text3); }
-
-@keyframes spin { to { transform: rotate(360deg); } }
-.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--green-dim); border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
-
-@media (max-width: 800px) {
-  .app-layout { grid-template-columns: 1fr; }
-  .left-panel { border-right: none; border-bottom: 1px solid var(--border); }
-  nav { padding: 0 20px; }
-}
+:root{--bg:#0c0c0c;--bg2:#141414;--bg3:#1c1c1c;--border:#2a2a2a;--border2:#383838;--text:#f0f0f0;--text2:#999;--text3:#555;--green:#00c875;--green-dim:#003d21;--radius:12px;--font-d:'Syne',sans-serif;--font:'DM Sans',sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;min-height:100vh}
+nav{display:flex;align-items:center;padding:0 40px;height:60px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100}
+.logo{font-family:var(--font-d);font-size:18px;font-weight:800;color:var(--text)}
+.logo em{font-style:normal;color:var(--green)}
+.nav-status{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--text3);transition:all .3s}
+.sdot.online{background:var(--green);box-shadow:0 0 8px var(--green)}
+.nav-link{margin-left:24px;font-size:12px;color:var(--text2);text-decoration:none;padding:6px 14px;border:1px solid var(--border2);border-radius:6px;transition:all .15s}
+.nav-link:hover{border-color:var(--green);color:var(--green)}
+.layout{display:grid;grid-template-columns:400px 1fr;min-height:calc(100vh - 60px)}
+.left{border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2)}
+.ps{border-bottom:1px solid var(--border);padding:20px 24px}
+.ps.grow{border-bottom:none;flex:1;display:flex;flex-direction:column}
+.slabel{font-family:var(--font-d);font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:14px}
+.tabs{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px;gap:2px}
+.tab{flex:1;padding:8px;text-align:center;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;border-radius:6px;border:none;background:transparent;transition:all .15s}
+.tab:hover{color:var(--text)}
+.tab.active{background:var(--bg3);color:var(--green);border:1px solid var(--border2)}
+.dz{flex:1;border:1px dashed var(--border2);border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .2s;position:relative;min-height:160px;background:var(--bg)}
+.dz:hover,.dz.over{border-color:var(--green);background:rgba(0,200,117,.03)}
+.dz input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.dz-icon{font-size:28px;opacity:.4;pointer-events:none}
+.dz-text{font-family:var(--font-d);font-size:13px;font-weight:600;color:var(--text2);pointer-events:none}
+.dz-hint{font-size:11px;color:var(--text3);pointer-events:none}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.thumb{width:56px;height:56px;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.url-in{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:13px;color:var(--text);outline:none;transition:border-color .15s}
+.url-in:focus{border-color:var(--green)}
+.url-in::placeholder{color:var(--text3)}
+.toggles{display:flex;flex-direction:column;gap:8px}
+.toggle{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s}
+.toggle:hover{border-color:var(--border2)}
+.toggle.on{border-color:var(--green);background:rgba(0,200,117,.04)}
+.tl{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500}
+.ti{font-size:14px}
+.td{font-size:11px;color:var(--text3);margin-top:2px}
+.sw{width:34px;height:19px;border-radius:10px;background:var(--bg3);border:1px solid var(--border2);position:relative;transition:all .2s;flex-shrink:0}
+.sw::after{content:'';position:absolute;width:13px;height:13px;background:var(--text3);border-radius:50%;top:2px;left:2px;transition:all .2s}
+.toggle.on .sw{background:var(--green-dim);border-color:var(--green)}
+.toggle.on .sw::after{background:var(--green);left:17px}
+.lrow{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px}
+.ll{font-size:12px;color:var(--text2);white-space:nowrap}
+.ls{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--font);font-size:13px;outline:none;cursor:pointer}
+.ls option{background:var(--bg2)}
+.run{width:100%;padding:13px;background:var(--green);color:#000;border:none;border-radius:var(--radius);font-family:var(--font-d);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.run:hover{background:#00e688;transform:translateY(-1px)}
+.run:disabled{background:var(--bg3);color:var(--text3);cursor:not-allowed;transform:none}
+.run.loading{background:var(--green-dim);color:var(--green);cursor:wait}
+.abts{display:flex;gap:8px;margin-top:8px}
+.abt{flex:1;padding:9px;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:12px;cursor:pointer;transition:all .15s}
+.abt:hover{border-color:var(--border2);color:var(--text)}
+.right{display:flex;flex-direction:column;background:var(--bg)}
+.out-hdr{border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;height:48px;gap:0}
+.otab{height:100%;padding:0 16px;font-family:var(--font);font-size:11px;font-weight:500;color:var(--text3);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;letter-spacing:.06em;text-transform:uppercase}
+.otab:hover{color:var(--text2)}
+.otab.active{color:var(--green);border-bottom-color:var(--green)}
+.ometa{margin-left:auto;font-size:11px;color:var(--text3)}
+.out-body{flex:1;overflow-y:auto;padding:32px}
+.out-body::-webkit-scrollbar{width:4px}
+.out-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.out-text{font-family:var(--font);font-size:15px;line-height:1.85;color:var(--text);white-space:pre-wrap}
+.out-actions{display:flex;gap:10px;margin-top:20px;padding-top:18px;border-top:1px solid var(--border)}
+.oabtn{padding:8px 16px;background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
+.oabtn:hover{border-color:var(--green);color:var(--green)}
+.oabtn.speaking{background:var(--green-dim);color:var(--green);border-color:var(--green)}
+.ph{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;color:var(--text3);text-align:center}
+.ph-icon{font-size:44px;opacity:.25}
+.ph-title{font-family:var(--font-d);font-size:15px;font-weight:700;color:var(--text2)}
+.ph-sub{font-size:13px;line-height:1.6;max-width:300px}
+.err{background:rgba(255,60,60,.06);border:1px solid rgba(255,60,60,.2);border-radius:var(--radius);padding:16px;font-size:13px;color:#ff6b6b;line-height:1.6}
+.proc-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:380px;margin:0 auto}
+.proc-title{font-family:var(--font-d);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:18px}
+.pstep{display:flex;align-items:center;gap:12px;padding:10px 0;font-size:13px}
+.pstep+.pstep{border-top:1px solid var(--border)}
+.pstep.done{color:var(--green)}
+.pstep.active{color:var(--text)}
+.pstep.waiting{color:var(--text3)}
+.si{font-size:15px;width:24px;text-align:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--green-dim);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.left{border-right:none;border-bottom:1px solid var(--border)}nav{padding:0 20px}}
 </style>
 </head>
 <body>
-
 <nav>
-  <span class="nav-logo">Simpli<em>Scan</em></span>
+  <span class="logo">Simpli<em>Scan</em></span>
   <div class="nav-status">
-    <span class="status-dot" id="statusDot"></span>
-    <span id="statusLabel">Connecting</span>
+    <span class="sdot" id="sd"></span>
+    <span id="sl">Connecting</span>
   </div>
-  <a href="/landing" class="nav-app-link">About →</a>
+  <a href="/landing" class="nav-link">About</a>
 </nav>
-
-<div class="app-layout">
-
-  <!-- LEFT PANEL -->
-  <div class="left-panel">
-
-    <!-- Input mode -->
-    <div class="panel-section">
-      <div class="section-label">Input mode</div>
-      <div class="mode-tabs">
-        <button class="mode-tab active" onclick="switchMode('upload')">Upload</button>
-        <button class="mode-tab" onclick="switchMode('batch')">Batch</button>
-        <button class="mode-tab" onclick="switchMode('url')">URL</button>
+<div class="layout">
+  <div class="left">
+    <div class="ps">
+      <div class="slabel">Input mode</div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchMode('upload')">Upload</button>
+        <button class="tab" onclick="switchMode('batch')">Batch</button>
+        <button class="tab" onclick="switchMode('url')">URL</button>
       </div>
     </div>
-
-    <!-- File drop -->
-    <div class="panel-section" id="uploadSection" style="flex:1;display:flex;flex-direction:column;">
-      <div class="section-label">Document</div>
-      <div class="drop-zone" id="dropZone"
-           ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
-        <input type="file" id="fileInput" accept="image/*" onchange="onFileSelect(event)"/>
-        <div class="drop-icon">⌗</div>
-        <div class="drop-text">Drop image here</div>
-        <div class="drop-hint">JPEG · PNG · WEBP · TIFF · BMP &nbsp;·&nbsp; max 20MB</div>
+    <div class="ps grow" id="upSec">
+      <div class="slabel">Document</div>
+      <div class="dz" id="dz" ondragover="ov(event)" ondragleave="ol()" ondrop="od(event)">
+        <input type="file" id="fi" accept="image/*" onchange="fs(event)"/>
+        <div class="dz-icon">⌗</div>
+        <div class="dz-text">Drop image here or click to browse</div>
+        <div class="dz-hint">JPEG · PNG · WEBP · TIFF · BMP · max 20MB</div>
       </div>
-      <div class="thumb-row" id="thumbRow"></div>
+      <div class="thumbs" id="tr"></div>
     </div>
-
-    <!-- URL input -->
-    <div class="panel-section" id="urlSection" style="display:none;">
-      <div class="section-label">Image URL</div>
-      <input class="url-input" id="urlInput" type="url" placeholder="https://example.com/document.jpg"/>
+    <div class="ps" id="urlSec" style="display:none">
+      <div class="slabel">Image URL</div>
+      <input class="url-in" id="ui" type="url" placeholder="https://example.com/document.jpg"/>
     </div>
-
-    <!-- AI features -->
-    <div class="panel-section">
-      <div class="section-label">AI features</div>
-      <div class="feature-toggles">
-        <div class="toggle-row active" id="toggleOCR">
-          <div>
-            <div class="toggle-label"><span class="toggle-icon">📖</span> OCR extraction</div>
-            <div class="toggle-desc">Always enabled</div>
-          </div>
-          <div class="toggle-switch"></div>
+    <div class="ps">
+      <div class="slabel">AI features</div>
+      <div class="toggles">
+        <div class="toggle on" style="cursor:default">
+          <div><div class="tl"><span class="ti">📖</span> OCR extraction</div><div class="td">Always enabled</div></div>
+          <div class="sw"></div>
         </div>
-        <div class="toggle-row" id="toggleELI12" onclick="toggleFeature('eli12')">
-          <div>
-            <div class="toggle-label"><span class="toggle-icon">🧒</span> Plain language</div>
-            <div class="toggle-desc">Simplify complex text</div>
-          </div>
-          <div class="toggle-switch"></div>
+        <div class="toggle" id="tELI" onclick="tf('eli12')">
+          <div><div class="tl"><span class="ti">🧒</span> Plain language</div><div class="td">Simplify complex text with AI</div></div>
+          <div class="sw"></div>
         </div>
-        <div class="toggle-row" id="toggleTranslate" onclick="toggleFeature('translate')">
-          <div>
-            <div class="toggle-label"><span class="toggle-icon">🌐</span> Translate</div>
-            <div class="toggle-desc">Convert to another language</div>
-          </div>
-          <div class="toggle-switch"></div>
+        <div class="toggle" id="tTR" onclick="tf('translate')">
+          <div><div class="tl"><span class="ti">🌐</span> Translate</div><div class="td">Convert to another language</div></div>
+          <div class="sw"></div>
         </div>
       </div>
-      <div class="lang-row" id="langRow" style="display:none;">
-        <span class="lang-label">Translate to</span>
-        <select class="lang-select" id="targetLang">
+      <div class="lrow" id="lr" style="display:none">
+        <span class="ll">Translate to</span>
+        <select class="ls" id="tl">
           <option value="Hebrew">עברית Hebrew</option>
           <option value="English">English</option>
           <option value="Arabic">عربي Arabic</option>
@@ -555,228 +405,58 @@ nav {
         </select>
       </div>
     </div>
-
-    <!-- Run -->
-    <div class="panel-section">
-      <button class="run-btn" id="runBtn" onclick="runOCR()">
-        <span>▶</span>&nbsp; Process document
-      </button>
-      <div class="action-btns">
-        <button class="action-btn" onclick="resetAll()">Reset</button>
-        <button class="action-btn" onclick="location.reload()">Refresh</button>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- RIGHT PANEL -->
-  <div class="right-panel">
-    <div class="output-header">
-      <button class="output-tab active" onclick="switchTab('ocr')" id="tabOCR">Extracted text</button>
-      <button class="output-tab" onclick="switchTab('eli12')" id="tabELI12" style="display:none">Plain language</button>
-      <button class="output-tab" onclick="switchTab('translation')" id="tabTranslation" style="display:none">Translation</button>
-      <span class="output-meta" id="outputMeta"></span>
-    </div>
-    <div class="output-body" id="outputBody">
-      <div class="placeholder">
-        <div class="placeholder-icon">▤</div>
-        <div class="placeholder-title">No document loaded</div>
-        <div class="placeholder-sub">Upload an image or paste a URL, then click Process document to extract text.</div>
+    <div class="ps">
+      <button class="run" id="rb" onclick="run()">▶ &nbsp;Process document</button>
+      <div class="abts">
+        <button class="abt" onclick="rst()">Reset</button>
+        <button class="abt" onclick="location.reload()">Refresh</button>
       </div>
     </div>
   </div>
-
+  <div class="right">
+    <div class="out-hdr">
+      <button class="otab active" onclick="st('ocr')" id="t0">Extracted text</button>
+      <button class="otab" onclick="st('eli12')" id="t1" style="display:none">Plain language</button>
+      <button class="otab" onclick="st('translation')" id="t2" style="display:none">Translation</button>
+      <span class="ometa" id="om"></span>
+    </div>
+    <div class="out-body" id="ob">
+      <div class="ph"><div class="ph-icon">▤</div><div class="ph-title">No document loaded</div><div class="ph-sub">Upload an image or paste a URL, then click Process document.</div></div>
+    </div>
+  </div>
 </div>
-
 <script>
-let inputMode = "upload", selectedFiles = [], features = {eli12:false, translate:false};
-let results = {ocr:"", eli12:"", translation:""};
-let speaking = false, activeTab = "ocr";
-
-async function checkHealth() {
-  try {
-    const r = await fetch("/health");
-    if (r.ok) {
-      document.getElementById("statusDot").className = "status-dot online";
-      document.getElementById("statusLabel").textContent = "Online";
-    }
-  } catch {}
-}
-checkHealth();
-
-function switchMode(mode) {
-  inputMode = mode;
-  document.querySelectorAll(".mode-tab").forEach((t,i) => t.classList.toggle("active", ["upload","batch","url"][i]===mode));
-  document.getElementById("uploadSection").style.display = mode!=="url" ? "flex" : "none";
-  document.getElementById("urlSection").style.display = mode==="url" ? "" : "none";
-  document.getElementById("fileInput").multiple = mode==="batch";
-  selectedFiles=[]; renderThumbs();
-}
-
-function toggleFeature(key) {
-  features[key] = !features[key];
-  document.getElementById("toggle"+key.charAt(0).toUpperCase()+key.slice(1))
-    .classList.toggle("active", features[key]);
-  if (key==="translate") document.getElementById("langRow").style.display = features.translate ? "flex" : "none";
-}
-
-function onFileSelect(e) { selectedFiles=Array.from(e.target.files); renderThumbs(); }
-function onDragOver(e) { e.preventDefault(); document.getElementById("dropZone").classList.add("drag-over"); }
-function onDragLeave() { document.getElementById("dropZone").classList.remove("drag-over"); }
-function onDrop(e) {
-  e.preventDefault(); document.getElementById("dropZone").classList.remove("drag-over");
-  selectedFiles=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith("image/")); renderThumbs();
-}
-function renderThumbs() {
-  const row=document.getElementById("thumbRow"); row.innerHTML="";
-  selectedFiles.slice(0,8).forEach(f=>{
-    const d=document.createElement("div"); d.className="thumb";
-    const i=document.createElement("img"); i.src=URL.createObjectURL(f);
-    d.appendChild(i); row.appendChild(d);
-  });
-}
-
-async function runOCR() {
-  const btn=document.getElementById("runBtn");
-  btn.disabled=true; btn.className="run-btn loading";
-  btn.innerHTML='<span class="spinner"></span> Processing...';
-  showProcessing();
-
-  try {
-    // Step 1: OCR
-    setStep(1,"active");
-    let ocrText="";
-    if (inputMode==="url") {
-      const url=document.getElementById("urlInput").value.trim();
-      if (!url) throw new Error("Please enter an image URL.");
-      const r=await fetch("/ocr/url?mode=text",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});
-      if (!r.ok){const e=await r.json();throw new Error(Array.isArray(e.detail)?e.detail.map(x=>x.msg).join(", "):e.detail);}
-      ocrText=(await r.json()).text;
-    } else {
-      if (!selectedFiles.length) throw new Error("Please select an image file.");
-      const fd=new FormData();
-      if (inputMode==="batch") selectedFiles.forEach(f=>fd.append("files",f));
-      else fd.append("file",selectedFiles[0]);
-      const ep=inputMode==="batch"?"/ocr/batch":"/ocr/upload";
-      const r=await fetch(ep+"?mode=text",{method:"POST",body:fd});
-      if (!r.ok){const e=await r.json();throw new Error(Array.isArray(e.detail)?e.detail.map(x=>x.msg).join(", "):e.detail);}
-      const d=await r.json();
-      ocrText=inputMode==="batch"?d.results.map(r=>r.text).join("\\n---\\n"):d.text;
-    }
-    setStep(1,"done"); results.ocr=ocrText;
-    await delay(200); setStep(2,"active");
-    await delay(300); setStep(2,"done");
-
-    if (features.eli12) {
-      setStep(3,"active");
-      const r=await fetch("/ai/eli12",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:ocrText})});
-      if (!r.ok) throw new Error("AI simplification failed.");
-      results.eli12=(await r.json()).result;
-      setStep(3,"done");
-    }
-
-    if (features.translate) {
-      setStep(4,"active");
-      const lang=document.getElementById("targetLang").value;
-      const src=features.eli12?results.eli12:ocrText;
-      const r=await fetch("/ai/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:src,language:lang})});
-      if (!r.ok) throw new Error("Translation failed.");
-      results.translation=(await r.json()).result;
-      setStep(4,"done");
-    }
-
-    renderResults();
-  } catch(err) {
-    document.getElementById("outputBody").innerHTML=`<div class="error-box">⚠ ${escHtml(err.message)}</div>`;
-  } finally {
-    btn.disabled=false; btn.className="run-btn";
-    btn.innerHTML="<span>▶</span>&nbsp; Process document";
-  }
-}
-
-function delay(ms) { return new Promise(r=>setTimeout(r,ms)); }
-
-function showProcessing() {
-  const eli12Visible=features.eli12, transVisible=features.translate;
-  document.getElementById("outputBody").innerHTML=`
-    <div class="processing-card">
-      <div class="proc-title">Processing</div>
-      <div class="proc-step waiting" id="s1"><span class="step-icon">📖</span> OCR extraction</div>
-      <div class="proc-step waiting" id="s2"><span class="step-icon">🤖</span> AI correction</div>
-      ${eli12Visible?'<div class="proc-step waiting" id="s3"><span class="step-icon">🧒</span> Plain language</div>':''}
-      ${transVisible?'<div class="proc-step waiting" id="s4"><span class="step-icon">🌐</span> Translation</div>':''}
-    </div>`;
-  document.getElementById("outputMeta").textContent="";
-  ["tabELI12","tabTranslation"].forEach(id=>{
-    const t=document.getElementById(id);
-    if(t) t.style.display="none";
-  });
-}
-
-function setStep(n, state) {
-  const el=document.getElementById("s"+n);
-  if(el) el.className="proc-step "+state;
-}
-
-function renderResults() {
-  const tabIds = {ocr:"tabOCR", eli12:"tabELI12", translation:"tabTranslation"};
-  Object.keys(tabIds).forEach(k => {
-    const t=document.getElementById(tabIds[k]);
-    if(t) t.style.display = (k==="ocr"||(k==="eli12"&&features.eli12)||(k==="translation"&&features.translate)) ? "" : "none";
-  });
-
-  if (features.translate) switchTab("translation");
-  else if (features.eli12) switchTab("eli12");
-  else switchTab("ocr");
-
-  const words = results.ocr.split(/\\s+/).filter(Boolean).length;
-  document.getElementById("outputMeta").textContent = `${words} words`;
-}
-
-function switchTab(tab) {
-  activeTab=tab;
-  document.querySelectorAll(".output-tab").forEach(t => t.classList.remove("active"));
-  const tabMap={ocr:"tabOCR", eli12:"tabELI12", translation:"tabTranslation"};
-  const activeEl=document.getElementById(tabMap[tab]);
-  if(activeEl) activeEl.classList.add("active");
-
-  const text=results[tab]||"";
-  if (!text) { document.getElementById("outputBody").innerHTML='<div class="placeholder"><div class="placeholder-icon">▤</div><div class="placeholder-title">No output yet</div></div>'; return; }
-
-  const isRtl=/[\\u05d0-\\u05ea\\u0600-\\u06ff]/.test(text);
-  document.getElementById("outputBody").innerHTML=`
-    <pre class="output-text" style="direction:${isRtl?"rtl":"ltr"};text-align:${isRtl?"right":"left"}">${escHtml(text)}</pre>
-    <div class="output-actions">
-      <button class="out-action-btn" id="speakBtn" onclick="speakText(this, ${JSON.stringify(text)})">🔊 Listen</button>
-      <button class="out-action-btn" onclick="copyText(this, ${JSON.stringify(text)})">📋 Copy</button>
-    </div>`;
-}
-
-function speakText(btn, text) {
-  if(speaking){window.speechSynthesis.cancel();speaking=false;btn.className="out-action-btn";btn.innerHTML="🔊 Listen";return;}
-  const isHe=/[\\u05d0-\\u05ea]/.test(text), isAr=/[\\u0600-\\u06ff]/.test(text);
-  const utter=new SpeechSynthesisUtterance(text);
-  utter.lang=isHe?"he-IL":isAr?"ar-SA":"en-US"; utter.rate=0.88;
-  utter.onend=()=>{speaking=false;btn.className="out-action-btn";btn.innerHTML="🔊 Listen";};
-  speaking=true; btn.className="out-action-btn speaking"; btn.innerHTML="⏹ Stop";
-  window.speechSynthesis.speak(utter);
-}
-
-function copyText(btn, text) {
-  navigator.clipboard.writeText(text).then(()=>{btn.innerHTML="✅ Copied";setTimeout(()=>btn.innerHTML="📋 Copy",1500);});
-}
-
-function resetAll() {
-  selectedFiles=[]; results={ocr:"",eli12:"",translation:""};
-  document.getElementById("fileInput").value="";
-  document.getElementById("urlInput").value="";
-  document.getElementById("thumbRow").innerHTML="";
-  document.getElementById("outputBody").innerHTML='<div class="placeholder"><div class="placeholder-icon">▤</div><div class="placeholder-title">No document loaded</div><div class="placeholder-sub">Upload an image or paste a URL, then click Process document to extract text.</div></div>';
-  document.getElementById("outputMeta").textContent="";
-  if(speaking){window.speechSynthesis.cancel();speaking=false;}
-}
-
-function escHtml(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+let mode="upload",files=[],feats={eli12:false,translate:false},res={ocr:"",eli12:"",translation:""},spk=false,atab="ocr";
+async function hc(){try{const r=await fetch("/health");if(r.ok){document.getElementById("sd").className="sdot online";document.getElementById("sl").textContent="Online";}}catch{}}
+hc();
+function switchMode(m){mode=m;document.querySelectorAll(".tab").forEach((t,i)=>t.classList.toggle("active",["upload","batch","url"][i]===m));document.getElementById("upSec").style.display=m!=="url"?"flex":"none";document.getElementById("urlSec").style.display=m==="url"?"":"none";document.getElementById("fi").multiple=m==="batch";files=[];rt();}
+function tf(k){feats[k]=!feats[k];document.getElementById(k==="eli12"?"tELI":"tTR").classList.toggle("on",feats[k]);if(k==="translate")document.getElementById("lr").style.display=feats.translate?"flex":"none";}
+function fs(e){files=Array.from(e.target.files);rt();}
+function ov(e){e.preventDefault();document.getElementById("dz").classList.add("over");}
+function ol(){document.getElementById("dz").classList.remove("over");}
+function od(e){e.preventDefault();document.getElementById("dz").classList.remove("over");files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith("image/"));rt();}
+function rt(){const r=document.getElementById("tr");r.innerHTML="";files.slice(0,8).forEach(f=>{const d=document.createElement("div");d.className="thumb";const i=document.createElement("img");i.src=URL.createObjectURL(f);d.appendChild(i);r.appendChild(d);});}
+async function run(){const btn=document.getElementById("rb");btn.disabled=true;btn.className="run loading";btn.innerHTML='<span class="spinner"></span>Processing...';sp();
+try{
+  ss(1,"active");
+  let txt="";
+  if(mode==="url"){const u=document.getElementById("ui").value.trim();if(!u)throw new Error("Please enter an image URL.");const r=await fetch("/ocr/url?mode=text",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:u})});if(!r.ok){const e=await r.json();throw new Error(Array.isArray(e.detail)?e.detail.map(x=>x.msg).join(", "):e.detail);}txt=(await r.json()).text;}
+  else{if(!files.length)throw new Error("Please select an image file.");const fd=new FormData();if(mode==="batch")files.forEach(f=>fd.append("files",f));else fd.append("file",files[0]);const ep=mode==="batch"?"/ocr/batch":"/ocr/upload";const r=await fetch(ep+"?mode=text",{method:"POST",body:fd});if(!r.ok){const e=await r.json();throw new Error(Array.isArray(e.detail)?e.detail.map(x=>x.msg).join(", "):e.detail);}const d=await r.json();txt=mode==="batch"?d.results.map(r=>r.text).join("\\n---\\n"):d.text;}
+  ss(1,"done");res.ocr=txt;await dl(200);ss(2,"active");await dl(300);ss(2,"done");
+  if(feats.eli12){ss(3,"active");const r=await fetch("/ai/eli12",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:txt})});if(!r.ok)throw new Error("AI simplification failed.");res.eli12=(await r.json()).result;ss(3,"done");}
+  if(feats.translate){ss(4,"active");const lang=document.getElementById("tl").value;const src=feats.eli12?res.eli12:txt;const r=await fetch("/ai/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:src,language:lang})});if(!r.ok)throw new Error("Translation failed.");res.translation=(await r.json()).result;ss(4,"done");}
+  rr();
+}catch(e){document.getElementById("ob").innerHTML=`<div class="err">⚠ ${eh(e.message)}</div>`;}
+finally{btn.disabled=false;btn.className="run";btn.innerHTML="▶ &nbsp;Process document";}}
+function dl(ms){return new Promise(r=>setTimeout(r,ms));}
+function sp(){const e=feats.eli12,t=feats.translate;document.getElementById("ob").innerHTML=`<div class="proc-card"><div class="proc-title">Processing</div><div class="pstep waiting" id="s1"><span class="si">📖</span>OCR extraction</div><div class="pstep waiting" id="s2"><span class="si">🤖</span>AI correction</div>${e?'<div class="pstep waiting" id="s3"><span class="si">🧒</span>Plain language</div>':''}${t?'<div class="pstep waiting" id="s4"><span class="si">🌐</span>Translation</div>':''}</div>`;document.getElementById("om").textContent="";["t1","t2"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="none";});}
+function ss(n,s){const el=document.getElementById("s"+n);if(el)el.className="pstep "+s;}
+function rr(){const m={ocr:"t0",eli12:"t1",translation:"t2"};Object.keys(m).forEach(k=>{const t=document.getElementById(m[k]);if(t)t.style.display=(k==="ocr"||(k==="eli12"&&feats.eli12)||(k==="translation"&&feats.translate))?"":"none";});if(feats.translate)st("translation");else if(feats.eli12)st("eli12");else st("ocr");const w=res.ocr.split(/\\s+/).filter(Boolean).length;document.getElementById("om").textContent=w+" words";}
+function st(tab){atab=tab;document.querySelectorAll(".otab").forEach(t=>t.classList.remove("active"));const m={ocr:"t0",eli12:"t1",translation:"t2"};const el=document.getElementById(m[tab]);if(el)el.classList.add("active");const text=res[tab]||"";if(!text){document.getElementById("ob").innerHTML='<div class="ph"><div class="ph-icon">▤</div><div class="ph-title">No output yet</div></div>';return;}const rtl=/[\\u05d0-\\u05ea\\u0600-\\u06ff]/.test(text);document.getElementById("ob").innerHTML=`<pre class="out-text" style="direction:${rtl?"rtl":"ltr"};text-align:${rtl?"right":"left"}">${eh(text)}</pre><div class="out-actions"><button class="oabtn" id="spkb" onclick="spkText(this,${JSON.stringify(text)})">🔊 Listen</button><button class="oabtn" onclick="cpText(this,${JSON.stringify(text)})">📋 Copy</button></div>`;}
+function spkText(btn,text){if(spk){window.speechSynthesis.cancel();spk=false;btn.className="oabtn";btn.innerHTML="🔊 Listen";return;}const isHe=/[\\u05d0-\\u05ea]/.test(text),isAr=/[\\u0600-\\u06ff]/.test(text);const u=new SpeechSynthesisUtterance(text);u.lang=isHe?"he-IL":isAr?"ar-SA":"en-US";u.rate=0.88;u.onend=()=>{spk=false;btn.className="oabtn";btn.innerHTML="🔊 Listen";};spk=true;btn.className="oabtn speaking";btn.innerHTML="⏹ Stop";window.speechSynthesis.speak(u);}
+function cpText(btn,text){navigator.clipboard.writeText(text).then(()=>{btn.innerHTML="✅ Copied";setTimeout(()=>btn.innerHTML="📋 Copy",1500);});}
+function rst(){files=[];res={ocr:"",eli12:"",translation:""};document.getElementById("fi").value="";document.getElementById("ui").value="";document.getElementById("tr").innerHTML="";document.getElementById("ob").innerHTML='<div class="ph"><div class="ph-icon">▤</div><div class="ph-title">No document loaded</div><div class="ph-sub">Upload an image or paste a URL, then click Process document.</div></div>';document.getElementById("om").textContent="";if(spk){window.speechSynthesis.cancel();spk=false;}}
+function eh(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 </script>
 </body>
 </html>"""
