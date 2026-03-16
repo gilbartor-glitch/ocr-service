@@ -15,16 +15,8 @@ _reader = None
 
 @asynccontextmanager
 async def lifespan(app):
-    global _reader
-    log.info("Loading EasyOCR English model...")
-    loop = asyncio.get_event_loop()
-    _reader = await loop.run_in_executor(None, lambda: easyocr.Reader(["en"]))
-    log.info("OCR ready.")
+    log.info("Tesseract OCR ready (en+he).")
     yield
-
-def get_reader():
-    if _reader is None: raise RuntimeError("Reader not initialised.")
-    return _reader
 
 app = FastAPI(title="OCR Service", version="2.0.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -158,7 +150,7 @@ def _build(filename, text, mode):
 
 @app.get("/health", tags=["meta"])
 async def health():
-    return {"status":"ok","model":"easyocr+tesseract","languages":["en","he"],"version":"2.0.0"}
+    return {"status":"ok","model":"tesseract","languages":["en","he"],"version":"2.0.0"}
 
 @app.post("/ocr/upload", response_model=TextResult, tags=["ocr"])
 async def ocr_single(file: Annotated[UploadFile, File()], mode: OutputMode = Query("text")):
