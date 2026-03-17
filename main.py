@@ -206,7 +206,7 @@ async def health():
 
 @app.post("/ocr/upload", response_model=TextResult, tags=["ocr"])
 async def ocr_single(file: Annotated[UploadFile, File()], mode: OutputMode = Query("text")):
-    if file.content_type not in ALLOWED: raise HTTPException(415, f"סוג קובץ לא נתמך: {file.content_type}")
+    if file.content_type and not file.content_type.startswith("image/"): raise HTTPException(415, f"סוג קובץ לא נתמך: {file.content_type}")
     data = await file.read()
     if len(data) > MAX_BYTES: raise HTTPException(413, "הקובץ גדול מדי (מקסימום 20MB).")
     try: text = await _ocr_from_bytes(data)
@@ -218,7 +218,7 @@ async def ocr_batch(files: Annotated[list[UploadFile], File()], mode: OutputMode
     if not files: raise HTTPException(400, "לא נבחרו קבצים.")
     if len(files) > 20: raise HTTPException(400, "מקסימום 20 קבצים.")
     async def process(f):
-        if f.content_type not in ALLOWED:
+        if f.content_type and not f.content_type.startswith("image/"):
             return TextResult(filename=f.filename or "?", text=f"[דלג] סוג לא נתמך")
         data = await f.read()
         if len(data) > MAX_BYTES:
