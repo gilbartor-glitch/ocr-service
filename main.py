@@ -89,6 +89,21 @@ async def _ocr_from_bytes(data, media_type="image/jpeg"):
     import base64, io as _io
     if ANTHROPIC_API_KEY:
         try:
+            # Convert HEIC to JPEG using imagemagick if needed
+            import subprocess, tempfile, os
+            if b'ftyp' in data[:20] or b'heic' in data[:20].lower():
+                with tempfile.NamedTemporaryFile(suffix='.heic', delete=False) as f:
+                    f.write(data); tmp_in = f.name
+                tmp_out = tmp_in.replace('.heic', '.jpg')
+                try:
+                    subprocess.run(['convert', tmp_in, tmp_out], check=True, timeout=10)
+                    data = open(tmp_out, 'rb').read()
+                except Exception as e:
+                    log.warning(f"ImageMagick conversion failed: {e}")
+                finally:
+                    for f in [tmp_in, tmp_out]:
+                        try: os.unlink(f)
+                        except: pass
             # Detect media type from magic bytes
             if data[:4] in (b'\x00\x00\x00\x18', b'\x00\x00\x00\x1c', b'\x00\x00\x00\x20') or b'heic' in data[:20].lower() or b'heix' in data[:20].lower():
                 detected_type = "image/heic"
