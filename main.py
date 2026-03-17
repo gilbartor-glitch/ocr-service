@@ -38,6 +38,8 @@ def _preprocess(data):
         pillow_heif.register_heif_opener()
         from PIL import Image as _PILImage
         img_pil = _PILImage.open(_io.BytesIO(data))
+        from PIL import ImageOps
+        img_pil = ImageOps.exif_transpose(img_pil)
         buf = _io.BytesIO()
         img_pil.save(buf, format="JPEG")
         data = buf.getvalue()
