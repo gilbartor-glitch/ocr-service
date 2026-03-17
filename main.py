@@ -56,7 +56,7 @@ def _clean_text(raw):
     # Replace lone O at start of lines (OCR misread of bullet points)
     raw = _re.sub(r'\bO\b', '', raw)
     lines = raw.splitlines()
-    cleaned = [_fix_rtl_line(re.sub(r"[^\S\n]+"," ",l).strip()) for l in lines]
+    cleaned = [re.sub(r"[^\S\n]+"," ",l).strip() for l in lines]
     return re.sub(r"\n{3,}","\n\n","\n".join(cleaned)).strip()
 
 def _run_ocr(image):
