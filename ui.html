@@ -278,7 +278,7 @@ function showTab(tab){
   var heCount=0;
   for(var i=0;i<text.length;i++){var code=text.charCodeAt(i);if(code>=1488&&code<=1514)heCount++;}
   var isRtl=heCount>2;
-  var lines=text.split('\n').map(function(l){return esc(l);}).join('<br>');
+  document.getElementById("outBody").style.direction=isRtl?"rtl":"ltr";var lines=text.split('\n').map(function(l){return esc(l);}).join('<br>');
   window._ct=text;
   document.getElementById('outBody').innerHTML=
     '<div class="otext" style="direction:'+(isRtl?'rtl':'ltr')+';text-align:'+(isRtl?'right':'left')+';unicode-bidi:embed">'+lines+'</div>'+
