@@ -32,17 +32,17 @@ MAX_BYTES = 20 * 1024 * 1024
 # ---------------------------------------------------------------------------
 def _preprocess(data):
     # Convert HEIC/HEIF to JPEG first
+    import io as _io
     try:
         import pillow_heif
-        heif = pillow_heif.read_heif(data)
+        pillow_heif.register_heif_opener()
         from PIL import Image as _PILImage
-        import io as _io
-        img_pil = _PILImage.frombytes(heif.mode, heif.size, heif.data)
+        img_pil = _PILImage.open(_io.BytesIO(data))
         buf = _io.BytesIO()
         img_pil.save(buf, format="JPEG")
         data = buf.getvalue()
-    except Exception:
-        pass
+    except Exception as e:
+        log.warning(f"HEIC conversion: {e}")
     arr = np.frombuffer(data, dtype=np.uint8)
     img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
     if img is None: raise ValueError("לא ניתן לפענח את התמונה.")
