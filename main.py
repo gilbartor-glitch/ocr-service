@@ -85,6 +85,28 @@ def _run_ocr(image):
             log.warning(f"Tesseract PSM {psm} failed: {e}")
     return best.strip()
 
+
+async def _ai_correct(text: str) -> str:
+    if not ANTHROPIC_API_KEY or not text.strip():
+        return text
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={"x-api-key": ANTHROPIC_API_KEY,
+                         "anthropic-version": "2023-06-01",
+                         "content-type": "application/json"},
+                json={"model": "claude-sonnet-4-6", "max_tokens": 2048,
+                      "messages": [{"role": "user", "content":
+                        f"אתה עוזר תיקון OCR. תקן שגיאות זיהוי טקסט. שמור על השפה המקורית ועל מעברי שורה. פלט את הטקסט המתוקן בלבד.\n\n{text}"}]}
+            )
+        if resp.status_code == 200:
+            return resp.json()["content"][0]["text"].strip()
+        return text
+    except Exception as e:
+        log.warning(f"AI correction failed: {e}")
+        return text
+
 async def _ocr_from_bytes(data, media_type="image/jpeg"):
     import base64, io as _io
     if ANTHROPIC_API_KEY:
