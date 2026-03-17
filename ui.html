@@ -275,6 +275,7 @@ function showTab(tab){
   var el=document.getElementById(ids[tab]);if(el)el.classList.add('active');
   var text=out[tab]||'';
   if(!text){document.getElementById('outBody').innerHTML='<div class="ph"><div class="ph-icon">&#x25A4;</div><div class="ph-title">No output</div></div>';return;}
+  document.getElementById('outBody').style.direction=isRtl?'rtl':'ltr';
   var heCount=0;
   for(var i=0;i<text.length;i++){var code=text.charCodeAt(i);if(code>=1488&&code<=1514)heCount++;}
   var isRtl=heCount>2;
