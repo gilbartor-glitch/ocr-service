@@ -86,20 +86,22 @@ def _run_ocr(image):
     return best.strip()
 
 async def _ocr_from_bytes(data, media_type="image/jpeg"):
-    import base64, cv2 as _cv2, io as _io
+    import base64, io as _io
     if ANTHROPIC_API_KEY:
         try:
-            # For HEIC, convert via PIL first
-            import PIL.Image as _PIL
-            try:
-                import pillow_heif
-                pillow_heif.register_heif_opener()
-            except Exception:
-                pass
-            pil_img = _PIL.open(_io.BytesIO(data))
-            buf = _io.BytesIO()
-            pil_img.save(buf, format="JPEG")
-            b64 = base64.b64encode(buf.getvalue()).decode()
+            # Detect media type from magic bytes
+            if data[:4] in (b'\x00\x00\x00\x18', b'\x00\x00\x00\x1c', b'\x00\x00\x00\x20') or b'heic' in data[:20].lower() or b'heix' in data[:20].lower():
+                detected_type = "image/heic"
+            elif data[:2] == b'\xff\xd8':
+                detected_type = "image/jpeg"
+            elif data[:8] == b'\x89PNG\r\n\x1a\n':
+                detected_type = "image/png"
+            elif data[:4] == b'RIFF':
+                detected_type = "image/webp"
+            else:
+                detected_type = "image/jpeg"
+
+            b64 = base64.b64encode(data).decode()
             async with httpx.AsyncClient(timeout=60.0) as client:
                 resp = await client.post(
                     "https://api.anthropic.com/v1/messages",
@@ -109,13 +111,13 @@ async def _ocr_from_bytes(data, media_type="image/jpeg"):
                     json={"model": "claude-sonnet-4-6", "max_tokens": 4096,
                           "messages": [{"role": "user", "content": [
                               {"type": "image", "source": {"type": "base64",
-                               "media_type": "image/jpeg", "data": b64}},
+                               "media_type": detected_type, "data": b64}},
                               {"type": "text", "text": "Extract ALL text from this image exactly as it appears. Preserve the original language (Hebrew, English, or mixed). Preserve line breaks, numbers, and structure. Output ONLY the extracted text, nothing else."}
                           ]}]}
                 )
             if resp.status_code == 200:
                 return _clean_text(resp.json()["content"][0]["text"].strip())
-            log.warning(f"Claude Vision {resp.status_code}, falling back to Tesseract")
+            log.warning(f"Claude Vision {resp.status_code}: {resp.text[:200]}")
         except Exception as e:
             log.warning(f"Claude Vision failed: {e}, falling back to Tesseract")
     loop = asyncio.get_event_loop()
@@ -123,47 +125,6 @@ async def _ocr_from_bytes(data, media_type="image/jpeg"):
     raw = await loop.run_in_executor(None, _run_ocr, gray)
     return _clean_text(await _ai_correct(raw))
 
-async def _claude(prompt: str, max_tokens: int = 2048) -> str:
-    if not ANTHROPIC_API_KEY:
-        raise HTTPException(503, "מפתח API לא מוגדר — פנה למנהל המערכת.")
-    async with httpx.AsyncClient(timeout=45.0) as client:
-        resp = await client.post(
-            "https://api.anthropic.com/v1/messages",
-            headers={"x-api-key": ANTHROPIC_API_KEY,
-                     "anthropic-version": "2023-06-01",
-                     "content-type": "application/json"},
-            json={"model": "claude-sonnet-4-6", "max_tokens": max_tokens,
-                  "messages": [{"role": "user", "content": prompt}]}
-        )
-    if resp.status_code != 200:
-        raise HTTPException(502, f"שגיאת Claude API: {resp.status_code}")
-    return resp.json()["content"][0]["text"].strip()
-
-async def _ai_correct(text: str) -> str:
-    if not ANTHROPIC_API_KEY or not text.strip():
-        return text
-    try:
-        return await _claude(
-            f"""אתה עוזר תיקון OCR המתמחה בעברית. תקן את הטקסט הבא שנסרק על ידי OCR.
-
-הבעיה הנפוצה ביותר: מילים עברית מתמזגות יחד ללא רווח.
-לדוגמה: "מהפכתהאינטרנט" צריך להיות "מהפכת האינטרנט"
-לדוגמה: "ביותרבישראל" צריך להיות "ביותר בישראל"
-לדוגמה: "מטעםהפרקליטות" צריך להיות "מטעם הפרקליטות"
-
-כללים:
-1. הפרד מילים שמוזגו יחד — זה התיקון הכי חשוב
-2. תקן אותיות שגויות בעברית
-3. אל תשנה מספרים כלל
-4. שמור על מעברי שורה בדיוק
-5. פלט את הטקסט המתוקן בלבד, ללא הסברים או תוספות
-
-טקסט לתיקון:
-{text}"""
-        )
-    except Exception as e:
-        log.warning(f"AI correction failed: {e}")
-        return text
 
 # ---------------------------------------------------------------------------
 # Schemas
