@@ -85,14 +85,21 @@ def _run_ocr(image):
             log.warning(f"Tesseract PSM {psm} failed: {e}")
     return best.strip()
 
-async def _ocr_from_bytes(data):
-    import base64, cv2 as _cv2
+async def _ocr_from_bytes(data, media_type="image/jpeg"):
+    import base64, cv2 as _cv2, io as _io
     if ANTHROPIC_API_KEY:
         try:
-            loop = asyncio.get_event_loop()
-            img = await loop.run_in_executor(None, _preprocess, data)
-            _, buf = _cv2.imencode(".jpg", img, [_cv2.IMWRITE_JPEG_QUALITY, 95])
-            b64 = base64.b64encode(buf.tobytes()).decode()
+            # For HEIC, convert via PIL first
+            import PIL.Image as _PIL
+            try:
+                import pillow_heif
+                pillow_heif.register_heif_opener()
+            except Exception:
+                pass
+            pil_img = _PIL.open(_io.BytesIO(data))
+            buf = _io.BytesIO()
+            pil_img.save(buf, format="JPEG")
+            b64 = base64.b64encode(buf.getvalue()).decode()
             async with httpx.AsyncClient(timeout=60.0) as client:
                 resp = await client.post(
                     "https://api.anthropic.com/v1/messages",
