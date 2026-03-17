@@ -24,13 +24,25 @@ async def lifespan(app):
 app = FastAPI(title="Simplified Access OCR", version="3.0.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-ALLOWED = {"image/jpeg","image/png","image/webp","image/tiff","image/bmp"}
+ALLOWED = {"image/jpeg","image/png","image/webp","image/tiff","image/bmp","image/heic","image/heif"}
 MAX_BYTES = 20 * 1024 * 1024
 
 # ---------------------------------------------------------------------------
 # Pre-processing
 # ---------------------------------------------------------------------------
 def _preprocess(data):
+    # Convert HEIC/HEIF to JPEG first
+    try:
+        import pillow_heif
+        heif = pillow_heif.read_heif(data)
+        from PIL import Image as _PILImage
+        import io as _io
+        img_pil = _PILImage.frombytes(heif.mode, heif.size, heif.data)
+        buf = _io.BytesIO()
+        img_pil.save(buf, format="JPEG")
+        data = buf.getvalue()
+    except Exception:
+        pass
     arr = np.frombuffer(data, dtype=np.uint8)
     img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
     if img is None: raise ValueError("לא ניתן לפענח את התמונה.")
