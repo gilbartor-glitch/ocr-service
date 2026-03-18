@@ -354,7 +354,7 @@ async function runAsync(){
   setStep(2,'active');
   try{
     var ar=await fetch('/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:txt})});
-    if(ar.ok)analysis=await ar.json();
+    if(ar.ok){var ad=await ar.json();try{analysis=JSON.parse(ad.result);}catch(e){analysis=null;}}
     else analysis=null;
   }catch(e){analysis=null;}
   setStep(2,'done');

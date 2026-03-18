@@ -318,6 +318,76 @@ async def translate(body: AIRequest):
     )
     return AIResponse(result=result)
 
+
+@app.post("/ai/analyze", response_model=AIResponse, tags=["ai"])
+async def analyze(body: AIRequest):
+    if not body.text.strip(): raise HTTPException(400, "הטקסט ריק.")
+    result = await _claude(
+        f"""Analyze this document and return ONLY a JSON object with these fields:
+- document_type: short label e.g. Tax Notice, Traffic Fine, Utility Bill, Bank Statement, Government Letter
+- summary: 1-2 sentence plain-language summary
+- payment_required: true or false
+- payment_amount: amount string if payment required e.g. 250 NIS or null
+- payment_due: due date string if found or null
+- payment_note: brief note about payment or null
+- reply_address: full postal address to reply to if found or null
+
+Return ONLY valid JSON, no explanation, no markdown.
+
+Document:
+{body.text}"""
+    )
+    import re as _re, json as _json
+    clean = _re.sub(r'''json|''''', ''', result).strip()
+    try:
+        data = _json.loads(clean)
+        return AIResponse(result=_json.dumps(data))
+    except:
+        return AIResponse(result=clean)
+
+
+@app.post("/ai/analyze", response_model=AIResponse, tags=["ai"])
+async def analyze(body: AIRequest):
+    if not body.text.strip(): raise HTTPException(400, "Empty text.")
+    result = await _claude(
+        """Analyze this document and return ONLY JSON with fields: document_type, summary, payment_required (bool), payment_amount (or null), payment_due (or null), payment_note (or null), reply_address (or null). No markdown, no explanation.
+
+Document:
+""" + body.text
+    )
+    clean = re.sub(r"```(?:json)?\|```", "", result).strip()
+    try:
+        data = json.loads(clean)
+        return AIResponse(result=json.dumps(data))
+    except:
+        return AIResponse(result=clean)
+
+
+@app.post("/ai/analyze", response_model=AIResponse, tags=["ai"])
+async def analyze(body: AIRequest):
+    if not body.text.strip(): raise HTTPException(400, "Empty text.")
+    result = await _claude(
+        """Analyze this document and return ONLY a JSON object with these exact fields:
+- document_type: short label e.g. Tax Notice, Traffic Fine, Utility Bill, Flight Ticket, Bank Statement, Government Letter
+- summary: 1-2 sentence plain-language summary
+- payment_required: true or false
+- payment_amount: amount string if payment required e.g. 250 NIS or null
+- payment_due: due date string if found or null
+- payment_note: brief note about payment or null
+- reply_address: full postal address to reply to if found in document or null
+
+Return ONLY valid JSON. No markdown, no explanation.
+
+Document:
+""" + body.text
+    )
+    clean = re.sub(r"```(?:json)?\|```", "", result).strip()
+    try:
+        data = json.loads(clean)
+        return AIResponse(result=json.dumps(data))
+    except:
+        return AIResponse(result=clean)
+
 # ---------------------------------------------------------------------------
 # UI
 # ---------------------------------------------------------------------------
