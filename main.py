@@ -161,7 +161,7 @@ async def _ocr_from_bytes(data, media_type="image/jpeg"):
                           "messages": [{"role": "user", "content": [
                               {"type": "image", "source": {"type": "base64",
                                "media_type": detected_type, "data": b64}},
-                              {"type": "text", "text": "Extract ALL text from this image exactly as it appears. Preserve the original language (Hebrew, English, or mixed). Preserve line breaks, numbers, and structure. Output ONLY the extracted text, nothing else."}
+                              {"type": "text", "text": "This image may be rotated or tilted. Detect the correct reading orientation and extract ALL text as it should be read. The text is likely Hebrew, English, or mixed Hebrew/English - NOT Armenian or any other script. Preserve line breaks, numbers, and structure. Output ONLY the extracted text, nothing else."}
                           ]}]}
                 )
             if resp.status_code == 200:
