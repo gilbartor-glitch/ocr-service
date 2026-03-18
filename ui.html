@@ -1,28 +1,496 @@
-SimpliScan
-Connecting
-About
-INPUT MODE
-Upload
-Batch
-URL
-DOCUMENT
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SimpliScan</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bricolage+Grotesque:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080f;--bg2:#0d0f1a;--bg3:#131626;
+  --border:#1e2235;--border2:#2a2f4a;
+  --text:#eef0ff;--text2:#8890b0;--text3:#454d6e;
+  --cyan:#00e5ff;--green:#00e676;--amber:#ffb830;--red:#ff4d6d;--purple:#b388ff;
+  --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:15px;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 10% 20%,rgba(0,229,255,.04) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 90% 80%,rgba(179,136,255,.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+nav{display:flex;align-items:center;padding:0 40px;height:58px;border-bottom:1px solid var(--border);background:rgba(7,8,15,.8);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.logo{font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.02em}
+.logo em{font-style:normal;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nst{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--text3);transition:all .3s}
+.dot.on{background:var(--green);box-shadow:0 0 10px var(--green)}
+.nlink{margin-left:20px;font-size:12px;color:var(--text2);text-decoration:none;padding:5px 14px;border:1px solid var(--border2);border-radius:8px;transition:all .2s}
+.nlink:hover{border-color:var(--cyan);color:var(--cyan)}
+.wrap{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 58px);position:relative;z-index:1}
+.left{border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2)}
+.sec{border-bottom:1px solid var(--border);padding:16px 20px}
+.sec.grow{border-bottom:none;flex:1;display:flex;flex-direction:column}
+.lbl{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
+.tabs{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px}
+.tab{flex:1;padding:7px;text-align:center;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;border-radius:8px;border:none;background:transparent;transition:all .2s;font-family:'Space Grotesk',sans-serif}
+.tab.active{background:var(--bg3);color:var(--cyan);border:1px solid rgba(0,229,255,.2)}
+.dz{flex:1;border:1.5px dashed var(--border2);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:all .25s;position:relative;min-height:140px;background:linear-gradient(135deg,var(--bg) 0%,rgba(0,229,255,.02) 100%)}
+.dz:hover,.dz.over{border-color:var(--cyan);background:rgba(0,229,255,.04)}
+.dz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.dzi{font-size:28px;opacity:.3;pointer-events:none}
+.dzt{font-size:13px;font-weight:600;color:var(--text2);pointer-events:none}
+.dzh{font-size:11px;color:var(--text3);pointer-events:none}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.thumb{width:52px;height:52px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.urlin{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);outline:none;font-family:'Space Grotesk',sans-serif;transition:border .2s}
+.urlin:focus{border-color:var(--cyan)}
+.urlin::placeholder{color:var(--text3)}
+.togs{display:flex;flex-direction:column;gap:8px}
+.tog{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s}
+.tog.on{border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.04)}
+.tlbl{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.tdesc{font-size:11px;color:var(--text3);margin-top:2px}
+.sw{width:36px;height:20px;border-radius:10px;background:var(--bg3);border:1px solid var(--border2);position:relative;transition:all .2s;flex-shrink:0}
+.sw::after{content:'';position:absolute;width:14px;height:14px;background:var(--text3);border-radius:50%;top:2px;left:2px;transition:all .2s}
+.tog.on .sw{background:rgba(0,229,255,.2);border-color:var(--cyan)}
+.tog.on .sw::after{background:var(--cyan);left:18px;box-shadow:0 0 8px var(--cyan)}
+.lrow{display:flex;align-items:center;gap:10px;margin-top:8px;padding:10px 13px;background:var(--bg);border:1px solid var(--border);border-radius:10px}
+.llbl{font-size:12px;color:var(--text2);white-space:nowrap}
+.lsel{flex:1;background:transparent;border:none;color:var(--text);font-size:13px;outline:none;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.lsel option{background:var(--bg2)}
+.runbtn{width:100%;padding:14px;background:linear-gradient(135deg,var(--cyan),#0091ea);color:#000;border:none;border-radius:var(--r);font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;box-shadow:0 4px 20px rgba(0,229,255,.2)}
+.runbtn:hover{box-shadow:0 6px 30px rgba(0,229,255,.4);transform:translateY(-1px)}
+.runbtn:disabled{background:var(--bg3);color:var(--text3);cursor:not-allowed;box-shadow:none;transform:none}
+.abts{display:flex;gap:8px;margin-top:8px}
+.abt{flex:1;padding:9px;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:10px;font-size:12px;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s}
+.abt:hover{border-color:var(--border2);color:var(--text)}
+.right{display:flex;flex-direction:column;background:var(--bg)}
+.ohdr{border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;height:48px;gap:4px}
+.otab{height:100%;padding:0 14px;font-size:11px;font-weight:600;color:var(--text3);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;letter-spacing:.08em;text-transform:uppercase;font-family:'Space Grotesk',sans-serif;transition:all .2s}
+.otab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.ometa{margin-left:auto;font-size:11px;color:var(--text3)}
+.obody{flex:1;overflow-y:auto;padding:28px}
+.obody::-webkit-scrollbar{width:4px}
+.obody::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.otext{font-size:15px;line-height:1.9;color:var(--text)}
+.oacts{display:flex;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.oabtn{padding:8px 16px;background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Space Grotesk',sans-serif;transition:all .2s}
+.oabtn:hover{border-color:var(--cyan);color:var(--cyan)}
+.oabtn.spk{background:rgba(0,229,255,.1);color:var(--cyan);border-color:rgba(0,229,255,.3)}
+.ph{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;color:var(--text3);text-align:center;padding:40px}
+.ph-icon{font-size:48px;opacity:.2}
+.ph-title{font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:700;color:var(--text2)}
+.ph-sub{font-size:13px;line-height:1.7;max-width:300px}
+.err{background:rgba(255,77,109,.06);border:1px solid rgba(255,77,109,.2);border-radius:var(--r);padding:16px;font-size:13px;color:var(--red);line-height:1.6}
+.pcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:24px;max-width:360px;margin:0 auto}
+.ptitle{font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:18px}
+.pstep{display:flex;align-items:center;gap:12px;padding:10px 0;font-size:13px}
+.pstep+.pstep{border-top:1px solid var(--border)}
+.pstep.done{color:var(--green)}.pstep.active{color:var(--text)}.pstep.waiting{color:var(--text3)}
+.si{font-size:15px;width:24px;text-align:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(0,229,255,.2);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(229,57,53,.5)}50%{box-shadow:0 0 0 10px rgba(229,57,53,0)}}
+.doc-banner{background:linear-gradient(135deg,rgba(0,149,255,.12),rgba(0,229,255,.06));border:1px solid rgba(0,149,255,.3);border-radius:var(--r);padding:16px 20px;margin-bottom:20px;display:flex;align-items:flex-start;gap:14px;animation:slideUp .3s ease}
+.doc-banner-icon{font-size:24px;margin-top:2px}
+.doc-banner-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,149,255,.7);margin-bottom:3px}
+.doc-banner-type{font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;color:var(--text)}
+.doc-banner-summary{font-size:13px;color:var(--text2);margin-top:4px;line-height:1.5}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:24px}
+.acard{border-radius:16px;padding:20px;cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;animation:popIn .35s ease forwards;opacity:0;border:none;display:flex;flex-direction:column;gap:6px;min-height:130px;font-family:'Space Grotesk',sans-serif}
+.acard:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.acard:active{transform:scale(.97)}
+.acard-icon{font-size:26px}
+.acard-title{font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:800;line-height:1.2;margin-top:auto}
+.acard-sub{font-size:11px;opacity:.75;line-height:1.4}
+.acard.red{background:#e53935;color:#fff}
+.acard.pink{background:#d81b8a;color:#fff}
+.acard.cyan{background:#00acc1;color:#000}
+.acard.slate{background:#546e7a;color:#fff}
+.acard.lime{background:#689f38;color:#fff}
+.acard.yellow{background:#f9a825;color:#000}
+.acard.brown{background:#795548;color:#fff}
+.acard.darkgreen{background:#2e7d32;color:#fff}
+.acard.purple{background:#6a1b9a;color:#fff}
+.acard.urgent{animation:popIn .35s ease forwards,pulse 1.8s ease 1s infinite}
+.acard:nth-child(1){animation-delay:.04s}.acard:nth-child(2){animation-delay:.09s}.acard:nth-child(3){animation-delay:.14s}.acard:nth-child(4){animation-delay:.19s}.acard:nth-child(5){animation-delay:.24s}.acard:nth-child(6){animation-delay:.29s}.acard:nth-child(7){animation-delay:.34s}.acard:nth-child(8){animation-delay:.39s}.acard:nth-child(9){animation-delay:.44s}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px 20px 0 0;width:100%;max-width:760px;max-height:82vh;overflow-y:auto;padding:28px 32px;animation:slideUp .25s ease}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800}
+.modal-close{width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--text2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;line-height:1}
+.modal-close:hover{color:var(--text)}
+.modal-body{font-size:14px;line-height:1.8;color:var(--text2)}
+.modal-body .loading{display:flex;align-items:center;gap:10px;color:var(--text3);font-size:13px}
+.cp-row{margin-bottom:12px}
+.cp-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.cp-inp{width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);outline:none;font-family:'Space Grotesk',sans-serif;transition:border .2s}
+.cp-inp:focus{border-color:var(--amber)}
+.cp-ta{min-height:130px;resize:vertical}
+.cp-actions{display:flex;gap:8px;margin-top:8px}
+.cp-send{flex:1;padding:11px;background:linear-gradient(135deg,var(--amber),#ff9a3c);color:#000;border:none;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.cp-cancel{padding:11px 18px;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:10px;font-size:13px;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.address-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--text2);font-style:italic;line-height:1.6;margin-bottom:14px}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}.left{border-right:none;border-bottom:1px solid var(--border)}nav{padding:0 16px}.card-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<nav>
+  <span class="logo">Simpli<em>Scan</em></span>
+  <div class="nst"><span class="dot" id="dot"></span><span id="sl">Connecting</span></div>
+  <a href="/landing" class="nlink">About</a>
+</nav>
+<div class="wrap">
+  <div class="left">
+    <div class="sec">
+      <div class="lbl">Input mode</div>
+      <div class="tabs">
+        <button class="tab active" id="tabUp" onclick="setMode('upload')">Upload</button>
+        <button class="tab" id="tabBa" onclick="setMode('batch')">Batch</button>
+        <button class="tab" id="tabUr" onclick="setMode('url')">URL</button>
+      </div>
+    </div>
+    <div class="sec grow" id="upSec">
+      <div class="lbl">Document</div>
+      <div class="dz" id="dz" ondragover="dzOver(event)" ondragleave="dzLeave()" ondrop="dzDrop(event)">
+        <input type="file" id="fileIn" accept="image/*,.heic,.heif" onchange="fileChange(event)"/>
+        <div class="dzi">&#x2317;</div>
+        <div class="dzt">Drop image here or click to browse</div>
+        <div class="dzh">JPEG &middot; PNG &middot; WEBP &middot; TIFF &middot; BMP</div>
+      </div>
+      <div class="thumbs" id="thumbs"></div>
+    </div>
+    <div class="sec" id="urlSec" style="display:none">
+      <div class="lbl">Image URL</div>
+      <input class="urlin" id="urlIn" type="url" placeholder="https://example.com/image.jpg"/>
+    </div>
+    <div class="sec">
+      <div class="lbl">AI features</div>
+      <div class="togs">
+        <div class="tog on" style="cursor:default">
+          <div><div class="tlbl">&#x1F4D6; OCR extraction</div><div class="tdesc">Always on</div></div>
+          <div class="sw"></div>
+        </div>
+        <div class="tog on" style="cursor:default">
+          <div><div class="tlbl">&#x1F9E0; Smart analysis</div><div class="tdesc">Auto-detects type &amp; actions</div></div>
+          <div class="sw"></div>
+        </div>
+        <div class="tog" id="togELI" onclick="togFeat('eli12')">
+          <div><div class="tlbl">&#x1F9D3; Plain language</div><div class="tdesc">Simplify complex text</div></div>
+          <div class="sw"></div>
+        </div>
+        <div class="tog" id="togTR" onclick="togFeat('translate')">
+          <div><div class="tlbl">&#x1F310; Translate</div><div class="tdesc">Convert to another language</div></div>
+          <div class="sw"></div>
+        </div>
+      </div>
+      <div class="lrow" id="lrow" style="display:none">
+        <span class="llbl">Translate to</span>
+        <select class="lsel" id="langSel">
+          <option value="Hebrew">Hebrew</option>
+          <option value="English">English</option>
+          <option value="Arabic">Arabic</option>
+          <option value="Russian">Russian</option>
+          <option value="French">French</option>
+          <option value="Spanish">Spanish</option>
+          <option value="Amharic">Amharic</option>
+        </select>
+      </div>
+    </div>
+    <div class="sec">
+      <button class="runbtn" id="runBtn" onclick="doRun()">&#x25B6; Process document</button>
+      <div class="abts">
+        <button class="abt" onclick="doReset()">Reset</button>
+        <button class="abt" onclick="location.reload()">Refresh</button>
+      </div>
+    </div>
+  </div>
+  <div class="right">
+    <div class="ohdr">
+      <button class="otab active" id="tab0" onclick="showTab('ocr')">Document</button>
+      <button class="otab" id="tab1" onclick="showTab('eli12')" style="display:none">Plain language</button>
+      <button class="otab" id="tab2" onclick="showTab('translation')" style="display:none">Translation</button>
+      <span class="ometa" id="meta"></span>
+    </div>
+    <div class="obody" id="outBody">
+      <div class="ph">
+        <div class="ph-icon">&#x25A4;</div>
+        <div class="ph-title">No document loaded</div>
+        <div class="ph-sub">Upload an image then click Process document.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle"></div>
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+<script>
+var mode='upload',selFiles=[],feats={eli12:false,translate:false};
+var out={ocr:'',eli12:'',translation:''};
+var analysis=null,isSpeaking=false;
 
-⌗
-Drop image here or click to browse
-JPEG · PNG · WEBP · TIFF · BMP
-AI FEATURES
-📖 OCR extraction
-Always on
-🧠 Smart analysis
-Auto-detects type & actions
-🧓 Plain language
-Simplify complex text
-🌐 Translate
-Convert to another language
-▶ PROCESS DOCUMENT
-Reset
-Refresh
-DOCUMENT
-▤
-No document loaded
-Upload an image then click Process document.
+fetch('/health').then(function(r){if(r.ok){document.getElementById('dot').className='dot on';document.getElementById('sl').textContent='Online';}}).catch(function(){});
+
+function setMode(m){
+  mode=m;
+  document.getElementById('tabUp').classList.toggle('active',m==='upload');
+  document.getElementById('tabBa').classList.toggle('active',m==='batch');
+  document.getElementById('tabUr').classList.toggle('active',m==='url');
+  document.getElementById('upSec').style.display=m!=='url'?'flex':'none';
+  document.getElementById('urlSec').style.display=m==='url'?'':'none';
+  document.getElementById('fileIn').multiple=(m==='batch');
+  selFiles=[];renderThumbs();
+}
+function togFeat(k){
+  feats[k]=!feats[k];
+  document.getElementById(k==='eli12'?'togELI':'togTR').classList.toggle('on',feats[k]);
+  if(k==='translate')document.getElementById('lrow').style.display=feats.translate?'flex':'none';
+}
+function fileChange(e){selFiles=Array.from(e.target.files);renderThumbs();}
+function dzOver(e){e.preventDefault();document.getElementById('dz').classList.add('over');}
+function dzLeave(){document.getElementById('dz').classList.remove('over');}
+function dzDrop(e){
+  e.preventDefault();document.getElementById('dz').classList.remove('over');
+  selFiles=Array.from(e.dataTransfer.files).filter(function(f){return f.type.indexOf('image/')===0;});
+  renderThumbs();
+}
+function renderThumbs(){
+  var row=document.getElementById('thumbs');row.innerHTML='';
+  selFiles.slice(0,8).forEach(function(f){
+    var d=document.createElement('div');d.className='thumb';
+    var i=document.createElement('img');i.src=URL.createObjectURL(f);
+    d.appendChild(i);row.appendChild(d);
+  });
+}
+function doRun(){
+  var btn=document.getElementById('runBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Processing...';
+  showProcessing();
+  runAsync().catch(function(e){
+    document.getElementById('outBody').innerHTML='<div class="err">&#x26A0; '+esc(e.message)+'</div>';
+  }).finally(function(){btn.disabled=false;btn.innerHTML='&#x25B6; Process document';});
+}
+async function runAsync(){
+  setStep(1,'active');
+  var txt='';
+  if(mode==='url'){
+    var u=document.getElementById('urlIn').value.trim();
+    if(!u)throw new Error('Please enter an image URL.');
+    var r=await fetch('/ocr/url?mode=text',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:u})});
+    if(!r.ok){var e=await r.json();throw new Error(e.detail||r.statusText);}
+    txt=(await r.json()).text;
+  }else{
+    if(!selFiles.length)throw new Error('Please select an image file.');
+    var fd=new FormData();
+    if(mode==='batch')selFiles.forEach(function(f){fd.append('files',f);});
+    else fd.append('file',selFiles[0]);
+    var ep=mode==='batch'?'/ocr/batch':'/ocr/upload';
+    var r=await fetch(ep+'?mode=text',{method:'POST',body:fd});
+    if(!r.ok){var e=await r.json();throw new Error(Array.isArray(e.detail)?e.detail.map(function(x){return x.msg;}).join(', '):e.detail);}
+    var d=await r.json();
+    txt=mode==='batch'?d.results.map(function(x){return x.text;}).join('\n---\n'):d.text;
+  }
+  setStep(1,'done');out.ocr=txt;
+  setStep(2,'active');
+  try{
+    var ar=await fetch('/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:txt})});
+    if(ar.ok){var ad=await ar.json();try{analysis=JSON.parse(ad.result);}catch(e){analysis=null;}}
+    else analysis=null;
+  }catch(e){analysis=null;}
+  setStep(2,'done');
+  if(feats.eli12){
+    setStep(3,'active');
+    var r=await fetch('/ai/eli12',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:txt})});
+    if(!r.ok)throw new Error('AI simplification failed.');
+    out.eli12=(await r.json()).result;setStep(3,'done');
+  }
+  if(feats.translate){
+    setStep(4,'active');
+    var lang=document.getElementById('langSel').value;
+    var src=feats.eli12?out.eli12:txt;
+    var r=await fetch('/ai/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:src,language:lang})});
+    if(!r.ok)throw new Error('Translation failed.');
+    out.translation=(await r.json()).result;setStep(4,'done');
+  }
+  renderResults();
+}
+function showProcessing(){
+  var h='<div class="pcard"><div class="ptitle">Processing</div>';
+  h+='<div class="pstep waiting" id="s1"><span class="si">&#x1F4D6;</span> OCR extraction</div>';
+  h+='<div class="pstep waiting" id="s2"><span class="si">&#x1F9E0;</span> Smart analysis</div>';
+  if(feats.eli12)h+='<div class="pstep waiting" id="s3"><span class="si">&#x1F9D3;</span> Plain language</div>';
+  if(feats.translate)h+='<div class="pstep waiting" id="s4"><span class="si">&#x1F310;</span> Translation</div>';
+  h+='</div>';
+  document.getElementById('outBody').innerHTML=h;
+  document.getElementById('meta').textContent='';
+  document.getElementById('tab1').style.display='none';
+  document.getElementById('tab2').style.display='none';
+}
+function setStep(n,s){var el=document.getElementById('s'+n);if(el)el.className='pstep '+s;}
+function renderResults(){
+  document.getElementById('tab1').style.display=feats.eli12?'':'none';
+  document.getElementById('tab2').style.display=feats.translate?'':'none';
+  showTab('ocr');
+  var wc=out.ocr.split(/\s+/).filter(function(w){return w.length>0;}).length;
+  document.getElementById('meta').textContent=wc+' words';
+}
+function getCards(){
+  var cards=[
+    {color:'red',icon:'&#x1F4C4;',title:'Full OCR',sub:'View extracted text',action:'showOCR'},
+    {color:'cyan',icon:'&#x1F9E0;',title:'Doc Summary',sub:'Plain-language overview',action:'showSummary'},
+    {color:'pink',icon:'&#x1F4EC;',title:'Entity & Contacts',sub:'Names, addresses, phones',action:'showContacts'},
+    {color:'slate',icon:'&#x1F50D;',title:'Compliance',sub:'Rules & requirements',action:'showCompliance'},
+    {color:'lime',icon:'&#x1F310;',title:'Translate',sub:'Convert to another language',action:'showTranslateModal'},
+    {color:'yellow',icon:'&#x23F0;',title:'Time-sensitive',sub:'Deadlines & urgent items',action:'showUrgent'},
+    {color:'brown',icon:'&#x2696;&#xFE0F;',title:'Legal / Policy',sub:'Rights & obligations',action:'showLegal'},
+    {color:'darkgreen',icon:'&#x2709;&#xFE0F;',title:'Write a reply',sub:'Compose & copy a letter',action:'showReply'},
+  ];
+  if(analysis&&analysis.payment_required){
+    cards.unshift({color:'red urgent',icon:'&#x1F4B3;',title:'Payment Required',sub:analysis.payment_amount||(analysis.payment_due?'Due: '+analysis.payment_due:'Action needed'),action:'showPayment'});
+  }
+  return cards;
+}
+function buildCards(){
+  var cards=getCards();
+  var h='<div class="card-grid">';
+  cards.forEach(function(c){
+    h+='<div class="acard '+c.color+'" onclick="cardAction(\''+c.action+'\')">';
+    h+='<div class="acard-icon">'+c.icon+'</div>';
+    h+='<div class="acard-title">'+c.title+'</div>';
+    h+='<div class="acard-sub">'+c.sub+'</div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  return h;
+}
+function showTab(tab){
+  document.querySelectorAll('.otab').forEach(function(t){t.classList.remove('active');});
+  var ids={ocr:'tab0',eli12:'tab1',translation:'tab2'};
+  var el=document.getElementById(ids[tab]);if(el)el.classList.add('active');
+  if(tab==='ocr'){
+    var banner='';
+    if(analysis&&analysis.document_type){
+      banner='<div class="doc-banner"><div class="doc-banner-icon">&#x1F4CB;</div><div>';
+      banner+='<div class="doc-banner-label">Document type</div>';
+      banner+='<div class="doc-banner-type">'+esc(analysis.document_type)+'</div>';
+      if(analysis.summary)banner+='<div class="doc-banner-summary">'+esc(analysis.summary)+'</div>';
+      banner+='</div></div>';
+    }
+    document.getElementById('outBody').innerHTML=banner+buildCards();
+    return;
+  }
+  var text=out[tab]||'';
+  if(!text){document.getElementById('outBody').innerHTML='<div class="ph"><div class="ph-icon">&#x25A4;</div><div class="ph-title">No output</div></div>';return;}
+  var heC=0;for(var i=0;i<text.length;i++){var c=text.charCodeAt(i);if(c>=1488&&c<=1514)heC++;}
+  var isRtl=heC>2;
+  window._ct=text;
+  var lines=text.split('\n').map(function(l){return esc(l);}).join('<br>');
+  document.getElementById('outBody').innerHTML=
+    '<div class="otext" style="direction:'+(isRtl?'rtl':'ltr')+';text-align:'+(isRtl?'right':'left')+';unicode-bidi:embed">'+lines+'</div>'+
+    '<div class="oacts"><button class="oabtn" id="spkBtn" onclick="doSpeak()">&#x1F50A; Listen</button><button class="oabtn" onclick="doCopy(this)">&#x1F4CB; Copy</button></div>';
+  document.getElementById('outBody').style.direction=isRtl?'rtl':'ltr';
+}
+function cardAction(action){
+  var fns={showOCR:showOCR,showSummary:showSummary,showTranslateModal:showTranslateModal,showUrgent:showUrgent,showContacts:showContacts,showLegal:showLegal,showCompliance:showCompliance,showReply:showReply,showPayment:showPayment};
+  if(fns[action])fns[action]();
+}
+function openModal(title,bodyHtml){
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalBody').innerHTML=bodyHtml;
+  document.getElementById('modalOverlay').style.display='flex';
+}
+function closeModal(e){if(!e||e.target===document.getElementById('modalOverlay'))document.getElementById('modalOverlay').style.display='none';}
+function showOCR(){
+  var text=out.ocr;var heC=0;for(var i=0;i<text.length;i++){var c=text.charCodeAt(i);if(c>=1488&&c<=1514)heC++;}
+  var isRtl=heC>2;window._ct=text;
+  openModal('Full extracted text',
+    '<div style="direction:'+(isRtl?'rtl':'ltr')+';text-align:'+(isRtl?'right':'left')+';line-height:1.9;color:var(--text)">'+text.split('\n').map(function(l){return esc(l);}).join('<br>')+'</div>'+
+    '<div style="display:flex;gap:8px;margin-top:16px"><button onclick="doSpeak()" style="padding:8px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);cursor:pointer;font-family:Space Grotesk,sans-serif;font-size:12px">&#x1F50A; Listen</button><button onclick="doCopy(this)" style="padding:8px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);cursor:pointer;font-family:Space Grotesk,sans-serif;font-size:12px">&#x1F4CB; Copy</button></div>');
+}
+function aiModal(title,prompt){
+  openModal(title,'<div class="loading"><span class="spin"></span> Analyzing...</div>');
+  fetch('/ai/eli12',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:prompt})})
+    .then(function(r){return r.json();})
+    .then(function(d){document.getElementById('modalBody').innerHTML='<div style="line-height:1.8;color:var(--text)">'+d.result.split('\n').map(function(l){return esc(l);}).join('<br>')+'</div>';})
+    .catch(function(){document.getElementById('modalBody').innerHTML='<div style="color:var(--red)">Failed. Please try again.</div>';});
+}
+function showSummary(){aiModal('Document summary','Summarize this document in plain language. What is it? What does the recipient need to know or do?\n\n'+out.ocr);}
+function showUrgent(){aiModal('Time-sensitive actions','List all deadlines, due dates, and time-sensitive actions from this document with dates if available.\n\n'+out.ocr);}
+function showContacts(){aiModal('Entity & contact details','Extract all names, organizations, addresses, phone numbers, emails, and reference numbers. Present as a clear list.\n\n'+out.ocr);}
+function showLegal(){aiModal('Legal & policy information','Explain the legal rights, obligations, and policy implications in plain language.\n\n'+out.ocr);}
+function showCompliance(){aiModal('Compliance & requirements','What are the compliance requirements mentioned? What must the recipient do?\n\n'+out.ocr);}
+function showPayment(){
+  var a=analysis||{};
+  var h='';
+  if(a.payment_amount)h+='<div style="font-family:Bricolage Grotesque,sans-serif;font-size:40px;font-weight:800;color:var(--red);margin:4px 0 8px">'+esc(a.payment_amount)+'</div>';
+  if(a.payment_due)h+='<div style="color:var(--amber);font-size:14px;margin-bottom:14px">&#x23F0; Due: '+esc(a.payment_due)+'</div>';
+  if(a.payment_note)h+='<div style="line-height:1.7;color:var(--text2);margin-bottom:12px">'+esc(a.payment_note)+'</div>';
+  if(a.summary)h+='<div style="line-height:1.8;color:var(--text2)">'+esc(a.summary)+'</div>';
+  openModal('Payment required',h||'Payment is required for this document.');
+}
+function showTranslateModal(){
+  var lang=document.getElementById('langSel').value||'English';
+  openModal('Translate to '+lang,'<div class="loading"><span class="spin"></span> Translating...</div>');
+  fetch('/ai/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:out.ocr,language:lang})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var t=d.result;var heC=0;for(var i=0;i<t.length;i++){var c=t.charCodeAt(i);if(c>=1488&&c<=1514)heC++;}
+      var rtl=heC>2;
+      document.getElementById('modalBody').innerHTML='<div style="direction:'+(rtl?'rtl':'ltr')+';text-align:'+(rtl?'right':'left')+';line-height:1.9;color:var(--text)">'+t.split('\n').map(function(l){return esc(l);}).join('<br>')+'</div>';
+    })
+    .catch(function(){document.getElementById('modalBody').innerHTML='<div style="color:var(--red)">Translation failed.</div>';});
+}
+function showReply(){
+  var addr=analysis&&analysis.reply_address?analysis.reply_address:'';
+  var h='';
+  if(addr)h+='<div style="margin-bottom:14px"><div class="cp-lbl">Send to</div><div class="address-box">'+esc(addr)+'</div></div>';
+  h+='<div class="cp-row"><div class="cp-lbl">Your name</div><input class="cp-inp" id="cpName" placeholder="Full name"/></div>';
+  h+='<div class="cp-row"><div class="cp-lbl">Your address</div><input class="cp-inp" id="cpFrom" placeholder="Your return address"/></div>';
+  h+='<div class="cp-row"><div class="cp-lbl">Message</div><textarea class="cp-inp cp-ta" id="cpMsg" placeholder="Type your reply..."></textarea></div>';
+  h+='<div class="cp-actions"><button class="cp-send" onclick="doSendMail(\''+addr.replace(/'/g,"\\'").replace(/\n/g,' ')+'\')">&#x1F4EC; Copy formatted letter</button><button class="cp-cancel" onclick="closeModal()">Cancel</button></div>';
+  openModal('Write a reply',h);
+}
+function doSendMail(addr){
+  var name=document.getElementById('cpName').value.trim();
+  var from=document.getElementById('cpFrom').value.trim();
+  var msg=document.getElementById('cpMsg').value.trim();
+  var today=new Date().toLocaleDateString('en-GB');
+  var letter=(name?name+'\n':'')+(from?from+'\n':'')+'\n'+today+'\n\nTo:\n'+addr+'\n\n'+msg+'\n\nSincerely,\n'+(name||'');
+  navigator.clipboard.writeText(letter).then(function(){
+    var btn=document.querySelector('.cp-send');
+    btn.innerHTML='&#x2705; Copied!';setTimeout(function(){btn.innerHTML='&#x1F4EC; Copy formatted letter';},2000);
+  });
+}
+function doSpeak(){
+  var text=window._ct||out.ocr||'';
+  if(isSpeaking){window.speechSynthesis.cancel();isSpeaking=false;return;}
+  var heC=0;for(var i=0;i<text.length;i++){var c=text.charCodeAt(i);if(c>=1488&&c<=1514)heC++;}
+  var u=new SpeechSynthesisUtterance(text);u.lang=heC>2?'he-IL':'en-US';u.rate=0.88;
+  u.onend=function(){isSpeaking=false;};
+  isSpeaking=true;window.speechSynthesis.speak(u);
+}
+function doCopy(btn){
+  navigator.clipboard.writeText(window._ct||out.ocr||'').then(function(){
+    var orig=btn.innerHTML;btn.innerHTML='&#x2705; Copied';setTimeout(function(){btn.innerHTML=orig;},1500);
+  });
+}
+function doReset(){
+  selFiles=[];out={ocr:'',eli12:'',translation:''};analysis=null;
+  document.getElementById('fileIn').value='';document.getElementById('urlIn').value='';
+  document.getElementById('thumbs').innerHTML='';
+  document.getElementById('outBody').innerHTML='<div class="ph"><div class="ph-icon">&#x25A4;</div><div class="ph-title">No document loaded</div><div class="ph-sub">Upload an image then click Process document.</div></div>';
+  document.getElementById('meta').textContent='';
+  if(isSpeaking){window.speechSynthesis.cancel();isSpeaking=false;}
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>
