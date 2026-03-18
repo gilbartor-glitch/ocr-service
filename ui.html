@@ -96,7 +96,7 @@ nav{display:flex;align-items:center;padding:0 40px;height:58px;border-bottom:1px
 .doc-banner-icon{font-size:24px;margin-top:2px}
 .doc-banner-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,149,255,.7);margin-bottom:3px}
 .doc-banner-type{font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;color:var(--text)}
-.doc-banner-summary{font-size:13px;color:var(--text2);margin-top:4px;line-height:1.5}
+.doc-banner-summary{display:none}
 .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:24px}
 .acard{border-radius:16px;padding:20px;cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;animation:popIn .35s ease forwards;opacity:0;border:none;display:flex;flex-direction:column;gap:6px;min-height:130px;font-family:'Space Grotesk',sans-serif}
 .acard:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,.5)}
@@ -381,7 +381,7 @@ function showTab(tab){
       banner='<div class="doc-banner"><div class="doc-banner-icon">&#x1F4CB;</div><div>';
       banner+='<div class="doc-banner-label">Document type</div>';
       banner+='<div class="doc-banner-type">'+esc(analysis.document_type)+'</div>';
-      if(analysis.summary)banner+='<div class="doc-banner-summary">'+esc(analysis.summary)+'</div>';
+      
       banner+='</div></div>';
     }
     document.getElementById('outBody').innerHTML=banner+buildCards();
