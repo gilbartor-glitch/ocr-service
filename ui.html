@@ -1,73 +1,524 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.4">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 20.0px 'Helvetica Neue'; color: #eaecff; -webkit-text-stroke: #eaecff}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #757ca0; -webkit-text-stroke: #757ca0; background-color: #353b5b; min-height: 14.0px}
-    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #757ca0; -webkit-text-stroke: #757ca0}
-    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px 'Helvetica Neue'; color: #353b5b; -webkit-text-stroke: #353b5b}
-    p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; text-align: center; font: 12.0px 'Helvetica Neue'; color: #1ce0ff; -webkit-text-stroke: #1ce0ff; background-color: #10111c}
-    p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; text-align: center; font: 12.0px 'Helvetica Neue'; color: #757ca0; -webkit-text-stroke: #757ca0}
-    p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 11.0px 'Helvetica Neue'; color: #eaecff; -webkit-text-stroke: #eaecff; min-height: 12.0px}
-    p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 32.0px 'Helvetica Neue'; color: #eaecff; -webkit-text-stroke: #eaecff}
-    p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'; color: #757ca0; -webkit-text-stroke: #757ca0}
-    p.p10 {margin: 0.0px 0.0px 0.0px 0.0px; font: 11.0px 'Helvetica Neue'; color: #353b5b; -webkit-text-stroke: #353b5b}
-    p.p11 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'; color: #eaecff; -webkit-text-stroke: #eaecff}
-    p.p12 {margin: 0.0px 0.0px 0.0px 0.0px; font: 15.0px 'Helvetica Neue'; color: #eaecff; -webkit-text-stroke: #eaecff; background-color: #1ce0ff; background-color: rgba(28, 224, 255, 0.2); min-height: 17.0px}
-    p.p13 {margin: 0.0px 0.0px 0.0px 0.0px; font: 15.0px 'Helvetica Neue'; color: #eaecff; -webkit-text-stroke: #eaecff; background-color: #10111c; min-height: 17.0px}
-    p.p14 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'; color: #eaecff; -webkit-text-stroke: #000000}
-    p.p15 {margin: 0.0px 0.0px 0.0px 0.0px; text-align: center; font: 11.0px 'Helvetica Neue'; color: #1ce0ff; -webkit-text-stroke: #1ce0ff}
-    p.p16 {margin: 0.0px 0.0px 0.0px 0.0px; font: 11.0px 'Helvetica Neue'; color: #353b5b; -webkit-text-stroke: #353b5b; min-height: 12.0px}
-    p.p17 {margin: 0.0px 0.0px 0.0px 0.0px; text-align: center; font: 48.0px 'Helvetica Neue'; color: #353b5b; -webkit-text-stroke: #353b5b}
-    p.p18 {margin: 0.0px 0.0px 0.0px 0.0px; text-align: center; font: 16.0px 'Helvetica Neue'; color: #757ca0; -webkit-text-stroke: #757ca0}
-    p.p19 {margin: 0.0px 0.0px 0.0px 0.0px; text-align: center; font: 13.0px 'Helvetica Neue'; color: #353b5b; -webkit-text-stroke: #353b5b; background-color: #08090d}
-    span.s1 {font-kerning: none; background-color: rgba(8, 9, 13, 0.8)}
-    span.s2 {font-kerning: none}
-    span.s3 {font: 12.0px 'Helvetica Neue'; font-kerning: none; color: #757ca0; -webkit-text-stroke: 0px #757ca0}
-    span.s4 {font-kerning: none; background-color: #0c0d14}
-    span.s5 {font-kerning: none; background-color: #08090d}
-    span.s6 {font-kerning: none; background-color: rgba(28, 224, 255, 0.078)}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SimpliScan</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bricolage+Grotesque:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080f;
+  --bg2:#0d0f1a;
+  --bg3:#131626;
+  --border:#1e2235;
+  --border2:#2a2f4a;
+  --text:#eef0ff;
+  --text2:#8890b0;
+  --text3:#454d6e;
+  --cyan:#00e5ff;
+  --cyan-dim:rgba(0,229,255,.08);
+  --amber:#ffb830;
+  --amber-dim:rgba(255,184,48,.08);
+  --red:#ff4d6d;
+  --red-dim:rgba(255,77,109,.08);
+  --green:#00e676;
+  --green-dim:rgba(0,230,118,.08);
+  --purple:#b388ff;
+  --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:15px;min-height:100vh;overflow-x:hidden}
+
+/* Background mesh */
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 60% 40% at 10% 20%,rgba(0,229,255,.04) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 60% at 90% 80%,rgba(179,136,255,.04) 0%,transparent 60%);
+  pointer-events:none;z-index:0}
+
+nav{display:flex;align-items:center;padding:0 40px;height:58px;border-bottom:1px solid var(--border);background:rgba(7,8,15,.8);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.logo{font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.02em}
+.logo em{font-style:normal;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nst{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--text3);transition:all .3s}
+.dot.on{background:var(--green);box-shadow:0 0 10px var(--green)}
+.nlink{margin-left:20px;font-size:12px;color:var(--text2);text-decoration:none;padding:5px 14px;border:1px solid var(--border2);border-radius:8px;transition:all .2s}
+.nlink:hover{border-color:var(--cyan);color:var(--cyan)}
+
+.wrap{display:grid;grid-template-columns:380px 1fr;min-height:calc(100vh - 58px);position:relative;z-index:1}
+.left{border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2)}
+.sec{border-bottom:1px solid var(--border);padding:18px 22px}
+.sec.grow{border-bottom:none;flex:1;display:flex;flex-direction:column}
+.lbl{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
+
+.tabs{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px}
+.tab{flex:1;padding:7px;text-align:center;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;border-radius:8px;border:none;background:transparent;transition:all .2s;font-family:'Space Grotesk',sans-serif}
+.tab.active{background:var(--bg3);color:var(--cyan);border:1px solid rgba(0,229,255,.2)}
+
+.dz{flex:1;border:1.5px dashed var(--border2);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:all .25s;position:relative;min-height:160px;background:linear-gradient(135deg,var(--bg) 0%,rgba(0,229,255,.02) 100%)}
+.dz:hover,.dz.over{border-color:var(--cyan);background:var(--cyan-dim);box-shadow:0 0 30px rgba(0,229,255,.05) inset}
+.dz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.dzi{font-size:32px;opacity:.3;pointer-events:none;filter:drop-shadow(0 0 8px var(--cyan))}
+.dzt{font-size:13px;font-weight:600;color:var(--text2);pointer-events:none}
+.dzh{font-size:11px;color:var(--text3);pointer-events:none}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.thumb{width:56px;height:56px;border-radius:10px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.4)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.urlin{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);outline:none;font-family:'Space Grotesk',sans-serif;transition:border .2s}
+.urlin:focus{border-color:var(--cyan)}
+.urlin::placeholder{color:var(--text3)}
+
+.togs{display:flex;flex-direction:column;gap:8px}
+.tog{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s}
+.tog.on{border-color:rgba(0,229,255,.3);background:var(--cyan-dim)}
+.tlbl{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.tdesc{font-size:11px;color:var(--text3);margin-top:2px}
+.sw{width:36px;height:20px;border-radius:10px;background:var(--bg3);border:1px solid var(--border2);position:relative;transition:all .2s;flex-shrink:0}
+.sw::after{content:'';position:absolute;width:14px;height:14px;background:var(--text3);border-radius:50%;top:2px;left:2px;transition:all .2s}
+.tog.on .sw{background:rgba(0,229,255,.2);border-color:var(--cyan)}
+.tog.on .sw::after{background:var(--cyan);left:18px;box-shadow:0 0 8px var(--cyan)}
+.lrow{display:flex;align-items:center;gap:10px;margin-top:8px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px}
+.llbl{font-size:12px;color:var(--text2);white-space:nowrap}
+.lsel{flex:1;background:transparent;border:none;color:var(--text);font-size:13px;outline:none;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.lsel option{background:var(--bg2)}
+
+.runbtn{width:100%;padding:14px;background:linear-gradient(135deg,var(--cyan),#0091ea);color:#000;border:none;border-radius:var(--r);font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;box-shadow:0 4px 20px rgba(0,229,255,.2)}
+.runbtn:hover{box-shadow:0 6px 30px rgba(0,229,255,.4);transform:translateY(-1px)}
+.runbtn:disabled{background:var(--bg3);color:var(--text3);cursor:not-allowed;box-shadow:none;transform:none}
+.abts{display:flex;gap:8px;margin-top:8px}
+.abt{flex:1;padding:9px;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:10px;font-size:12px;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s}
+.abt:hover{border-color:var(--border2);color:var(--text)}
+
+/* Right panel */
+.right{display:flex;flex-direction:column;background:var(--bg)}
+.ohdr{border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;height:48px;gap:4px}
+.otab{height:100%;padding:0 14px;font-size:11px;font-weight:600;color:var(--text3);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;letter-spacing:.08em;text-transform:uppercase;font-family:'Space Grotesk',sans-serif;transition:all .2s}
+.otab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.ometa{margin-left:auto;font-size:11px;color:var(--text3)}
+.obody{flex:1;overflow-y:auto;padding:28px}
+.obody::-webkit-scrollbar{width:4px}
+.obody::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.otext{font-size:15px;line-height:1.9;color:var(--text)}
+.oacts{display:flex;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.oabtn{padding:8px 16px;background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Space Grotesk',sans-serif;transition:all .2s}
+.oabtn:hover{border-color:var(--cyan);color:var(--cyan)}
+.oabtn.spk{background:rgba(0,229,255,.1);color:var(--cyan);border-color:rgba(0,229,255,.3)}
+
+/* Placeholder */
+.ph{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;color:var(--text3);text-align:center;padding:40px}
+.ph-icon{font-size:48px;opacity:.2}
+.ph-title{font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:700;color:var(--text2)}
+.ph-sub{font-size:13px;line-height:1.7;max-width:300px}
+.err{background:rgba(255,77,109,.06);border:1px solid rgba(255,77,109,.2);border-radius:var(--r);padding:16px;font-size:13px;color:var(--red);line-height:1.6}
+
+/* Processing card */
+.pcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:24px;max-width:360px;margin:0 auto}
+.ptitle{font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:18px}
+.pstep{display:flex;align-items:center;gap:12px;padding:10px 0;font-size:13px}
+.pstep+.pstep{border-top:1px solid var(--border)}
+.pstep.done{color:var(--green)}.pstep.active{color:var(--text)}.pstep.waiting{color:var(--text3)}
+.si{font-size:15px;width:24px;text-align:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(0,229,255,.2);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+
+/* ── INSIGHT CARDS ─────────────────────────────────────────── */
+.insight-grid{display:grid;gap:14px;margin-bottom:24px}
+
+.icard{border-radius:var(--r);padding:18px 20px;border:1px solid;position:relative;overflow:hidden;animation:slideUp .3s ease forwards;opacity:0}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.icard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+
+/* Blue — context */
+.icard.context{background:rgba(0,149,255,.07);border-color:rgba(0,149,255,.25)}
+.icard.context::before{background:linear-gradient(90deg,#0095ff,#00e5ff)}
+.icard.context .ic-icon{color:#0095ff}
+
+/* Red — payment */
+.icard.payment{background:rgba(255,77,109,.07);border-color:rgba(255,77,109,.3)}
+.icard.payment::before{background:linear-gradient(90deg,var(--red),#ff9a3c)}
+.icard.payment .ic-icon{color:var(--red)}
+
+/* Green — no payment */
+.icard.nopayment{background:rgba(0,230,118,.05);border-color:rgba(0,230,118,.2)}
+.icard.nopayment::before{background:linear-gradient(90deg,var(--green),#00bcd4)}
+.icard.nopayment .ic-icon{color:var(--green)}
+
+/* Amber — mail */
+.icard.mail{background:rgba(255,184,48,.07);border-color:rgba(255,184,48,.25)}
+.icard.mail::before{background:linear-gradient(90deg,var(--amber),#ff9a3c)}
+.icard.mail .ic-icon{color:var(--amber)}
+
+.ic-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.ic-icon{font-size:18px;flex-shrink:0}
+.ic-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text3)}
+.ic-title{font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:4px}
+.ic-body{font-size:13px;color:var(--text2);line-height:1.6}
+.ic-amount{font-family:'Bricolage Grotesque',sans-serif;font-size:26px;font-weight:800;color:var(--red);margin:8px 0 4px}
+.ic-due{font-size:12px;color:rgba(255,77,109,.7)}
+
+/* Mail compose */
+.mail-address{font-size:13px;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:10px 0;font-style:italic;line-height:1.5}
+.compose-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;background:linear-gradient(135deg,var(--amber),#ff9a3c);color:#000;border:none;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-top:4px;transition:all .2s}
+.compose-btn:hover{box-shadow:0 4px 16px rgba(255,184,48,.4);transform:translateY(-1px)}
+
+/* Mail compose panel */
+.compose-panel{margin-top:14px;background:var(--bg3);border:1px solid rgba(255,184,48,.2);border-radius:12px;padding:16px;display:none}
+.compose-panel.open{display:block;animation:slideUp .2s ease}
+.cp-row{margin-bottom:12px}
+.cp-lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.cp-inp{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);outline:none;font-family:'Space Grotesk',sans-serif;transition:border .2s}
+.cp-inp:focus{border-color:var(--amber)}
+.cp-ta{min-height:120px;resize:vertical}
+.cp-actions{display:flex;gap:8px;margin-top:4px}
+.cp-send{flex:1;padding:10px;background:linear-gradient(135deg,var(--amber),#ff9a3c);color:#000;border:none;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.cp-send:hover{box-shadow:0 4px 16px rgba(255,184,48,.3)}
+.cp-cancel{padding:10px 16px;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.cp-cancel:hover{color:var(--text);border-color:var(--border2)}
+
+/* OCR text section */
+.ocr-section{margin-top:0}
+.ocr-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.ocr-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+@media(max-width:800px){.wrap{grid-template-columns:1fr}.left{border-right:none;border-bottom:1px solid var(--border)}nav{padding:0 16px}}
+
+/* Animation delays for cards */
+.icard:nth-child(1){animation-delay:.05s}
+.icard:nth-child(2){animation-delay:.12s}
+.icard:nth-child(3){animation-delay:.19s}
+</style>
 </head>
 <body>
-<p class="p1"><span class="s1">SimpliScan</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p3"><span class="s1">Connecting</span></p>
-<p class="p3"><span class="s1"><a href="file:///landing">About<span class="s3"></span></a></span></p>
-<p class="p4"><span class="s4">INPUT MODE</span></p>
-<p class="p5"><span class="s2">Upload</span></p>
-<p class="p6"><span class="s5">Batch</span></p>
-<p class="p6"><span class="s5">URL</span></p>
-<p class="p4"><span class="s4">DOCUMENT</span></p>
-<p class="p7"><span class="s2"></span><br></p>
-<p class="p8"><span class="s4">⊞</span></p>
-<p class="p9"><span class="s4">Drop image here or click to browse</span></p>
-<p class="p10"><span class="s4">JPEG · PNG · WEBP · TIFF · BMP</span></p>
-<p class="p4"><span class="s4">AI FEATURES</span></p>
-<p class="p11"><span class="s6">📖 OCR extraction</span></p>
-<p class="p10"><span class="s6">Always on</span></p>
-<p class="p12"><span class="s2"></span><br></p>
-<p class="p11"><span class="s6">🧠 Smart analysis</span></p>
-<p class="p10"><span class="s6">Context, payment &amp; mail detection</span></p>
-<p class="p12"><span class="s2"></span><br></p>
-<p class="p11"><span class="s5">🧓 Plain language</span></p>
-<p class="p10"><span class="s5">Simplify complex text</span></p>
-<p class="p13"><span class="s2"></span><br></p>
-<p class="p11"><span class="s5">🌐 Translate</span></p>
-<p class="p10"><span class="s5">Convert to another language</span></p>
-<p class="p13"><span class="s2"></span><br></p>
-<p class="p14"><span class="s4">▶ PROCESS DOCUMENT</span></p>
-<p class="p6"><span class="s4">Reset</span></p>
-<p class="p6"><span class="s4">Refresh</span></p>
-<p class="p15"><span class="s5">EXTRACTED TEXT</span></p>
-<p class="p16"><span class="s2"></span><br></p>
-<p class="p17"><span class="s5">⊞</span></p>
-<p class="p18"><span class="s5">No document loaded</span></p>
-<p class="p19"><span class="s2">Upload an image then click Process document.</span></p>
+<nav>
+  <span class="logo">Simpli<em>Scan</em></span>
+  <div class="nst"><span class="dot" id="dot"></span><span id="sl">Connecting</span></div>
+  <a href="/landing" class="nlink">About</a>
+</nav>
+<div class="wrap">
+  <div class="left">
+    <div class="sec">
+      <div class="lbl">Input mode</div>
+      <div class="tabs">
+        <button class="tab active" id="tabUp" onclick="setMode('upload')">Upload</button>
+        <button class="tab" id="tabBa" onclick="setMode('batch')">Batch</button>
+        <button class="tab" id="tabUr" onclick="setMode('url')">URL</button>
+      </div>
+    </div>
+    <div class="sec grow" id="upSec">
+      <div class="lbl">Document</div>
+      <div class="dz" id="dz" ondragover="dzOver(event)" ondragleave="dzLeave()" ondrop="dzDrop(event)">
+        <input type="file" id="fileIn" accept="image/*,.heic,.heif" onchange="fileChange(event)"/>
+        <div class="dzi">⊞</div>
+        <div class="dzt">Drop image here or click to browse</div>
+        <div class="dzh">JPEG · PNG · WEBP · TIFF · BMP</div>
+      </div>
+      <div class="thumbs" id="thumbs"></div>
+    </div>
+    <div class="sec" id="urlSec" style="display:none">
+      <div class="lbl">Image URL</div>
+      <input class="urlin" id="urlIn" type="url" placeholder="https://example.com/image.jpg"/>
+    </div>
+    <div class="sec">
+      <div class="lbl">AI features</div>
+      <div class="togs">
+        <div class="tog on" style="cursor:default">
+          <div><div class="tlbl">📖 OCR extraction</div><div class="tdesc">Always on</div></div>
+          <div class="sw"></div>
+        </div>
+        <div class="tog on" style="cursor:default">
+          <div><div class="tlbl">🧠 Smart analysis</div><div class="tdesc">Context, payment & mail detection</div></div>
+          <div class="sw"></div>
+        </div>
+        <div class="tog" id="togELI" onclick="togFeat('eli12')">
+          <div><div class="tlbl">🧓 Plain language</div><div class="tdesc">Simplify complex text</div></div>
+          <div class="sw"></div>
+        </div>
+        <div class="tog" id="togTR" onclick="togFeat('translate')">
+          <div><div class="tlbl">🌐 Translate</div><div class="tdesc">Convert to another language</div></div>
+          <div class="sw"></div>
+        </div>
+      </div>
+      <div class="lrow" id="lrow" style="display:none">
+        <span class="llbl">Translate to</span>
+        <select class="lsel" id="langSel">
+          <option value="Hebrew">Hebrew</option>
+          <option value="English">English</option>
+          <option value="Arabic">Arabic</option>
+          <option value="Russian">Russian</option>
+          <option value="French">French</option>
+          <option value="Spanish">Spanish</option>
+          <option value="Amharic">Amharic</option>
+        </select>
+      </div>
+    </div>
+    <div class="sec">
+      <button class="runbtn" id="runBtn" onclick="doRun()">▶ Process document</button>
+      <div class="abts">
+        <button class="abt" onclick="doReset()">Reset</button>
+        <button class="abt" onclick="location.reload()">Refresh</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="ohdr">
+      <button class="otab active" id="tab0" onclick="showTab('ocr')">Extracted text</button>
+      <button class="otab" id="tab1" onclick="showTab('eli12')" style="display:none">Plain language</button>
+      <button class="otab" id="tab2" onclick="showTab('translation')" style="display:none">Translation</button>
+      <span class="ometa" id="meta"></span>
+    </div>
+    <div class="obody" id="outBody">
+      <div class="ph">
+        <div class="ph-icon">⊞</div>
+        <div class="ph-title">No document loaded</div>
+        <div class="ph-sub">Upload an image then click Process document.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var mode='upload',selFiles=[],feats={eli12:false,translate:false};
+var out={ocr:'',eli12:'',translation:''};
+var analysis=null;
+var isSpeaking=false;
+
+fetch('/health').then(function(r){
+  if(r.ok){document.getElementById('dot').className='dot on';document.getElementById('sl').textContent='Online';}
+}).catch(function(){});
+
+function setMode(m){
+  mode=m;
+  ['Up','Ba','Ur'].forEach(function(x,i){document.getElementById('tab'+x).classList.toggle('active',['upload','batch','url'][i]===m);});
+  document.getElementById('upSec').style.display=m!=='url'?'flex':'none';
+  document.getElementById('urlSec').style.display=m==='url'?'':'none';
+  document.getElementById('fileIn').multiple=(m==='batch');
+  selFiles=[];renderThumbs();
+}
+function togFeat(k){
+  feats[k]=!feats[k];
+  document.getElementById(k==='eli12'?'togELI':'togTR').classList.toggle('on',feats[k]);
+  if(k==='translate')document.getElementById('lrow').style.display=feats.translate?'flex':'none';
+}
+function fileChange(e){selFiles=Array.from(e.target.files);renderThumbs();}
+function dzOver(e){e.preventDefault();document.getElementById('dz').classList.add('over');}
+function dzLeave(){document.getElementById('dz').classList.remove('over');}
+function dzDrop(e){
+  e.preventDefault();document.getElementById('dz').classList.remove('over');
+  selFiles=Array.from(e.dataTransfer.files).filter(function(f){return f.type.indexOf('image/')===0;});
+  renderThumbs();
+}
+function renderThumbs(){
+  var row=document.getElementById('thumbs');row.innerHTML='';
+  selFiles.slice(0,8).forEach(function(f){
+    var d=document.createElement('div');d.className='thumb';
+    var i=document.createElement('img');i.src=URL.createObjectURL(f);
+    d.appendChild(i);row.appendChild(d);
+  });
+}
+
+function doRun(){
+  var btn=document.getElementById('runBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Processing...';
+  showProcessing();
+  runAsync().catch(function(e){
+    document.getElementById('outBody').innerHTML='<div class="err">⚠ '+esc(e.message)+'</div>';
+  }).finally(function(){
+    btn.disabled=false;btn.innerHTML='▶ Process document';
+  });
+}
+
+async function runAsync(){
+  setStep(1,'active');
+  var txt='';
+  if(mode==='url'){
+    var u=document.getElementById('urlIn').value.trim();
+    if(!u)throw new Error('Please enter an image URL.');
+    var r=await fetch('/ocr/url?mode=text',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:u})});
+    if(!r.ok){var e=await r.json();throw new Error(e.detail||r.statusText);}
+    txt=(await r.json()).text;
+  }else{
+    if(!selFiles.length)throw new Error('Please select an image file.');
+    var fd=new FormData();
+    if(mode==='batch')selFiles.forEach(function(f){fd.append('files',f);});
+    else fd.append('file',selFiles[0]);
+    var ep=mode==='batch'?'/ocr/batch':'/ocr/upload';
+    var r=await fetch(ep+'?mode=text',{method:'POST',body:fd});
+    if(!r.ok){var e=await r.json();throw new Error(Array.isArray(e.detail)?e.detail.map(function(x){return x.msg;}).join(', '):e.detail);}
+    var d=await r.json();
+    txt=mode==='batch'?d.results.map(function(x){return x.text;}).join('\n---\n'):d.text;
+  }
+  setStep(1,'done');out.ocr=txt;
+
+  // Smart analysis
+  setStep(2,'active');
+  try{
+    var ar=await fetch('/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:txt})});
+    if(ar.ok)analysis=await ar.json();
+    else analysis=null;
+  }catch(e){analysis=null;}
+  setStep(2,'done');
+
+  if(feats.eli12){
+    setStep(3,'active');
+    var r=await fetch('/ai/eli12',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:txt})});
+    if(!r.ok)throw new Error('AI simplification failed.');
+    out.eli12=(await r.json()).result;setStep(3,'done');
+  }
+  if(feats.translate){
+    setStep(4,'active');
+    var lang=document.getElementById('langSel').value;
+    var src=feats.eli12?out.eli12:txt;
+    var r=await fetch('/ai/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:src,language:lang})});
+    if(!r.ok)throw new Error('Translation failed.');
+    out.translation=(await r.json()).result;setStep(4,'done');
+  }
+  renderResults();
+}
+
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+
+function showProcessing(){
+  var h='<div class="pcard"><div class="ptitle">Processing</div>';
+  h+='<div class="pstep waiting" id="s1"><span class="si">📖</span> OCR extraction</div>';
+  h+='<div class="pstep waiting" id="s2"><span class="si">🧠</span> Smart analysis</div>';
+  if(feats.eli12)h+='<div class="pstep waiting" id="s3"><span class="si">🧓</span> Plain language</div>';
+  if(feats.translate)h+='<div class="pstep waiting" id="s4"><span class="si">🌐</span> Translation</div>';
+  h+='</div>';
+  document.getElementById('outBody').innerHTML=h;
+  document.getElementById('meta').textContent='';
+  document.getElementById('tab1').style.display='none';
+  document.getElementById('tab2').style.display='none';
+}
+function setStep(n,s){var el=document.getElementById('s'+n);if(el)el.className='pstep '+s;}
+
+function renderResults(){
+  document.getElementById('tab1').style.display=feats.eli12?'':'none';
+  document.getElementById('tab2').style.display=feats.translate?'':'none';
+  if(feats.translate)showTab('translation');
+  else if(feats.eli12)showTab('eli12');
+  else showTab('ocr');
+  var wc=out.ocr.split(/\s+/).filter(function(w){return w.length>0;}).length;
+  document.getElementById('meta').textContent=wc+' words';
+}
+
+function buildInsightCards(){
+  if(!analysis)return'';
+  var h='<div class="insight-grid">';
+
+  // Context card (blue)
+  if(analysis.document_type){
+    h+='<div class="icard context">';
+    h+='<div class="ic-header"><span class="ic-icon">📄</span><span class="ic-label">Document type</span></div>';
+    h+='<div class="ic-title">'+esc(analysis.document_type)+'</div>';
+    if(analysis.summary)h+='<div class="ic-body">'+esc(analysis.summary)+'</div>';
+    h+='</div>';
+  }
+
+  // Payment card (red if needed, green if none)
+  if(analysis.payment_required){
+    h+='<div class="icard payment">';
+    h+='<div class="ic-header"><span class="ic-icon">💳</span><span class="ic-label">Payment required</span></div>';
+    if(analysis.payment_amount)h+='<div class="ic-amount">'+esc(analysis.payment_amount)+'</div>';
+    if(analysis.payment_due)h+='<div class="ic-due">Due: '+esc(analysis.payment_due)+'</div>';
+    if(analysis.payment_note)h+='<div class="ic-body" style="margin-top:8px">'+esc(analysis.payment_note)+'</div>';
+    h+='</div>';
+  }
+
+  // Mail card (amber)
+  if(analysis.reply_address){
+    h+='<div class="icard mail">';
+    h+='<div class="ic-header"><span class="ic-icon">✉️</span><span class="ic-label">Reply by mail</span></div>';
+    h+='<div class="ic-title">Send a reply</div>';
+    h+='<div class="mail-address" id="mailAddr">'+esc(analysis.reply_address)+'</div>';
+    h+='<button class="compose-btn" onclick="toggleCompose()">✍️ Write & Send</button>';
+    h+='<div class="compose-panel" id="composePanel">';
+    h+='<div class="cp-row"><div class="cp-lbl">Your name</div><input class="cp-inp" id="cpName" placeholder="Full name"/></div>';
+    h+='<div class="cp-row"><div class="cp-lbl">Your address</div><input class="cp-inp" id="cpFrom" placeholder="Your return address"/></div>';
+    h+='<div class="cp-row"><div class="cp-lbl">Message</div><textarea class="cp-inp cp-ta" id="cpMsg" placeholder="Type your reply..."></textarea></div>';
+    h+='<div class="cp-actions"><button class="cp-send" onclick="doSendMail()">📬 Copy formatted letter</button><button class="cp-cancel" onclick="toggleCompose()">Cancel</button></div>';
+    h+='</div>';
+    h+='</div>';
+  }
+
+  h+='</div>';
+  return h;
+}
+
+function toggleCompose(){
+  var p=document.getElementById('composePanel');
+  if(p)p.classList.toggle('open');
+}
+
+function doSendMail(){
+  var name=document.getElementById('cpName').value.trim();
+  var from=document.getElementById('cpFrom').value.trim();
+  var msg=document.getElementById('cpMsg').value.trim();
+  var to=document.getElementById('mailAddr')?document.getElementById('mailAddr').textContent.trim():'';
+  var today=new Date().toLocaleDateString('en-GB');
+  var letter=(name?name+'\n':'')+(from?from+'\n':'')+'\n'+today+'\n\nTo:\n'+to+'\n\n'+msg+'\n\nSincerely,\n'+(name||'');
+  navigator.clipboard.writeText(letter).then(function(){
+    var btn=document.querySelector('.cp-send');
+    btn.innerHTML='✅ Copied to clipboard!';
+    setTimeout(function(){btn.innerHTML='📬 Copy formatted letter';},2000);
+  });
+}
+
+function showTab(tab){
+  document.querySelectorAll('.otab').forEach(function(t){t.classList.remove('active');});
+  var ids={ocr:'tab0',eli12:'tab1',translation:'tab2'};
+  var el=document.getElementById(ids[tab]);if(el)el.classList.add('active');
+  var text=out[tab]||'';
+  if(!text){document.getElementById('outBody').innerHTML='<div class="ph"><div class="ph-icon">⊞</div><div class="ph-title">No output</div></div>';return;}
+
+  var heCount=0;
+  for(var i=0;i<text.length;i++){var code=text.charCodeAt(i);if(code>=1488&&code<=1514)heCount++;}
+  var isRtl=heCount>2;
+
+  window._ct=text;
+  var lines=text.split('\n').map(function(l){return esc(l);}).join('<br>');
+
+  var cards=(tab==='ocr')?buildInsightCards():'';
+
+  document.getElementById('outBody').innerHTML=
+    cards+
+    '<div class="ocr-section">'+
+    (cards?'<div class="ocr-label">Full text</div>':'')+
+    '<div class="otext" style="direction:'+(isRtl?'rtl':'ltr')+';text-align:'+(isRtl?'right':'left')+';unicode-bidi:embed">'+lines+'</div>'+
+    '<div class="oacts">'+
+    '<button class="oabtn" id="spkBtn" onclick="doSpeak()">🔊 Listen</button>'+
+    '<button class="oabtn" onclick="doCopy(this)">📋 Copy</button>'+
+    '</div></div>';
+
+  document.getElementById('outBody').style.direction=isRtl?'rtl':'ltr';
+}
+
+function doSpeak(){
+  var btn=document.getElementById('spkBtn');
+  if(isSpeaking){window.speechSynthesis.cancel();isSpeaking=false;btn.className='oabtn';btn.innerHTML='🔊 Listen';return;}
+  var text=window._ct||'';
+  var heC=0;for(var i=0;i<text.length;i++){var c=text.charCodeAt(i);if(c>=1488&&c<=1514)heC++;}
+  var u=new SpeechSynthesisUtterance(text);
+  u.lang=heC>2?'he-IL':'en-US';u.rate=0.88;
+  u.onend=function(){isSpeaking=false;var b=document.getElementById('spkBtn');if(b){b.className='oabtn';b.innerHTML='🔊 Listen';}};
+  isSpeaking=true;btn.className='oabtn spk';btn.innerHTML='⏹ Stop';
+  window.speechSynthesis.speak(u);
+}
+function doCopy(btn){
+  navigator.clipboard.writeText(window._ct||'').then(function(){
+    btn.innerHTML='✅ Copied';setTimeout(function(){btn.innerHTML='📋 Copy';},1500);
+  });
+}
+function doReset(){
+  selFiles=[];out={ocr:'',eli12:'',translation:''};analysis=null;
+  document.getElementById('fileIn').value='';
+  document.getElementById('urlIn').value='';
+  document.getElementById('thumbs').innerHTML='';
+  document.getElementById('outBody').innerHTML='<div class="ph"><div class="ph-icon">⊞</div><div class="ph-title">No document loaded</div><div class="ph-sub">Upload an image then click Process document.</div></div>';
+  document.getElementById('meta').textContent='';
+  if(isSpeaking){window.speechSynthesis.cancel();isSpeaking=false;}
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
 </body>
 </html>
