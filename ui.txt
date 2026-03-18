@@ -1,0 +1,28 @@
+SimpliScan
+Connecting
+About
+INPUT MODE
+Upload
+Batch
+URL
+DOCUMENT
+
+⌗
+Drop image here or click to browse
+JPEG · PNG · WEBP · TIFF · BMP
+AI FEATURES
+📖 OCR extraction
+Always on
+🧠 Smart analysis
+Auto-detects type & actions
+🧓 Plain language
+Simplify complex text
+🌐 Translate
+Convert to another language
+▶ PROCESS DOCUMENT
+Reset
+Refresh
+DOCUMENT
+▤
+No document loaded
+Upload an image then click Process document.
