@@ -338,7 +338,7 @@ Document:
 {body.text}"""
     )
     import re as _re, json as _json
-    clean = _re.sub(r'''json|''''', ''', result).strip()
+    clean = result.replace('```json', '').replace('```', '').strip()
     try:
         data = _json.loads(clean)
         return AIResponse(result=_json.dumps(data))
