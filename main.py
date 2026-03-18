@@ -140,6 +140,16 @@ async def _ocr_from_bytes(data, media_type="image/jpeg"):
             else:
                 detected_type = "image/jpeg"
 
+            try:
+                from PIL import Image, ImageOps
+                import io as _pil_io
+                pil_img = Image.open(_pil_io.BytesIO(data))
+                pil_img = ImageOps.exif_transpose(pil_img)
+                buf = _pil_io.BytesIO()
+                pil_img.save(buf, format='JPEG')
+                data = buf.getvalue()
+            except Exception as e:
+                log.warning(f'EXIF rotate failed: {e}')
             b64 = base64.b64encode(data).decode()
             async with httpx.AsyncClient(timeout=60.0) as client:
                 resp = await client.post(
