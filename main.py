@@ -263,6 +263,22 @@ async def ocr_url(body: UrlRequest, mode: OutputMode = Query("text")):
     return _build(str(body.url).split("/")[-1] or "remote", text, mode)
 
 # ---------------------------------------------------------------------------
+# AI helper
+# ---------------------------------------------------------------------------
+async def _claude(prompt: str) -> str:
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        resp = await client.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={"x-api-key": ANTHROPIC_API_KEY,
+                     "anthropic-version": "2023-06-01",
+                     "content-type": "application/json"},
+            json={"model": "claude-sonnet-4-6", "max_tokens": 2048,
+                  "messages": [{"role": "user", "content": prompt}]}
+        )
+    resp.raise_for_status()
+    return resp.json()["content"][0]["text"].strip()
+
+# ---------------------------------------------------------------------------
 # AI routes
 # ---------------------------------------------------------------------------
 @app.post("/ai/eli12", response_model=AIResponse, tags=["ai"])
