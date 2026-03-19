@@ -326,26 +326,26 @@ async def analyze(body: AIRequest):
     if not body.text.strip(): raise HTTPException(400, "Empty text.")
     import json as _json
     result = await _claude(
-        """Extract key fields from this document and return ONLY a JSON object.
-Include any of these fields that are present (null if not found):
-- document_type: type of document e.g. "Property Tax Bill", "Traffic Fine", "Utility Bill"
-- period: billing or relevant period e.g. "March-April 2026"
-- amount: the main amount/sum e.g. "2,478.80"
-- currency: currency symbol e.g. "₪" or "$"
-- due_date: payment due date as written in doc e.g. "05/04/2026"
-- deadline_date: due date in ISO format YYYY-MM-DD or null
+        """Extract ONLY these specific fields from this document. Return a JSON object with null for missing fields:
+- document_type: e.g. "Property Tax Bill"
+- amount: main payment amount as string e.g. "2,478.80"
+- currency: currency symbol e.g. "₪"
+- due_date: due date as written e.g. "05/04/2026"
+- deadline_date: due date ISO format YYYY-MM-DD or null
 - deadline_title: e.g. "Payment due"
-- clearing_id: payment/clearing reference number if present
+- clearing_id: clearing/payment reference number
 - account_number: account or customer number
-- reference_number: any reference or case number
-- address: full address from the document
-- sender: organization or company that sent the document
-- recipient: name of person/entity receiving the document
+- reference_number: reference or case number
+- period: billing period e.g. "03-04/2026"
+- sender: organization that sent this
+- recipient: recipient name
+- barcode: full barcode or payment slip number if present
 - payment_required: true or false
-- reply_address: postal address to send replies to or null
-- extra_fields: object with any other important labeled fields found in the document
+- reply_address: postal reply address or null
+- contact_details: object with phone, fax, email, website keys if found
+- property_details: object with address, block, parcel, size, type, description keys if found (for property bills)
 
-Return ONLY valid JSON. No markdown, no explanation.
+Return ONLY valid JSON. No markdown.
 
 Document:
 """ + body.text
