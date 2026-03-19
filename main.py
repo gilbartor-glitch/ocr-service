@@ -24,7 +24,7 @@ async def lifespan(app):
 app = FastAPI(title="Simplified Access OCR", version="3.0.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-ALLOWED = {"image/jpeg","image/png","image/webp","image/tiff","image/bmp","image/heic","image/heif"}
+ALLOWED = {"image/jpeg","image/png","image/webp","image/tiff","image/bmp","image/heic","image/heif","application/pdf"}
 MAX_BYTES = 20 * 1024 * 1024
 
 # ---------------------------------------------------------------------------
@@ -108,6 +108,24 @@ async def _ai_correct(text: str) -> str:
     except Exception as e:
         log.warning(f"AI correction failed: {e}")
         return text
+
+async def _pdf_to_images(data):
+    """Convert PDF bytes to list of JPEG image bytes."""
+    import subprocess, tempfile, os
+    with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as f:
+        f.write(data); tmp_pdf = f.name
+    tmp_dir = tmp_pdf + '_pages'
+    os.makedirs(tmp_dir, exist_ok=True)
+    try:
+        subprocess.run(['convert', '-density', '200', tmp_pdf, '-quality', '90', tmp_dir+'/page.jpg'], check=True, timeout=60)
+        pages = sorted([os.path.join(tmp_dir,f) for f in os.listdir(tmp_dir) if f.endswith('.jpg')])
+        return [open(p,'rb').read() for p in pages]
+    except Exception as e:
+        log.warning(f"PDF conversion failed: {e}")
+        return []
+    finally:
+        try: os.unlink(tmp_pdf)
+        except: pass
 
 async def _ocr_from_bytes(data, media_type="image/jpeg"):
     import base64, io as _io
@@ -226,6 +244,18 @@ async def ocr_single(file: Annotated[UploadFile, File()], mode: OutputMode = Que
     if file.content_type and not file.content_type.startswith("image/"): raise HTTPException(415, f"סוג קובץ לא נתמך: {file.content_type}")
     data = await file.read()
     if len(data) > MAX_BYTES: raise HTTPException(413, "הקובץ גדול מדי (מקסימום 20MB).")
+    if file.content_type == 'application/pdf' or (file.filename and file.filename.lower().endswith('.pdf')):
+        pages = await _pdf_to_images(data)
+        if pages:
+            texts = []
+            for page_data in pages:
+                texts.append(await _ocr_from_bytes(page_data, 'image/jpeg'))
+            text = '
+
+--- Page break ---
+
+'.join(texts)
+            return _build(file.filename or '?', text, mode)
     try: text = await _ocr_from_bytes(data)
     except Exception as e: raise HTTPException(500, str(e))
     return _build(file.filename or "upload", text, mode)
@@ -240,7 +270,19 @@ async def ocr_batch(files: Annotated[list[UploadFile], File()], mode: OutputMode
         data = await f.read()
         if len(data) > MAX_BYTES:
             return TextResult(filename=f.filename or "?", text="[דלג] קובץ גדול מדי")
-        try: text = await _ocr_from_bytes(data)
+        if file.content_type == 'application/pdf' or (file.filename and file.filename.lower().endswith('.pdf')):
+        pages = await _pdf_to_images(data)
+        if pages:
+            texts = []
+            for page_data in pages:
+                texts.append(await _ocr_from_bytes(page_data, 'image/jpeg'))
+            text = '
+
+--- Page break ---
+
+'.join(texts)
+            return _build(file.filename or '?', text, mode)
+    try: text = await _ocr_from_bytes(data)
         except Exception as e: return TextResult(filename=f.filename or "?", text=f"[שגיאה] {e}")
         return _build(f.filename or "?", text, mode)
     results = []
