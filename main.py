@@ -320,24 +320,28 @@ async def translate(body: AIRequest):
 
 
 @app.post("/ai/analyze", response_model=AIResponse, tags=["ai"])
+
+@app.post("/ai/analyze", response_model=AIResponse, tags=["ai"])
 async def analyze(body: AIRequest):
-    if not body.text.strip(): raise HTTPException(400, "הטקסט ריק.")
+    if not body.text.strip(): raise HTTPException(400, "Empty text.")
+    import json as _json
     result = await _claude(
-        f"""Analyze this document and return ONLY a JSON object with these fields:
-- document_type: short label e.g. Tax Notice, Traffic Fine, Utility Bill, Bank Statement, Government Letter
+        """Analyze this document and return ONLY a JSON object with these exact fields:
+- document_type: short label e.g. Tax Notice, Traffic Fine, Utility Bill, Flight Ticket
 - summary: 1-2 sentence plain-language summary
 - payment_required: true or false
-- payment_amount: amount string if payment required e.g. 250 NIS or null
+- payment_amount: amount string if payment required or null
 - payment_due: due date string if found or null
 - payment_note: brief note about payment or null
 - reply_address: full postal address to reply to if found or null
+- deadline_date: most important deadline in ISO format YYYY-MM-DD or null
+- deadline_title: short label e.g. "Payment due" or "Appeal deadline" or null
 
-Return ONLY valid JSON, no explanation, no markdown.
+Return ONLY valid JSON. No markdown, no explanation.
 
 Document:
-{body.text}"""
+""" + body.text
     )
-    import re as _re, json as _json
     clean = result.replace('```json', '').replace('```', '').strip()
     try:
         data = _json.loads(clean)
@@ -345,55 +349,3 @@ Document:
     except:
         return AIResponse(result=clean)
 
-
-@app.post("/ai/analyze", response_model=AIResponse, tags=["ai"])
-@app.post("/ai/analyze", response_model=AIResponse, tags=["ai"])
-async def analyze(body: AIRequest):
-    if not body.text.strip(): raise HTTPException(400, "Empty text.")
-    result = await _claude(
-        """Analyze this document and return ONLY a JSON object with these exact fields:
-- document_type: short label e.g. Tax Notice, Traffic Fine, Utility Bill, Flight Ticket, Bank Statement, Government Letter
-- summary: 1-2 sentence plain-language summary
-- payment_required: true or false
-- payment_amount: amount string if payment required e.g. 250 NIS or null
-- payment_due: due date string if found or null
-- payment_note: brief note about payment or null
-- reply_address: full postal address to reply to if found in document or null
-- deadline_date: the most important deadline or due date in ISO format YYYY-MM-DD or null
-- deadline_title: short label e.g. "Payment due" or "Appeal deadline" or null
-- deadline_date: the most important deadline or due date in ISO format YYYY-MM-DD or null
-- deadline_title: short label for the deadline e.g. "Payment due" or "Appeal deadline" or null
-- deadline_date: the most important deadline or due date in ISO format YYYY-MM-DD or null
-- deadline_title: short label for the deadline e.g. "Payment due" or "Appeal deadline" or null
-
-Return ONLY valid JSON. No markdown, no explanation.
-
-Document:
-""" + body.text
-    )
-    clean = re.sub(r"```(?:json)?\|```", "", result).strip()
-    try:
-        data = json.loads(clean)
-        return AIResponse(result=json.dumps(data))
-    except:
-        return AIResponse(result=clean)
-
-# ---------------------------------------------------------------------------
-# UI
-# ---------------------------------------------------------------------------
-
-
-@app.get("/", include_in_schema=False, response_class=HTMLResponse)
-async def serve_ui():
-    import os
-    p = os.path.join(os.path.dirname(__file__), "ui.html")
-    return HTMLResponse(open(p).read())
-
-
-@app.get("/landing", include_in_schema=False, response_class=HTMLResponse)
-async def serve_landing():
-    import os
-    p = os.path.join(os.path.dirname(__file__), "landing.html")
-    if not os.path.exists(p):
-        return HTMLResponse("<h1>Landing page not found</h1>", status_code=404)
-    return HTMLResponse(open(p).read())
