@@ -376,6 +376,8 @@ async def analyze(body: AIRequest):
 - payment_note: brief note about payment or null
 - reply_address: full postal address to reply to if found in document or null
 - deadline_date: the most important deadline or due date in ISO format YYYY-MM-DD or null
+- deadline_title: short label e.g. "Payment due" or "Appeal deadline" or null
+- deadline_date: the most important deadline or due date in ISO format YYYY-MM-DD or null
 - deadline_title: short label for the deadline e.g. "Payment due" or "Appeal deadline" or null
 - deadline_date: the most important deadline or due date in ISO format YYYY-MM-DD or null
 - deadline_title: short label for the deadline e.g. "Payment due" or "Appeal deadline" or null
