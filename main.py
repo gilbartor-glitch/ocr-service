@@ -245,14 +245,13 @@ async def ocr_single(file: Annotated[UploadFile, File()], mode: OutputMode = Que
     data = await file.read()
     if len(data) > MAX_BYTES: raise HTTPException(413, "הקובץ גדול מדי (מקסימום 20MB).")
     if file.content_type == 'application/pdf' or (file.filename and file.filename.lower().endswith('.pdf')):
-        pages = await _pdf_to_images(data)
-        if pages:
-            texts = []
-            for page_data in pages:
-                texts.append(await _ocr_from_bytes(page_data, 'image/jpeg'))
+            pages = await _pdf_to_images(data)
+            if pages:
+                texts = []
+                for page_data in pages:
+            texts.append(await _ocr_from_bytes(page_data, 'image/jpeg'))
             text = '
-
---- Page break ---
+            --- Page break ---
 
 '.join(texts)
             return _build(file.filename or '?', text, mode)
@@ -271,14 +270,13 @@ async def ocr_batch(files: Annotated[list[UploadFile], File()], mode: OutputMode
         if len(data) > MAX_BYTES:
             return TextResult(filename=f.filename or "?", text="[דלג] קובץ גדול מדי")
         if file.content_type == 'application/pdf' or (file.filename and file.filename.lower().endswith('.pdf')):
-        pages = await _pdf_to_images(data)
-        if pages:
-            texts = []
-            for page_data in pages:
-                texts.append(await _ocr_from_bytes(page_data, 'image/jpeg'))
+            pages = await _pdf_to_images(data)
+            if pages:
+                texts = []
+                for page_data in pages:
+            texts.append(await _ocr_from_bytes(page_data, 'image/jpeg'))
             text = '
-
---- Page break ---
+            --- Page break ---
 
 '.join(texts)
             return _build(file.filename or '?', text, mode)
