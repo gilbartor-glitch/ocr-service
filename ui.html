@@ -425,20 +425,22 @@ function aiModal(title,prompt){
 function showSummary(){aiModal('Document summary','Summarize this document in plain language. What is it? What does the recipient need to know or do?\n\n'+out.ocr);}
 function showUrgent(){
   var a=analysis||{};
-  var calBtn='';
+  var cal='';
   if(a.deadline_date){
-    var gcal='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(a.deadline_title||'Document deadline')+'&dates='+a.deadline_date.replace(/-/g,'')+'%2F'+a.deadline_date.replace(/-/g,'')+'&details='+encodeURIComponent('From SimpliScan: '+( a.document_type||''));
-    calBtn='<div style="display:flex;gap:10px;margin-bottom:16px">'
-      +'<a href="'+gcal+'" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:linear-gradient(135deg,#4285f4,#34a853);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px;font-family:Space Grotesk,sans-serif">📅 Add to Google Calendar</a>'
-      +'<button onclick="downloadICS()" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:10px;font-weight:600;font-size:13px;font-family:Space Grotesk,sans-serif;cursor:pointer">⬇️ Download .ics</button>'
+    var g='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(a.deadline_title||'Deadline')+'&dates='+a.deadline_date.replace(/-/g,'')+'%2F'+a.deadline_date.replace(/-/g,'');
+    cal='<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">'
+      +'<a href="'+g+'" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:linear-gradient(135deg,#4285f4,#34a853);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px">&#x1F4C5; Add to Google Calendar</a>'
+      +'<button onclick="downloadICS()" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:10px;font-weight:600;font-size:13px;cursor:pointer">&#x2B07; Download .ics</button>'
       +'</div>';
   }
-  openModal('Time-sensitive actions','<div class="loading"><span class="spin"></span> Analyzing...</div>');
-  fetch('/ai/eli12',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:'List all deadlines, due dates, and time-sensitive actions from this document with dates if available.\n\n'+out.ocr})})
-    .then(function(r){return r.json();})
-    .then(function(d){document.getElementById('modalBody').innerHTML=calBtn+'<div style="line-height:1.8;color:var(--text)">'+d.result.split('\n').map(function(l){return esc(l);}).join('<br>')+'</div>';})
-    .catch(function(){document.getElementById('modalBody').innerHTML='<div style="color:var(--red)">Failed.</div>';});
+  var body=cal;
+  if(a.payment_amount)body+='<div style="margin-bottom:16px;padding:16px;background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.3);border-radius:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,77,109,.7);margin-bottom:6px">Amount to pay</div><div style="font-family:Bricolage Grotesque,sans-serif;font-size:36px;font-weight:800;color:#ff4d6d">'+esc(a.payment_amount)+'</div></div>';
+  if(a.payment_due)body+='<div style="margin-bottom:16px;padding:16px;background:rgba(255,184,48,.08);border:1px solid rgba(255,184,48,.3);border-radius:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,184,48,.7);margin-bottom:6px">Due date</div><div style="font-family:Bricolage Grotesque,sans-serif;font-size:28px;font-weight:800;color:#ffb830">'+esc(a.payment_due)+'</div></div>';
+  if(a.payment_note)body+='<div style="padding:14px;background:var(--bg3);border-radius:10px;font-size:14px;color:var(--text2);line-height:1.6">'+esc(a.payment_note)+'</div>';
+  if(!a.payment_amount && !a.payment_due)body+='<div style="color:var(--text2)">No specific deadlines detected in this document.</div>';
+  openModal('&#x23F0; Time-sensitive actions', body);
 }
+
 function downloadICS(){
   var a=analysis||{};
   if(!a.deadline_date)return;
