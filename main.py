@@ -171,16 +171,22 @@ async def _ocr_from_bytes(data, media_type="image/jpeg"):
             except Exception as e:
                 log.warning(f'EXIF rotate failed: {e}')
             b64 = base64.b64encode(data).decode()
+            if detected_type == "application/pdf":
+                src_block = {"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": b64}}
+                extra = {"betas": ["pdfs-2024-09-25"]}
+            else:
+                src_block = {"type": "image", "source": {"type": "base64", "media_type": detected_type, "data": b64}}
+                extra = {}
             async with httpx.AsyncClient(timeout=60.0) as client:
                 resp = await client.post(
                     "https://api.anthropic.com/v1/messages",
                     headers={"x-api-key": ANTHROPIC_API_KEY,
                              "anthropic-version": "2023-06-01",
+                             "anthropic-beta": "pdfs-2024-09-25",
                              "content-type": "application/json"},
                     json={"model": "claude-sonnet-4-6", "max_tokens": 4096,
                           "messages": [{"role": "user", "content": [
-                              {"type": "image", "source": {"type": "base64",
-                               "media_type": detected_type, "data": b64}},
+                              src_block,
                               {"type": "text", "text": "This image may be rotated or tilted. Detect the correct reading orientation and extract ALL text as it should be read. The text is likely Hebrew, English, or mixed Hebrew/English - NOT Armenian or any other script. Preserve line breaks, numbers, and structure. Output ONLY the extracted text, nothing else."}
                           ]}]}
                 )
