@@ -405,7 +405,7 @@ function buildCards(){
     var span=f.wide?'grid-column:span 2;':'';
     if(f.isAction){
       var act=f.value.replace('__action__','');
-      h+='<div class="acard" style="background:var(--bg3);border:1px solid var(--border2)" onclick="cardAction(''+act+'')">';
+      h+='<div class="acard" style="background:var(--bg3);border:1px solid var(--border2)" onclick="cardAction(\''+act+'\')">';
       h+='<div style="font-size:26px">'+f.icon+'</div>';
       h+='<div style="font-family:Bricolage Grotesque,sans-serif;font-size:16px;font-weight:800;margin-top:auto;color:var(--text)">'+esc(f.label)+'</div>';
       h+='</div>';
