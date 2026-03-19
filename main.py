@@ -195,6 +195,8 @@ async def _ocr_from_bytes(data, media_type="image/jpeg"):
             log.warning(f"Claude Vision {resp.status_code}: {resp.text[:200]}")
         except Exception as e:
             log.warning(f"Claude Vision failed: {e}, falling back to Tesseract")
+    if data[:4] == b'%PDF':
+        return "[PDF not supported without API key]"
     loop = asyncio.get_event_loop()
     gray = await loop.run_in_executor(None, _preprocess, data)
     raw = await loop.run_in_executor(None, _run_ocr, gray)
