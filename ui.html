@@ -348,6 +348,89 @@ var FIELD_COLORS=['#e53935','#d81b8a','#00acc1','#546e7a','#689f38','#f9a825','#
 
 function buildCards(){
   var a=analysis||{};
+  var fields=[];
+
+  // Key fields only
+  if(a.amount)fields.push({label:'Amount',value:(a.currency||'')+(a.currency?' ':'')+a.amount});
+  if(a.due_date)fields.push({label:'Due Date',value:a.due_date});
+  if(a.clearing_id)fields.push({label:'Clearing ID',value:a.clearing_id});
+  if(a.account_number)fields.push({label:'Account Number',value:a.account_number});
+  if(a.reference_number)fields.push({label:'Reference',value:a.reference_number});
+  if(a.period)fields.push({label:'Period',value:a.period});
+  if(a.sender)fields.push({label:'Sender',value:a.sender});
+  if(a.recipient)fields.push({label:'Recipient',value:a.recipient});
+
+  // Barcode with custom label
+  var barcode=a.extra_fields&&a.extra_fields['barcode']||a.extra_fields&&a.extra_fields['BARCODE'];
+  if(barcode)fields.push({label:'Postal Payment Barcode',value:barcode});
+
+  // Group all secondary/property details into one card
+  var detailKeys=['address','property_address','bill_date','arnona_period','gush','helka','property_type_code','property_description','property_size_sqm','service_description','invoice_date','recipient','phone_inquiries','phone_payments','fax','email','website','public_complaints_phone','public_complaints_email'];
+  var details=[];
+  if(a.address)details.push({k:'Address',v:a.address});
+  if(a.extra_fields){
+    Object.keys(a.extra_fields).forEach(function(k){
+      var kl=k.toLowerCase();
+      var skip=['barcode','phone_payments','phone_inquiries','fax','email','website','public_complaints_phone','public_complaints_email'];
+      if(skip.indexOf(kl)>=0)return;
+      if(a.extra_fields[k])details.push({k:k.replace(/_/g,' '),v:String(a.extra_fields[k])});
+    });
+    // Contact details in one separate card
+    var contacts=[];
+    ['phone_payments','phone_inquiries','fax','email','website','public_complaints_phone','public_complaints_email'].forEach(function(ck){
+      if(a.extra_fields[ck])contacts.push({k:ck.replace(/_/g,' '),v:String(a.extra_fields[ck])});
+      if(a.extra_fields[ck.toUpperCase()])contacts.push({k:ck.replace(/_/g,' '),v:String(a.extra_fields[ck.toUpperCase()])});
+    });
+    if(contacts.length)fields.push({label:'Contact Details',value:contacts.map(function(c){return c.k+': '+c.v;}).join('\n'),multi:true});
+  }
+  if(details.length)fields.push({label:'Document Details',value:details.map(function(d){return d.k+': '+d.v;}).join('\n'),multi:true});
+
+  // Action cards
+  fields.push({label:'Full OCR',value:'__action__showOCR',isAction:true,icon:'&#x1F4C4;'});
+  fields.push({label:'Translate',value:'__action__showTranslateModal',isAction:true,icon:'&#x1F310;'});
+  fields.push({label:'Write a reply',value:'__action__showReply',isAction:true,icon:'&#x2709;&#xFE0F;'});
+  if(a.deadline_date)fields.push({label:'Add to Calendar',value:'__action__showUrgent',isAction:true,icon:'&#x1F4C5;'});
+
+  var h='<div class="card-grid">';
+  fields.forEach(function(f,i){
+    var color=FIELD_COLORS[i%FIELD_COLORS.length];
+    if(f.isAction){
+      var act=f.value.replace('__action__','');
+      h+='<div class="acard" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2)" onclick="cardAction(\''+act+'\')">';
+      h+='<div style="font-size:22px">'+f.icon+'</div>';
+      h+='<div class="acard-title" style="color:var(--text)">'+esc(f.label)+'</div>';
+      h+='</div>';
+    } else if(f.multi){
+      h+='<div class="acard data-card" style="grid-column:span 2;background:'+color+'18;border:1px solid '+color+'55;cursor:pointer;min-height:80px" onclick="toggleCardValue(this)">';
+      h+='<div class="card-label" style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:'+color+';margin-bottom:8px">'+esc(f.label)+'</div>';
+      h+='<div class="card-value-hidden" style="display:none;font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">'+esc(f.value)+'</div>';
+      h+='<div class="card-tap-hint" style="font-size:18px;opacity:.4;margin-top:4px">&#x1F440; tap to expand</div>';
+      h+='</div>';
+    } else {
+      h+='<div class="acard data-card" style="background:'+color+'18;border:1px solid '+color+'55;cursor:pointer" onclick="toggleCardValue(this)">';
+      h+='<div class="card-label" style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:'+color+';margin-bottom:8px">'+esc(f.label)+'</div>';
+      h+='<div class="card-value-hidden" style="display:none;font-family:Bricolage Grotesque,sans-serif;font-size:20px;font-weight:800;color:var(--text);line-height:1.3;word-break:break-all">'+esc(f.value)+'</div>';
+      h+='<div class="card-tap-hint" style="font-size:22px;opacity:.4;margin-top:auto">&#x1F440;</div>';
+      h+='</div>';
+    }
+  });
+  h+='</div>';
+  return h;
+}
+function toggleCardValue(card){
+  var hidden=card.querySelector('.card-value-hidden');
+  var hint=card.querySelector('.card-tap-hint');
+  if(hidden.style.display==='none'){
+    hidden.style.display='block';
+    if(hint)hint.style.display='none';
+  } else {
+    hidden.style.display='none';
+    if(hint)hint.style.display='block';
+  }
+}
+
+function buildCards(){
+  var a=analysis||{};
   // Build data field cards from extracted fields
   var fields=[];
 
