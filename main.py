@@ -1,8 +1,7 @@
 from __future__ import annotations
-import asyncio, logging, re, cv2, httpx, numpy as np, os
+import asyncio, logging, re, httpx, os, base64, json
 from contextlib import asynccontextmanager
 from typing import Annotated, Literal
-import pytesseract
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
@@ -14,189 +13,110 @@ ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
 @asynccontextmanager
 async def lifespan(app):
-    log.info("Tesseract OCR service ready (en+he).")
+    log.info("SimpliScan ready.")
     if ANTHROPIC_API_KEY:
         log.info("Claude AI features enabled.")
     else:
         log.warning("ANTHROPIC_API_KEY not set — AI features disabled.")
     yield
 
-app = FastAPI(title="Simplified Access OCR", version="3.0.0", lifespan=lifespan)
+app = FastAPI(title="SimpliScan OCR", version="4.0.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 ALLOWED = {"image/jpeg","image/png","image/webp","image/tiff","image/bmp","image/heic","image/heif","application/pdf"}
 MAX_BYTES = 20 * 1024 * 1024
 
 # ---------------------------------------------------------------------------
-# Pre-processing
+# Helpers
 # ---------------------------------------------------------------------------
-def _preprocess(data):
-    # Convert HEIC/HEIF to JPEG first
-    import io as _io
-    try:
-        import pillow_heif
-        pillow_heif.register_heif_opener()
-        from PIL import Image as _PILImage
-        img_pil = _PILImage.open(_io.BytesIO(data))
-        from PIL import ImageOps
-        img_pil = ImageOps.exif_transpose(img_pil)
-        buf = _io.BytesIO()
-        img_pil.save(buf, format="JPEG")
-        data = buf.getvalue()
-    except Exception as e:
-        log.warning(f"HEIC conversion: {e}")
-    arr = np.frombuffer(data, dtype=np.uint8)
-    img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-    if img is None: raise ValueError("לא ניתן לפענח את התמונה.")
-    h, w = img.shape[:2]
-    if max(h, w) < 1500:
-        scale = 2.0 if max(h, w) < 800 else 1.5
-        img = cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    gray = cv2.fastNlMeansDenoising(gray, h=7)
-    return gray
-
-# ---------------------------------------------------------------------------
-# OCR
-# ---------------------------------------------------------------------------
-def _fix_rtl_line(line):
-    he_chars = sum(1 for c in line if "\u05d0" <= c <= "\u05ea")
-    if he_chars > 2:
-        return " ".join(reversed(line.split()))
-    return line
-
 def _clean_text(raw):
-    import re as _re
-    # Replace lone O at start of lines (OCR misread of bullet points)
-    raw = _re.sub(r'\bO\b', '', raw)
     lines = raw.splitlines()
     cleaned = [re.sub(r"[^\S\n]+"," ",l).strip() for l in lines]
     return re.sub(r"\n{3,}","\n\n","\n".join(cleaned)).strip()
 
-def _run_ocr(image):
-    best = ""
-    for psm in [6, 3, 4]:
+def _detect_type(data: bytes) -> str:
+    if data[:4] == b'%PDF':
+        return "application/pdf"
+    if data[:4] in (b'\x00\x00\x00\x18', b'\x00\x00\x00\x1c', b'\x00\x00\x00\x20') or b'heic' in data[:20].lower() or b'heix' in data[:20].lower():
+        return "image/heic"
+    if data[:2] == b'\xff\xd8':
+        return "image/jpeg"
+    if data[:8] == b'\x89PNG\r\n\x1a\n':
+        return "image/png"
+    if data[:4] == b'RIFF':
+        return "image/webp"
+    return "image/jpeg"
+
+async def _ocr_from_bytes(data: bytes) -> str:
+    if not ANTHROPIC_API_KEY:
+        return "[ANTHROPIC_API_KEY not set]"
+
+    detected_type = _detect_type(data)
+
+    # For images: fix EXIF rotation
+    if detected_type != "application/pdf":
         try:
-            r = pytesseract.image_to_string(
-                image, lang="heb+eng",
-                config=f"--psm {psm} --oem 1 -c preserve_interword_spaces=1"
-            )
-            if len(r.strip()) > len(best.strip()):
-                best = r
+            from PIL import Image, ImageOps
+            import io as _io
+            pil_img = Image.open(_io.BytesIO(data))
+            pil_img = ImageOps.exif_transpose(pil_img)
+            buf = _io.BytesIO()
+            fmt = "JPEG" if detected_type != "image/png" else "PNG"
+            pil_img.save(buf, format=fmt)
+            data = buf.getvalue()
+            detected_type = "image/jpeg" if fmt == "JPEG" else "image/png"
         except Exception as e:
-            log.warning(f"Tesseract PSM {psm} failed: {e}")
-    return best.strip()
+            log.warning(f"EXIF rotate failed: {e}")
 
+    # For HEIC: convert to JPEG first
+    if detected_type == "image/heic":
+        try:
+            import subprocess, tempfile
+            with tempfile.NamedTemporaryFile(suffix='.heic', delete=False) as f:
+                f.write(data); tmp_in = f.name
+            tmp_out = tmp_in.replace('.heic', '.jpg')
+            subprocess.run(['convert', tmp_in, tmp_out], check=True, timeout=10)
+            data = open(tmp_out, 'rb').read()
+            detected_type = "image/jpeg"
+            for p in [tmp_in, tmp_out]:
+                try: os.unlink(p)
+                except: pass
+        except Exception as e:
+            log.warning(f"HEIC conversion failed: {e}")
 
-async def _ai_correct(text: str) -> str:
-    if not ANTHROPIC_API_KEY or not text.strip():
-        return text
+    b64 = base64.b64encode(data).decode()
+
+    if detected_type == "application/pdf":
+        content_block = {"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": b64}}
+        extra_headers = {"anthropic-beta": "pdfs-2024-09-25"}
+    else:
+        content_block = {"type": "image", "source": {"type": "base64", "media_type": detected_type, "data": b64}}
+        extra_headers = {}
+
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        headers = {
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+            **extra_headers
+        }
+        async with httpx.AsyncClient(timeout=60.0) as client:
             resp = await client.post(
                 "https://api.anthropic.com/v1/messages",
-                headers={"x-api-key": ANTHROPIC_API_KEY,
-                         "anthropic-version": "2023-06-01",
-                         "content-type": "application/json"},
-                json={"model": "claude-sonnet-4-6", "max_tokens": 2048,
-                      "messages": [{"role": "user", "content":
-                        f"אתה עוזר תיקון OCR. תקן שגיאות זיהוי טקסט. שמור על השפה המקורית ועל מעברי שורה. פלט את הטקסט המתוקן בלבד.\n\n{text}"}]}
+                headers=headers,
+                json={"model": "claude-sonnet-4-6", "max_tokens": 4096,
+                      "messages": [{"role": "user", "content": [
+                          content_block,
+                          {"type": "text", "text": "This document may be rotated or tilted. Detect the correct reading orientation and extract ALL text exactly as it appears. The text is likely Hebrew, English, or mixed Hebrew/English. Preserve line breaks, numbers, and structure. Output ONLY the extracted text, nothing else."}
+                      ]}]}
             )
         if resp.status_code == 200:
-            return resp.json()["content"][0]["text"].strip()
-        return text
+            return _clean_text(resp.json()["content"][0]["text"].strip())
+        log.warning(f"Claude Vision {resp.status_code}: {resp.text[:300]}")
+        return f"[Error {resp.status_code}]"
     except Exception as e:
-        log.warning(f"AI correction failed: {e}")
-        return text
-
-async def _pdf_to_images(data):
-    """Convert PDF bytes to list of JPEG image bytes."""
-    import subprocess, tempfile, os
-    with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as f:
-        f.write(data); tmp_pdf = f.name
-    tmp_dir = tmp_pdf + '_pages'
-    os.makedirs(tmp_dir, exist_ok=True)
-    try:
-        subprocess.run(['convert', '-density', '200', tmp_pdf, '-quality', '90', tmp_dir+'/page.jpg'], check=True, timeout=60)
-        pages = sorted([os.path.join(tmp_dir,f) for f in os.listdir(tmp_dir) if f.endswith('.jpg')])
-        return [open(p,'rb').read() for p in pages]
-    except Exception as e:
-        log.warning(f"PDF conversion failed: {e}")
-        return []
-    finally:
-        try: os.unlink(tmp_pdf)
-        except: pass
-
-async def _ocr_from_bytes(data, media_type="image/jpeg"):
-    import base64, io as _io
-    if ANTHROPIC_API_KEY:
-        try:
-            # Convert HEIC to JPEG using imagemagick if needed
-            import subprocess, tempfile, os
-            if b'ftyp' in data[:20] or b'heic' in data[:20].lower():
-                with tempfile.NamedTemporaryFile(suffix='.heic', delete=False) as f:
-                    f.write(data); tmp_in = f.name
-                tmp_out = tmp_in.replace('.heic', '.jpg')
-                try:
-                    subprocess.run(['convert', tmp_in, tmp_out], check=True, timeout=10)
-                    data = open(tmp_out, 'rb').read()
-                except Exception as e:
-                    log.warning(f"ImageMagick conversion failed: {e}")
-                finally:
-                    for f in [tmp_in, tmp_out]:
-                        try: os.unlink(f)
-                        except: pass
-            # Detect media type from magic bytes
-            if data[:4] == b'%PDF':
-                detected_type = "application/pdf"
-            elif data[:4] in (b'\x00\x00\x00\x18', b'\x00\x00\x00\x1c', b'\x00\x00\x00\x20') or b'heic' in data[:20].lower() or b'heix' in data[:20].lower():
-                detected_type = "image/heic"
-            elif data[:2] == b'\xff\xd8':
-                detected_type = "image/jpeg"
-            elif data[:8] == b'\x89PNG\r\n\x1a\n':
-                detected_type = "image/png"
-            elif data[:4] == b'RIFF':
-                detected_type = "image/webp"
-            else:
-                detected_type = "image/jpeg"
-
-            try:
-                from PIL import Image, ImageOps
-                import io as _pil_io
-                pil_img = Image.open(_pil_io.BytesIO(data))
-                pil_img = ImageOps.exif_transpose(pil_img)
-                buf = _pil_io.BytesIO()
-                pil_img.save(buf, format='JPEG')
-                data = buf.getvalue()
-            except Exception as e:
-                log.warning(f'EXIF rotate failed: {e}')
-            b64 = base64.b64encode(data).decode()
-            if detected_type == "application/pdf":
-                src_block = {"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": b64}}
-                extra = {"betas": ["pdfs-2024-09-25"]}
-            else:
-                src_block = {"type": "image", "source": {"type": "base64", "media_type": detected_type, "data": b64}}
-                extra = {}
-            async with httpx.AsyncClient(timeout=60.0) as client:
-                resp = await client.post(
-                    "https://api.anthropic.com/v1/messages",
-                    headers={"x-api-key": ANTHROPIC_API_KEY,
-                             "anthropic-version": "2023-06-01",
-                             "anthropic-beta": "pdfs-2024-09-25",
-                             "content-type": "application/json"},
-                    json={"model": "claude-sonnet-4-6", "max_tokens": 4096,
-                          "messages": [{"role": "user", "content": [
-                              src_block,
-                              {"type": "text", "text": "This image may be rotated or tilted. Detect the correct reading orientation and extract ALL text as it should be read. The text is likely Hebrew, English, or mixed Hebrew/English - NOT Armenian or any other script. Preserve line breaks, numbers, and structure. Output ONLY the extracted text, nothing else."}
-                          ]}]}
-                )
-            if resp.status_code == 200:
-                return _clean_text(resp.json()["content"][0]["text"].strip())
-            log.warning(f"Claude Vision {resp.status_code}: {resp.text[:200]}")
-        except Exception as e:
-            log.warning(f"Claude Vision failed: {e}, falling back to Tesseract")
-    return "[Could not extract text]"
-
+        log.warning(f"Claude Vision failed: {e}")
+        return f"[Error: {e}]"
 
 # ---------------------------------------------------------------------------
 # Schemas
@@ -241,19 +161,16 @@ def _build(filename, text, mode):
 # ---------------------------------------------------------------------------
 @app.get("/health", tags=["meta"])
 async def health():
-    return {"status":"ok","model":"tesseract","languages":["en","he"],
-            "ai": bool(ANTHROPIC_API_KEY), "version":"3.0.0"}
+    return {"status":"ok","model":"claude-vision","languages":["en","he","any"],
+            "ai": bool(ANTHROPIC_API_KEY), "version":"4.0.0"}
 
 @app.post("/ocr/upload", response_model=TextResult, tags=["ocr"])
 async def ocr_single(file: Annotated[UploadFile, File()], mode: OutputMode = Query("text")):
-    if file.content_type and file.content_type not in ALLOWED and not (file.filename and file.filename.lower().endswith('.pdf')): raise HTTPException(415, f"סוג קובץ לא נתמך: {file.content_type}")
+    if file.content_type and file.content_type not in ALLOWED and not (file.filename and file.filename.lower().endswith('.pdf')):
+        raise HTTPException(415, f"סוג קובץ לא נתמך: {file.content_type}")
     data = await file.read()
     if len(data) > MAX_BYTES: raise HTTPException(413, "הקובץ גדול מדי (מקסימום 20MB).")
-    if file.content_type == 'application/pdf' or (file.filename and file.filename.lower().endswith('.pdf')):
-        text = await _ocr_from_bytes(data, 'application/pdf')
-        return _build(file.filename or '?', text, mode)
-    try: text = await _ocr_from_bytes(data)
-    except Exception as e: raise HTTPException(500, str(e))
+    text = await _ocr_from_bytes(data)
     return _build(file.filename or "upload", text, mode)
 
 @app.post("/ocr/batch", response_model=BatchResponse, tags=["ocr"])
@@ -262,22 +179,11 @@ async def ocr_batch(files: Annotated[list[UploadFile], File()], mode: OutputMode
     if len(files) > 20: raise HTTPException(400, "מקסימום 20 קבצים.")
     async def process(f):
         if f.content_type and f.content_type not in ALLOWED and not (f.filename and f.filename.lower().endswith('.pdf')):
-            return TextResult(filename=f.filename or "?", text=f"[דלג] סוג לא נתמך")
+            return TextResult(filename=f.filename or "?", text="[דלג] סוג לא נתמך")
         data = await f.read()
         if len(data) > MAX_BYTES:
             return TextResult(filename=f.filename or "?", text="[דלג] קובץ גדול מדי")
-        if f.content_type == 'application/pdf' or (f.filename and f.filename.lower().endswith('.pdf')):
-            pages = await _pdf_to_images(data)
-            if pages:
-                texts = []
-                for page_data in pages:
-                    texts.append(await _ocr_from_bytes(page_data, 'image/jpeg'))
-                text = '\n\n--- Page break ---\n\n'.join(texts)
-                return _build(f.filename or '?', text, mode)
-        try:
-            text = await _ocr_from_bytes(data)
-        except Exception as e:
-            return TextResult(filename=f.filename or "?", text=f"[שגיאה] {e}")
+        text = await _ocr_from_bytes(data)
         return _build(f.filename or "?", text, mode)
     results = []
     for f in files: results.append(await process(f))
@@ -293,9 +199,8 @@ async def ocr_url(body: UrlRequest, mode: OutputMode = Query("text")):
     if len(r.content) > MAX_BYTES: raise HTTPException(413, "הקובץ גדול מדי.")
     first = r.content[:20].lower()
     if b"<html" in first or b"<!doc" in first:
-        raise HTTPException(422, "הקישור מוביל לדף אינטרנט ולא לתמונה. לחצו ימני על התמונה → \'פתח תמונה בכרטיסייה חדשה\' והעתיקו את הקישור.")
-    try: text = await _ocr_from_bytes(r.content)
-    except Exception as e: raise HTTPException(422, str(e))
+        raise HTTPException(422, "הקישור מוביל לדף אינטרנט ולא לתמונה.")
+    text = await _ocr_from_bytes(r.content)
     return _build(str(body.url).split("/")[-1] or "remote", text, mode)
 
 # ---------------------------------------------------------------------------
@@ -322,16 +227,8 @@ async def explain_eli12(body: AIRequest):
     if not body.text.strip(): raise HTTPException(400, "הטקסט ריק.")
     result = await _claude(
         f"""אתה עוזר שמסביר מסמכים מורכבים בשפה פשוטה וידידותית.
-
 המשימה: הסבר את הטקסט הבא כאילו אתה מדבר עם אדם מבוגר שלא מכיר עניינים בירוקרטיים/משפטיים.
-
-כללים:
-- השתמש בשפה פשוטה וברורה
-- הסבר מונחים מורכבים במילים פשוטות
-- ציין מה חשוב ומה הפעולות הנדרשות
-- כתוב בעברית
-- פרק למשפטים קצרים
-
+כללים: השתמש בשפה פשוטה וברורה, הסבר מונחים מורכבים, ציין מה חשוב ומה הפעולות הנדרשות, כתוב בעברית, פרק למשפטים קצרים.
 טקסט לפישוט:
 {body.text}"""
     )
@@ -343,24 +240,15 @@ async def translate(body: AIRequest):
     lang = body.language or "English"
     result = await _claude(
         f"""תרגם את הטקסט הבא ל{lang}.
-
-כללים:
-- תרגום מדויק ובהיר
-- שמור על המבנה המקורי
-- פלט את התרגום בלבד ללא הסברים
-
+כללים: תרגום מדויק ובהיר, שמור על המבנה המקורי, פלט את התרגום בלבד ללא הסברים.
 טקסט לתרגום:
 {body.text}"""
     )
     return AIResponse(result=result)
 
-
-@app.post("/ai/analyze", response_model=AIResponse, tags=["ai"])
-
 @app.post("/ai/analyze", response_model=AIResponse, tags=["ai"])
 async def analyze(body: AIRequest):
     if not body.text.strip(): raise HTTPException(400, "Empty text.")
-    import json as _json
     result = await _claude(
         """Extract ONLY these specific fields from this document. Return a JSON object with null for missing fields:
 - document_type: e.g. "Property Tax Bill"
@@ -379,7 +267,7 @@ async def analyze(body: AIRequest):
 - payment_required: true or false
 - reply_address: postal reply address or null
 - contact_details: object with phone, fax, email, website keys if found
-- property_details: object with address, block, parcel, size, type, description keys if found (for property bills)
+- property_details: object with address, block, parcel, size, type, description keys if found
 
 Return ONLY valid JSON. No markdown.
 
@@ -388,24 +276,21 @@ Document:
     )
     clean = result.replace('```json', '').replace('```', '').strip()
     try:
-        data = _json.loads(clean)
-        return AIResponse(result=_json.dumps(data))
+        data = json.loads(clean)
+        return AIResponse(result=json.dumps(data))
     except:
         return AIResponse(result=clean)
-
 
 # ---------------------------------------------------------------------------
 # UI
 # ---------------------------------------------------------------------------
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
 async def serve_ui():
-    import os
     p = os.path.join(os.path.dirname(__file__), "ui.html")
     return HTMLResponse(open(p).read())
 
 @app.get("/landing", include_in_schema=False, response_class=HTMLResponse)
 async def serve_landing():
-    import os
     p = os.path.join(os.path.dirname(__file__), "landing.html")
     if not os.path.exists(p):
         return HTMLResponse("<h1>Landing page not found</h1>", status_code=404)
