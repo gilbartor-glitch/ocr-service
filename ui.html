@@ -92,13 +92,13 @@ nav{display:flex;align-items:center;padding:0 40px;height:58px;border-bottom:1px
 @keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes popIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(229,57,53,.5)}50%{box-shadow:0 0 0 10px rgba(229,57,53,0)}}
-.doc-banner{background:linear-gradient(135deg,rgba(0,149,255,.12),rgba(0,229,255,.06));border:1px solid rgba(0,149,255,.3);border-radius:var(--r);padding:16px 20px;margin-bottom:20px;display:flex;align-items:flex-start;gap:14px;animation:slideUp .3s ease}
-.doc-banner-icon{font-size:24px;margin-top:2px}
-.doc-banner-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,149,255,.7);margin-bottom:3px}
-.doc-banner-type{font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;color:var(--text)}
+.doc-banner{background:linear-gradient(135deg,rgba(0,149,255,.12),rgba(0,229,255,.06));border:1px solid rgba(0,149,255,.3);border-radius:var(--r);padding:10px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px;animation:slideUp .3s ease}
+.doc-banner-icon{font-size:18px}
+.doc-banner-label{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,149,255,.7);margin-bottom:1px}
+.doc-banner-type{font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:800;color:var(--text)}
 .doc-banner-summary{display:none}
-.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:24px}
-.acard{border-radius:16px;padding:20px;cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;animation:popIn .35s ease forwards;opacity:0;border:none;display:flex;flex-direction:column;gap:6px;min-height:130px;font-family:'Space Grotesk',sans-serif}
+.card-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.acard{border-radius:16px;padding:24px 20px;cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;animation:popIn .35s ease forwards;opacity:0;border:none;display:flex;flex-direction:column;gap:8px;min-height:160px;font-family:'Space Grotesk',sans-serif}
 .acard:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,.5)}
 .acard:active{transform:scale(.97)}
 .acard-icon{font-size:26px}
@@ -133,6 +133,7 @@ nav{display:flex;align-items:center;padding:0 40px;height:58px;border-bottom:1px
 .cp-send{flex:1;padding:11px;background:linear-gradient(135deg,var(--amber),#ff9a3c);color:#000;border:none;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
 .cp-cancel{padding:11px 18px;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:10px;font-size:13px;cursor:pointer;font-family:'Space Grotesk',sans-serif}
 .address-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--text2);font-style:italic;line-height:1.6;margin-bottom:14px}
+@media(max-width:1100px){.card-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:800px){.wrap{grid-template-columns:1fr}.left{border-right:none;border-bottom:1px solid var(--border)}nav{padding:0 16px}.card-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
@@ -342,34 +343,65 @@ function renderResults(){
   var wc=out.ocr.split(/\s+/).filter(function(w){return w.length>0;}).length;
   document.getElementById('meta').textContent=wc+' words';
 }
-function getCards(){
-  var cards=[
-    {color:'red',icon:'&#x1F4C4;',title:'Full OCR',sub:'View extracted text',action:'showOCR'},
-    {color:'cyan',icon:'&#x1F9E0;',title:'Doc Summary',sub:'Plain-language overview',action:'showSummary'},
-    {color:'pink',icon:'&#x1F4EC;',title:'Entity & Contacts',sub:'Names, addresses, phones',action:'showContacts'},
-    {color:'slate',icon:'&#x1F50D;',title:'Compliance',sub:'Rules & requirements',action:'showCompliance'},
-    {color:'lime',icon:'&#x1F310;',title:'Translate',sub:'Convert to another language',action:'showTranslateModal'},
-    {color:'yellow',icon:'&#x23F0;',title:'Time-sensitive',sub:'Deadlines & urgent items',action:'showUrgent'},
-    {color:'brown',icon:'&#x2696;&#xFE0F;',title:'Legal / Policy',sub:'Rights & obligations',action:'showLegal'},
-    {color:'darkgreen',icon:'&#x2709;&#xFE0F;',title:'Write a reply',sub:'Compose & copy a letter',action:'showReply'},
-  ];
-  if(analysis&&analysis.payment_required){
-    cards.unshift({color:'red urgent',icon:'&#x1F4B3;',title:'Payment Required',sub:analysis.payment_amount||(analysis.payment_due?'Due: '+analysis.payment_due:'Action needed'),action:'showPayment'});
-  }
-  return cards;
-}
+// Field card colors cycle
+var FIELD_COLORS=['#e53935','#d81b8a','#00acc1','#546e7a','#689f38','#f9a825','#795548','#2e7d32','#6a1b9a','#f4511e','#0288d1','#00897b'];
+
 function buildCards(){
-  var cards=getCards();
+  var a=analysis||{};
+  // Build data field cards from extracted fields
+  var fields=[];
+
+  // Priority fields first (colored)
+  if(a.amount)fields.push({label:'Amount',value:(a.currency||'')+(a.currency?' ':'')+a.amount});
+  if(a.due_date)fields.push({label:'Due Date',value:a.due_date});
+  if(a.clearing_id)fields.push({label:'Clearing ID',value:a.clearing_id});
+  if(a.account_number)fields.push({label:'Account Number',value:a.account_number});
+  if(a.reference_number)fields.push({label:'Reference',value:a.reference_number});
+  if(a.period)fields.push({label:'Period',value:a.period});
+  if(a.sender)fields.push({label:'Sender',value:a.sender});
+  if(a.recipient)fields.push({label:'Recipient',value:a.recipient});
+  if(a.address)fields.push({label:'Address',value:a.address});
+  // Extra fields
+  if(a.extra_fields){Object.keys(a.extra_fields).forEach(function(k){if(a.extra_fields[k])fields.push({label:k.replace(/_/g,' '),value:String(a.extra_fields[k])});});}
+
+  // Always add action cards at the end
+  fields.push({label:'Full OCR',value:'__action__showOCR',isAction:true,icon:'&#x1F4C4;'});
+  fields.push({label:'Translate',value:'__action__showTranslateModal',isAction:true,icon:'&#x1F310;'});
+  fields.push({label:'Write a reply',value:'__action__showReply',isAction:true,icon:'&#x2709;&#xFE0F;'});
+  if(a.deadline_date)fields.push({label:'Add to Calendar',value:'__action__showUrgent',isAction:true,icon:'&#x1F4C5;'});
+
   var h='<div class="card-grid">';
-  cards.forEach(function(c){
-    h+='<div class="acard '+c.color+'" onclick="cardAction(\''+c.action+'\')">';
-    h+='<div class="acard-icon">'+c.icon+'</div>';
-    h+='<div class="acard-title">'+c.title+'</div>';
-    h+='<div class="acard-sub">'+c.sub+'</div>';
-    h+='</div>';
+  fields.forEach(function(f,i){
+    var color=FIELD_COLORS[i%FIELD_COLORS.length];
+    if(f.isAction){
+      var act=f.value.replace('__action__','');
+      h+='<div class="acard" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2)" onclick="cardAction(\''+act+'\')">';
+      h+='<div style="font-size:22px">'+f.icon+'</div>';
+      h+='<div class="acard-title" style="color:var(--text)">'+esc(f.label)+'</div>';
+      h+='</div>';
+    } else {
+      h+='<div class="acard data-card" style="background:'+color+'18;border:1px solid '+color+'55;cursor:pointer" onclick="toggleCardValue(this)">';
+      h+='<div class="card-label" style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:'+color+';margin-bottom:8px">'+esc(f.label)+'</div>';
+      h+='<div class="card-value-hidden" style="display:none;font-family:Bricolage Grotesque,sans-serif;font-size:20px;font-weight:800;color:var(--text);line-height:1.3;word-break:break-all">'+esc(f.value)+'</div>';
+      h+='<div class="card-tap-hint" style="font-size:22px;opacity:.4;margin-top:auto">&#x1F440;</div>';
+      h+='</div>';
+    }
   });
   h+='</div>';
   return h;
+}
+function toggleCardValue(card){
+  var hidden=card.querySelector('.card-value-hidden');
+  var hint=card.querySelector('.card-tap-hint');
+  var label=card.querySelector('.card-label');
+  if(hidden.style.display==='none'){
+    hidden.style.display='block';
+    if(hint)hint.style.display='none';
+    card.style.minHeight='auto';
+  } else {
+    hidden.style.display='none';
+    if(hint)hint.style.display='block';
+  }
 }
 function showTab(tab){
   document.querySelectorAll('.otab').forEach(function(t){t.classList.remove('active');});
@@ -381,7 +413,7 @@ function showTab(tab){
       banner='<div class="doc-banner"><div class="doc-banner-icon">&#x1F4CB;</div><div>';
       banner+='<div class="doc-banner-label">Document type</div>';
       banner+='<div class="doc-banner-type">'+esc(analysis.document_type)+'</div>';
-      
+      if(analysis.summary)banner+='<div class="doc-banner-summary">'+esc(analysis.summary)+'</div>';
       banner+='</div></div>';
     }
     document.getElementById('outBody').innerHTML=banner+buildCards();
@@ -397,18 +429,6 @@ function showTab(tab){
     '<div class="otext" style="direction:'+(isRtl?'rtl':'ltr')+';text-align:'+(isRtl?'right':'left')+';unicode-bidi:embed">'+lines+'</div>'+
     '<div class="oacts"><button class="oabtn" id="spkBtn" onclick="doSpeak()">&#x1F50A; Listen</button><button class="oabtn" onclick="doCopy(this)">&#x1F4CB; Copy</button></div>';
   document.getElementById('outBody').style.direction=isRtl?'rtl':'ltr';
-}
-function renderFields(fields){
-  var h='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">';
-  fields.forEach(function(f){
-    if(!f.value)return;
-    h+='<div style="background:'+f.color+'18;border:1px solid '+f.color+'44;border-radius:12px;padding:14px 16px">';
-    h+='<div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:'+f.color+';margin-bottom:6px">'+esc(f.label)+'</div>';
-    h+='<div style="font-family:Bricolage Grotesque,sans-serif;font-size:18px;font-weight:800;color:var(--text);line-height:1.2">'+esc(String(f.value))+'</div>';
-    h+='</div>';
-  });
-  h+='</div>';
-  return h;
 }
 function cardAction(action){
   var fns={showOCR:showOCR,showSummary:showSummary,showTranslateModal:showTranslateModal,showUrgent:showUrgent,showContacts:showContacts,showLegal:showLegal,showCompliance:showCompliance,showReply:showReply,showPayment:showPayment};
@@ -434,35 +454,23 @@ function aiModal(title,prompt){
     .then(function(d){document.getElementById('modalBody').innerHTML='<div style="line-height:1.8;color:var(--text)">'+d.result.split('\n').map(function(l){return esc(l);}).join('<br>')+'</div>';})
     .catch(function(){document.getElementById('modalBody').innerHTML='<div style="color:var(--red)">Failed. Please try again.</div>';});
 }
-function showSummary(){
-  var a=analysis||{};
-  var fields=[
-    {label:'Document type',value:a.document_type,color:'#0095ff'},
-    {label:'Sender',value:a.sender,color:'#7c3aed'},
-    {label:'Recipient',value:a.recipient,color:'#0891b2'},
-    {label:'Period',value:a.period,color:'#059669'},
-    {label:'Address',value:a.address,color:'#64748b'},
-  ];
-  openModal('Document details', renderFields(fields));
-}
+function showSummary(){aiModal('Document summary','Summarize this document in plain language. What is it? What does the recipient need to know or do?\n\n'+out.ocr);}
 function showUrgent(){
   var a=analysis||{};
-  var cal='';
+  var calBtn='';
   if(a.deadline_date){
-    var g='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(a.deadline_title||'Deadline')+'&dates='+a.deadline_date.replace(/-/g,'')+'%2F'+a.deadline_date.replace(/-/g,'');
-    cal='<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">'
-      +'<a href="'+g+'" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:linear-gradient(135deg,#4285f4,#34a853);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px">&#x1F4C5; Add to Google Calendar</a>'
-      +'<button onclick="downloadICS()" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:10px;font-weight:600;font-size:13px;cursor:pointer">&#x2B07; Download .ics</button>'
+    var gcal='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(a.deadline_title||'Document deadline')+'&dates='+a.deadline_date.replace(/-/g,'')+'%2F'+a.deadline_date.replace(/-/g,'')+'&details='+encodeURIComponent('From SimpliScan: '+(a.document_type||''));
+    calBtn='<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">'
+      +'<a href="'+gcal+'" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:linear-gradient(135deg,#4285f4,#34a853);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px;font-family:Space Grotesk,sans-serif">&#x1F4C5; Add to Google Calendar</a>'
+      +'<button onclick="downloadICS()" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:10px;font-weight:600;font-size:13px;font-family:Space Grotesk,sans-serif;cursor:pointer">&#x2B07; Download .ics</button>'
       +'</div>';
   }
-  var body=cal;
-  if(a.payment_amount)body+='<div style="margin-bottom:16px;padding:16px;background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.3);border-radius:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,77,109,.7);margin-bottom:6px">Amount to pay</div><div style="font-family:Bricolage Grotesque,sans-serif;font-size:36px;font-weight:800;color:#ff4d6d">'+esc(a.payment_amount)+'</div></div>';
-  if(a.payment_due)body+='<div style="margin-bottom:16px;padding:16px;background:rgba(255,184,48,.08);border:1px solid rgba(255,184,48,.3);border-radius:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,184,48,.7);margin-bottom:6px">Due date</div><div style="font-family:Bricolage Grotesque,sans-serif;font-size:28px;font-weight:800;color:#ffb830">'+esc(a.payment_due)+'</div></div>';
-  if(a.payment_note)body+='<div style="padding:14px;background:var(--bg3);border-radius:10px;font-size:14px;color:var(--text2);line-height:1.6">'+esc(a.payment_note)+'</div>';
-  if(!a.payment_amount && !a.payment_due)body+='<div style="color:var(--text2)">No specific deadlines detected in this document.</div>';
-  openModal('&#x23F0; Time-sensitive actions', body);
+  openModal('Time-sensitive actions','<div class="loading"><span class="spin"></span> Analyzing...</div>');
+  fetch('/ai/eli12',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:'List all deadlines, due dates, and time-sensitive actions from this document with dates if available.\n\n'+out.ocr})})
+    .then(function(r){return r.json();})
+    .then(function(d){document.getElementById('modalBody').innerHTML=calBtn+'<div style="line-height:1.8;color:var(--text)">'+d.result.split('\n').map(function(l){return esc(l);}).join('<br>')+'</div>';})
+    .catch(function(){document.getElementById('modalBody').innerHTML='<div style="color:var(--red)">Failed.</div>';});
 }
-
 function downloadICS(){
   var a=analysis||{};
   if(!a.deadline_date)return;
@@ -473,35 +481,18 @@ function downloadICS(){
   var url=URL.createObjectURL(blob);
   var a2=document.createElement('a');a2.href=url;a2.download='deadline.ics';a2.click();
 }
-function showContacts(){
-  var a=analysis||{};
-  var fields=[
-    {label:'Sender',value:a.sender,color:'#7c3aed'},
-    {label:'Recipient',value:a.recipient,color:'#0891b2'},
-    {label:'Address',value:a.address,color:'#64748b'},
-    {label:'Account number',value:a.account_number,color:'#0095ff'},
-    {label:'Reference number',value:a.reference_number,color:'#059669'},
-    {label:'Clearing ID',value:a.clearing_id,color:'#d97706'},
-  ];
-  if(a.extra_fields){Object.keys(a.extra_fields).forEach(function(k){fields.push({label:k,value:a.extra_fields[k],color:'#475569'});});}
-  openModal('Entity & contact details', renderFields(fields));
-}
+function showContacts(){aiModal('Entity & contact details','Extract all names, organizations, addresses, phone numbers, emails, and reference numbers. Present as a clear list.\n\n'+out.ocr);}
 function showLegal(){aiModal('Legal & policy information','Explain the legal rights, obligations, and policy implications in plain language.\n\n'+out.ocr);}
 function showCompliance(){aiModal('Compliance & requirements','What are the compliance requirements mentioned? What must the recipient do?\n\n'+out.ocr);}
 function showPayment(){
   var a=analysis||{};
-  var fields=[
-    {label:'Amount',value:(a.currency||'')+' '+a.amount,color:'#ff4d6d'},
-    {label:'Due date',value:a.due_date,color:'#ffb830'},
-    {label:'Clearing ID',value:a.clearing_id,color:'#00e5ff'},
-    {label:'Account number',value:a.account_number,color:'#7c3aed'},
-    {label:'Reference',value:a.reference_number,color:'#059669'},
-    {label:'Period',value:a.period,color:'#0095ff'},
-  ];
-  if(a.extra_fields){Object.keys(a.extra_fields).forEach(function(k){fields.push({label:k,value:a.extra_fields[k],color:'#475569'});});}
-  openModal('Payment details', renderFields(fields));
+  var h='';
+  if(a.payment_amount)h+='<div style="font-family:Bricolage Grotesque,sans-serif;font-size:40px;font-weight:800;color:var(--red);margin:4px 0 8px">'+esc(a.payment_amount)+'</div>';
+  if(a.payment_due)h+='<div style="color:var(--amber);font-size:14px;margin-bottom:14px">&#x23F0; Due: '+esc(a.payment_due)+'</div>';
+  if(a.payment_note)h+='<div style="line-height:1.7;color:var(--text2);margin-bottom:12px">'+esc(a.payment_note)+'</div>';
+  if(a.summary)h+='<div style="line-height:1.8;color:var(--text2)">'+esc(a.summary)+'</div>';
+  openModal('Payment required',h||'Payment is required for this document.');
 }
-
 function showTranslateModal(){
   var lang=document.getElementById('langSel').value||'English';
   openModal('Translate to '+lang,'<div class="loading"><span class="spin"></span> Translating...</div>');
