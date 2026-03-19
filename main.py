@@ -147,7 +147,9 @@ async def _ocr_from_bytes(data, media_type="image/jpeg"):
                         try: os.unlink(f)
                         except: pass
             # Detect media type from magic bytes
-            if data[:4] in (b'\x00\x00\x00\x18', b'\x00\x00\x00\x1c', b'\x00\x00\x00\x20') or b'heic' in data[:20].lower() or b'heix' in data[:20].lower():
+            if data[:4] == b'%PDF':
+                detected_type = "application/pdf"
+            elif data[:4] in (b'\x00\x00\x00\x18', b'\x00\x00\x00\x1c', b'\x00\x00\x00\x20') or b'heic' in data[:20].lower() or b'heix' in data[:20].lower():
                 detected_type = "image/heic"
             elif data[:2] == b'\xff\xd8':
                 detected_type = "image/jpeg"
