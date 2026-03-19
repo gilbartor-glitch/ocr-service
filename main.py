@@ -261,7 +261,7 @@ async def ocr_batch(files: Annotated[list[UploadFile], File()], mode: OutputMode
     if not files: raise HTTPException(400, "לא נבחרו קבצים.")
     if len(files) > 20: raise HTTPException(400, "מקסימום 20 קבצים.")
     async def process(f):
-        if f.content_type and not f.content_type.startswith("image/"):
+        if f.content_type and f.content_type not in ALLOWED and not (f.filename and f.filename.lower().endswith('.pdf')):
             return TextResult(filename=f.filename or "?", text=f"[דלג] סוג לא נתמך")
         data = await f.read()
         if len(data) > MAX_BYTES:
