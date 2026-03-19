@@ -245,13 +245,8 @@ async def ocr_single(file: Annotated[UploadFile, File()], mode: OutputMode = Que
     data = await file.read()
     if len(data) > MAX_BYTES: raise HTTPException(413, "הקובץ גדול מדי (מקסימום 20MB).")
     if file.content_type == 'application/pdf' or (file.filename and file.filename.lower().endswith('.pdf')):
-        pages = await _pdf_to_images(data)
-        if pages:
-            texts = []
-            for page_data in pages:
-                texts.append(await _ocr_from_bytes(page_data, 'image/jpeg'))
-            text = '\n\n--- Page break ---\n\n'.join(texts)
-            return _build(file.filename or '?', text, mode)
+        text = await _ocr_from_bytes(data, 'application/pdf')
+        return _build(file.filename or '?', text, mode)
     try: text = await _ocr_from_bytes(data)
     except Exception as e: raise HTTPException(500, str(e))
     return _build(file.filename or "upload", text, mode)
