@@ -241,7 +241,7 @@ async def health():
 
 @app.post("/ocr/upload", response_model=TextResult, tags=["ocr"])
 async def ocr_single(file: Annotated[UploadFile, File()], mode: OutputMode = Query("text")):
-    if file.content_type and not file.content_type.startswith("image/"): raise HTTPException(415, f"סוג קובץ לא נתמך: {file.content_type}")
+    if file.content_type and file.content_type not in ALLOWED: raise HTTPException(415, f"סוג קובץ לא נתמך: {file.content_type}")
     data = await file.read()
     if len(data) > MAX_BYTES: raise HTTPException(413, "הקובץ גדול מדי (מקסימום 20MB).")
     if file.content_type == 'application/pdf' or (file.filename and file.filename.lower().endswith('.pdf')):
@@ -266,16 +266,18 @@ async def ocr_batch(files: Annotated[list[UploadFile], File()], mode: OutputMode
         data = await f.read()
         if len(data) > MAX_BYTES:
             return TextResult(filename=f.filename or "?", text="[דלג] קובץ גדול מדי")
-        if file.content_type == 'application/pdf' or (file.filename and file.filename.lower().endswith('.pdf')):
+        if f.content_type == 'application/pdf' or (f.filename and f.filename.lower().endswith('.pdf')):
             pages = await _pdf_to_images(data)
             if pages:
                 texts = []
                 for page_data in pages:
-            texts.append(await _ocr_from_bytes(page_data, 'image/jpeg'))
-            text = '\n\n--- Page break ---\n\n'.join(texts)
-            return _build(file.filename or '?', text, mode)
-    try: text = await _ocr_from_bytes(data)
-        except Exception as e: return TextResult(filename=f.filename or "?", text=f"[שגיאה] {e}")
+                    texts.append(await _ocr_from_bytes(page_data, 'image/jpeg'))
+                text = '\n\n--- Page break ---\n\n'.join(texts)
+                return _build(f.filename or '?', text, mode)
+        try:
+            text = await _ocr_from_bytes(data)
+        except Exception as e:
+            return TextResult(filename=f.filename or "?", text=f"[שגיאה] {e}")
         return _build(f.filename or "?", text, mode)
     results = []
     for f in files: results.append(await process(f))
