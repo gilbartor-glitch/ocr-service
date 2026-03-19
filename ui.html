@@ -398,6 +398,18 @@ function showTab(tab){
     '<div class="oacts"><button class="oabtn" id="spkBtn" onclick="doSpeak()">&#x1F50A; Listen</button><button class="oabtn" onclick="doCopy(this)">&#x1F4CB; Copy</button></div>';
   document.getElementById('outBody').style.direction=isRtl?'rtl':'ltr';
 }
+function renderFields(fields){
+  var h='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">';
+  fields.forEach(function(f){
+    if(!f.value)return;
+    h+='<div style="background:'+f.color+'18;border:1px solid '+f.color+'44;border-radius:12px;padding:14px 16px">';
+    h+='<div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:'+f.color+';margin-bottom:6px">'+esc(f.label)+'</div>';
+    h+='<div style="font-family:Bricolage Grotesque,sans-serif;font-size:18px;font-weight:800;color:var(--text);line-height:1.2">'+esc(String(f.value))+'</div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  return h;
+}
 function cardAction(action){
   var fns={showOCR:showOCR,showSummary:showSummary,showTranslateModal:showTranslateModal,showUrgent:showUrgent,showContacts:showContacts,showLegal:showLegal,showCompliance:showCompliance,showReply:showReply,showPayment:showPayment};
   if(fns[action])fns[action]();
@@ -422,7 +434,17 @@ function aiModal(title,prompt){
     .then(function(d){document.getElementById('modalBody').innerHTML='<div style="line-height:1.8;color:var(--text)">'+d.result.split('\n').map(function(l){return esc(l);}).join('<br>')+'</div>';})
     .catch(function(){document.getElementById('modalBody').innerHTML='<div style="color:var(--red)">Failed. Please try again.</div>';});
 }
-function showSummary(){aiModal('Document summary','Summarize this document in plain language. What is it? What does the recipient need to know or do?\n\n'+out.ocr);}
+function showSummary(){
+  var a=analysis||{};
+  var fields=[
+    {label:'Document type',value:a.document_type,color:'#0095ff'},
+    {label:'Sender',value:a.sender,color:'#7c3aed'},
+    {label:'Recipient',value:a.recipient,color:'#0891b2'},
+    {label:'Period',value:a.period,color:'#059669'},
+    {label:'Address',value:a.address,color:'#64748b'},
+  ];
+  openModal('Document details', renderFields(fields));
+}
 function showUrgent(){
   var a=analysis||{};
   var cal='';
@@ -451,18 +473,35 @@ function downloadICS(){
   var url=URL.createObjectURL(blob);
   var a2=document.createElement('a');a2.href=url;a2.download='deadline.ics';a2.click();
 }
-function showContacts(){aiModal('Entity & contact details','Extract all names, organizations, addresses, phone numbers, emails, and reference numbers. Present as a clear list.\n\n'+out.ocr);}
+function showContacts(){
+  var a=analysis||{};
+  var fields=[
+    {label:'Sender',value:a.sender,color:'#7c3aed'},
+    {label:'Recipient',value:a.recipient,color:'#0891b2'},
+    {label:'Address',value:a.address,color:'#64748b'},
+    {label:'Account number',value:a.account_number,color:'#0095ff'},
+    {label:'Reference number',value:a.reference_number,color:'#059669'},
+    {label:'Clearing ID',value:a.clearing_id,color:'#d97706'},
+  ];
+  if(a.extra_fields){Object.keys(a.extra_fields).forEach(function(k){fields.push({label:k,value:a.extra_fields[k],color:'#475569'});});}
+  openModal('Entity & contact details', renderFields(fields));
+}
 function showLegal(){aiModal('Legal & policy information','Explain the legal rights, obligations, and policy implications in plain language.\n\n'+out.ocr);}
 function showCompliance(){aiModal('Compliance & requirements','What are the compliance requirements mentioned? What must the recipient do?\n\n'+out.ocr);}
 function showPayment(){
   var a=analysis||{};
-  var h='';
-  if(a.payment_amount)h+='<div style="font-family:Bricolage Grotesque,sans-serif;font-size:40px;font-weight:800;color:var(--red);margin:4px 0 8px">'+esc(a.payment_amount)+'</div>';
-  if(a.payment_due)h+='<div style="color:var(--amber);font-size:14px;margin-bottom:14px">&#x23F0; Due: '+esc(a.payment_due)+'</div>';
-  if(a.payment_note)h+='<div style="line-height:1.7;color:var(--text2);margin-bottom:12px">'+esc(a.payment_note)+'</div>';
-  if(a.summary)h+='<div style="line-height:1.8;color:var(--text2)">'+esc(a.summary)+'</div>';
-  openModal('Payment required',h||'Payment is required for this document.');
+  var fields=[
+    {label:'Amount',value:(a.currency||'')+' '+a.amount,color:'#ff4d6d'},
+    {label:'Due date',value:a.due_date,color:'#ffb830'},
+    {label:'Clearing ID',value:a.clearing_id,color:'#00e5ff'},
+    {label:'Account number',value:a.account_number,color:'#7c3aed'},
+    {label:'Reference',value:a.reference_number,color:'#059669'},
+    {label:'Period',value:a.period,color:'#0095ff'},
+  ];
+  if(a.extra_fields){Object.keys(a.extra_fields).forEach(function(k){fields.push({label:k,value:a.extra_fields[k],color:'#475569'});});}
+  openModal('Payment details', renderFields(fields));
 }
+
 function showTranslateModal(){
   var lang=document.getElementById('langSel').value||'English';
   openModal('Translate to '+lang,'<div class="loading"><span class="spin"></span> Translating...</div>');

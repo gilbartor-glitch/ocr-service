@@ -326,16 +326,24 @@ async def analyze(body: AIRequest):
     if not body.text.strip(): raise HTTPException(400, "Empty text.")
     import json as _json
     result = await _claude(
-        """Analyze this document and return ONLY a JSON object with these exact fields:
-- document_type: short label e.g. Tax Notice, Traffic Fine, Utility Bill, Flight Ticket
-- summary: 1-2 sentence plain-language summary
+        """Extract key fields from this document and return ONLY a JSON object.
+Include any of these fields that are present (null if not found):
+- document_type: type of document e.g. "Property Tax Bill", "Traffic Fine", "Utility Bill"
+- period: billing or relevant period e.g. "March-April 2026"
+- amount: the main amount/sum e.g. "2,478.80"
+- currency: currency symbol e.g. "₪" or "$"
+- due_date: payment due date as written in doc e.g. "05/04/2026"
+- deadline_date: due date in ISO format YYYY-MM-DD or null
+- deadline_title: e.g. "Payment due"
+- clearing_id: payment/clearing reference number if present
+- account_number: account or customer number
+- reference_number: any reference or case number
+- address: full address from the document
+- sender: organization or company that sent the document
+- recipient: name of person/entity receiving the document
 - payment_required: true or false
-- payment_amount: amount string if payment required or null
-- payment_due: due date string if found or null
-- payment_note: brief note about payment or null
-- reply_address: full postal address to reply to if found or null
-- deadline_date: most important deadline in ISO format YYYY-MM-DD or null
-- deadline_title: short label e.g. "Payment due" or "Appeal deadline" or null
+- reply_address: postal address to send replies to or null
+- extra_fields: object with any other important labeled fields found in the document
 
 Return ONLY valid JSON. No markdown, no explanation.
 
