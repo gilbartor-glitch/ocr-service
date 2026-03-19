@@ -349,3 +349,20 @@ Document:
     except:
         return AIResponse(result=clean)
 
+
+# ---------------------------------------------------------------------------
+# UI
+# ---------------------------------------------------------------------------
+@app.get("/", include_in_schema=False, response_class=HTMLResponse)
+async def serve_ui():
+    import os
+    p = os.path.join(os.path.dirname(__file__), "ui.html")
+    return HTMLResponse(open(p).read())
+
+@app.get("/landing", include_in_schema=False, response_class=HTMLResponse)
+async def serve_landing():
+    import os
+    p = os.path.join(os.path.dirname(__file__), "landing.html")
+    if not os.path.exists(p):
+        return HTMLResponse("<h1>Landing page not found</h1>", status_code=404)
+    return HTMLResponse(open(p).read())
