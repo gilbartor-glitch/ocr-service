@@ -347,22 +347,6 @@ Document:
 
 
 @app.post("/ai/analyze", response_model=AIResponse, tags=["ai"])
-async def analyze(body: AIRequest):
-    if not body.text.strip(): raise HTTPException(400, "Empty text.")
-    result = await _claude(
-        """Analyze this document and return ONLY JSON with fields: document_type, summary, payment_required (bool), payment_amount (or null), payment_due (or null), payment_note (or null), reply_address (or null). No markdown, no explanation.
-
-Document:
-""" + body.text
-    )
-    clean = re.sub(r"```(?:json)?\|```", "", result).strip()
-    try:
-        data = json.loads(clean)
-        return AIResponse(result=json.dumps(data))
-    except:
-        return AIResponse(result=clean)
-
-
 @app.post("/ai/analyze", response_model=AIResponse, tags=["ai"])
 async def analyze(body: AIRequest):
     if not body.text.strip(): raise HTTPException(400, "Empty text.")
