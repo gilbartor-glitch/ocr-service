@@ -272,10 +272,7 @@ async def ocr_batch(files: Annotated[list[UploadFile], File()], mode: OutputMode
                 texts = []
                 for page_data in pages:
             texts.append(await _ocr_from_bytes(page_data, 'image/jpeg'))
-            text = '
-            --- Page break ---
-
-'.join(texts)
+            text = '\n\n--- Page break ---\n\n'.join(texts)
             return _build(file.filename or '?', text, mode)
     try: text = await _ocr_from_bytes(data)
         except Exception as e: return TextResult(filename=f.filename or "?", text=f"[שגיאה] {e}")
