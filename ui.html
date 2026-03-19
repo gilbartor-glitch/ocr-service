@@ -156,10 +156,10 @@ nav{display:flex;align-items:center;padding:0 40px;height:58px;border-bottom:1px
     <div class="sec grow" id="upSec">
       <div class="lbl">Document</div>
       <div class="dz" id="dz" ondragover="dzOver(event)" ondragleave="dzLeave()" ondrop="dzDrop(event)">
-        <input type="file" id="fileIn" accept="image/*,.heic,.heif" onchange="fileChange(event)"/>
+        <input type="file" id="fileIn" accept="image/*,.heic,.heif,.pdf,application/pdf" onchange="fileChange(event)"/>
         <div class="dzi">&#x2317;</div>
         <div class="dzt">Drop image here or click to browse</div>
-        <div class="dzh">JPEG &middot; PNG &middot; WEBP &middot; TIFF &middot; BMP</div>
+        <div class="dzh">JPEG &middot; PNG &middot; WEBP &middot; TIFF &middot; BMP &middot; PDF</div>
       </div>
       <div class="thumbs" id="thumbs"></div>
     </div>
