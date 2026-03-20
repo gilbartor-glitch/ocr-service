@@ -115,8 +115,9 @@ async def _ocr_from_bytes(data: bytes) -> str:
         log.warning(f"Claude Vision {resp.status_code}: {resp.text[:300]}")
         return f"[Error {resp.status_code}]"
     except Exception as e:
-        log.warning(f"Claude Vision failed: {e}")
-        return f"[Error: {e}]"
+        log.warning(f"Claude Vision failed: {type(e).__name__}: {e}")
+        import traceback; log.warning(traceback.format_exc())
+        return f"[Error: {type(e).__name__}: {e}]"
 
 # ---------------------------------------------------------------------------
 # Schemas
