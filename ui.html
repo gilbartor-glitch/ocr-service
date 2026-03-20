@@ -67,6 +67,7 @@ nav{display:flex;align-items:center;padding:0 24px;height:56px;background:var(--
 
 /* RESULTS */
 .results{margin-top:28px}
+.doc-title{font-size:28px;font-weight:900;color:var(--text);margin-bottom:20px;line-height:1.2;letter-spacing:-.03em}
 
 /* HERO TILE — amount or primary info */
 .hero-tile{border-radius:var(--r);padding:28px;color:#fff;position:relative;overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-lg)}
@@ -299,11 +300,17 @@ function renderResults(){
   var a=analysis||{};
   var h='<div class="results">';
 
+  // DOCUMENT TITLE
+  if(a.document_type){
+    h+='<div class="doc-title">'+esc(a.document_type)+'</div>';
+  }
+
   // HERO TILE — amount (most important for a bill)
   if(a.amount){
     var urgentClass=a.payment_required?' urgent':'';
+    var heroLabel=a.payment_required?'Amount due':'Amount';
     h+='<div class="hero-tile'+urgentClass+'" style="background:linear-gradient(135deg,#dc2626,#b91c1c);cursor:pointer" onclick="showPayment()">';
-    h+='<div class="hero-tile-label">Amount due</div>';
+    h+='<div class="hero-tile-label">'+heroLabel+'</div>';
     h+='<div class="hero-tile-value">'+(a.currency||'')+' '+esc(a.amount)+'</div>';
     if(a.due_date)h+='<div class="hero-tile-sub">Due '+esc(a.due_date)+'</div>';
     h+='</div>';
@@ -311,7 +318,6 @@ function renderResults(){
 
   // DATA TILES
   var tiles=[];
-  if(a.document_type) tiles.push({label:'Document',value:a.document_type,ci:0});
   if(a.due_date&&!a.amount) tiles.push({label:'Due date',value:a.due_date,ci:3,urgent:true});
   if(a.sender) tiles.push({label:'From',value:a.sender,ci:1});
   if(a.recipient) tiles.push({label:'To',value:a.recipient,ci:5});
@@ -390,7 +396,6 @@ function actionTile(icon,title,sub,onclick,delay){
 function showTileDetail(idx){
   var a=analysis||{};
   var tiles=[];
-  if(a.document_type) tiles.push({label:'Document',value:a.document_type});
   if(a.due_date&&!a.amount) tiles.push({label:'Due date',value:a.due_date});
   if(a.sender) tiles.push({label:'From',value:a.sender});
   if(a.recipient) tiles.push({label:'To',value:a.recipient});

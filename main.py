@@ -286,7 +286,7 @@ async def analyze(body: AIRequest):
     if not body.text.strip(): raise HTTPException(400, "Empty text.")
     result = await _claude(
         """Extract ONLY these specific fields from this document. Return a JSON object with null for missing fields:
-- document_type: e.g. "Property Tax Bill"
+- document_type: clear, user-friendly purpose e.g. "Water & Sewage Bill", "Money Transfer", "Payment Receipt", "Property Tax (Arnona)", "Medical Referral"
 - amount: main payment amount as string e.g. "2,478.80"
 - currency: currency symbol e.g. "₪"
 - due_date: due date as written e.g. "05/04/2026"
@@ -338,7 +338,7 @@ def _safe_parse(text: str) -> dict:
 ANALYZE_PROMPT = """Analyze this document image. It could be any type: bill, receipt, bank transfer, government letter, medical document, contract, etc.
 
 Extract these fields. Return a JSON object with null for missing fields:
-- document_type: specific type e.g. "Water Bill", "Bank Transfer", "Payment Receipt", "Medical Referral", "Municipal Tax Notice"
+- document_type: clear, user-friendly purpose e.g. "Water & Sewage Bill", "Money Transfer", "Payment Receipt", "Property Tax (Arnona)", "Medical Referral", "Court Summons", "Insurance Claim", "Salary Slip", "Bank Statement"
 - amount: main monetary amount as string e.g. "2,478.80"
 - currency: currency symbol e.g. "₪", "$"
 - due_date: due date or transaction date as written e.g. "05/04/2026"
