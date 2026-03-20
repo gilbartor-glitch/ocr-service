@@ -309,9 +309,8 @@ function renderResults(){
 
   // If no structured data, show the extracted text directly
   if(!hasData&&ocrText){
-    var rtl=isRtl(ocrText);
-    h+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;box-shadow:var(--shadow);direction:'+(rtl?'rtl':'ltr')+';text-align:'+(rtl?'right':'left')+';font-size:14px;line-height:1.8;color:var(--text);max-height:300px;overflow-y:auto">';
-    h+=ocrText.split('\n').map(function(l){return esc(l);}).join('<br>');
+    h+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;box-shadow:var(--shadow);font-size:14px;max-height:400px;overflow-y:auto">';
+    h+=renderMarkdown(ocrText);
     h+='</div>';
   }
 
@@ -575,9 +574,40 @@ function doTranslate(lang,btn){
     .catch(function(){document.getElementById('translateResult').innerHTML='<div style="color:var(--red)">Translation failed.</div>';});
 }
 
+function renderMarkdown(text){
+  var rtl=isRtl(text);
+  var lines=text.split('\n');
+  var html='';var inTable=false;
+  for(var i=0;i<lines.length;i++){
+    var line=lines[i].trim();
+    // Detect markdown table rows
+    if(line.indexOf('|')===0||(/^\|.*\|$/).test(line)){
+      if(!inTable){html+='<table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0">';inTable=true;}
+      // Skip separator rows (|---|---|)
+      if(/^\|[\s\-:|]+\|$/.test(line))continue;
+      var cells=line.split('|').filter(function(c,idx,arr){return idx>0&&idx<arr.length-1;});
+      var tag=(!inTable||i<=1&&lines[i+1]&&/^\|[\s\-:|]+\|$/.test(lines[i+1].trim()))?'th':'td';
+      html+='<tr>';
+      cells.forEach(function(c){
+        var style='padding:8px 10px;border-bottom:1px solid var(--border);text-align:'+(rtl?'right':'left')+';';
+        if(tag==='th')style+='font-weight:700;background:var(--surface2);font-size:12px;';
+        html+='<'+tag+' style="'+style+'">'+esc(c.trim())+'</'+tag+'>';
+      });
+      html+='</tr>';
+    } else {
+      if(inTable){html+='</table>';inTable=false;}
+      if(line.indexOf('##')===0)html+='<div style="font-weight:700;font-size:15px;margin:14px 0 6px">'+esc(line.replace(/^#+\s*/,''))+'</div>';
+      else if(line.indexOf('#')===0)html+='<div style="font-weight:800;font-size:17px;margin:16px 0 8px">'+esc(line.replace(/^#+\s*/,''))+'</div>';
+      else if(line)html+='<div style="line-height:1.8">'+esc(line)+'</div>';
+      else html+='<br>';
+    }
+  }
+  if(inTable)html+='</table>';
+  return '<div style="direction:'+(rtl?'rtl':'ltr')+';text-align:'+(rtl?'right':'left')+';color:var(--text)">'+html+'</div>';
+}
+
 function showFullText(){
-  var rtl=isRtl(ocrText);
-  var h='<div style="direction:'+(rtl?'rtl':'ltr')+';text-align:'+(rtl?'right':'left')+';line-height:1.8;color:var(--text);font-size:14px">'+ocrText.split('\n').map(function(l){return esc(l);}).join('<br>')+'</div>';
+  var h=renderMarkdown(ocrText);
   h+='<div class="m-btn-row"><button class="m-btn m-btn-secondary" onclick="speakText(\''+btoa(unescape(encodeURIComponent(ocrText)))+'\')">&#x1F50A; Listen</button><button class="m-btn m-btn-secondary" onclick="copyText(\''+esc(ocrText).replace(/'/g,"\\'")+'\',this)">Copy</button></div>';
   openModal('Full text',h);
 }

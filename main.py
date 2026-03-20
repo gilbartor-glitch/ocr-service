@@ -137,10 +137,10 @@ async def _ocr_from_bytes(data: bytes) -> str:
             resp = await client.post(
                 "https://api.anthropic.com/v1/messages",
                 headers=headers,
-                json={"model": "claude-haiku-4-5-20251001", "max_tokens": 4096,
+                json={"model": "claude-sonnet-4-6", "max_tokens": 4096,
                       "messages": [{"role": "user", "content": [
                           content_block,
-                          {"type": "text", "text": "Extract ALL text exactly as it appears. The text is likely Hebrew, English, or mixed. Preserve line breaks, numbers, and structure. Output ONLY the extracted text."}
+                          {"type": "text", "text": "Extract ALL text from this image accurately. Rules:\n1. For tabular/grid data: output as a clean markdown table with proper columns and headers.\n2. Hebrew text must be accurate — use correct spelling for known names (cities, teams, organizations, people).\n3. Preserve all numbers, dates, times, and amounts exactly.\n4. Structure the output clearly with headings and sections where appropriate.\n5. Output ONLY the extracted content, no commentary."}
                       ]}]}
             )
         if resp.status_code == 200:
