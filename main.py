@@ -215,9 +215,8 @@ async def ocr_batch(files: Annotated[list[UploadFile], File()], mode: OutputMode
             return TextResult(filename=f.filename or "?", text="[דלג] קובץ גדול מדי")
         text = await _ocr_from_bytes(data)
         return _build(f.filename or "?", text, mode)
-    results = []
-    for f in files: results.append(await process(f))
-    return BatchResponse(results=results, total=len(results))
+    results = await asyncio.gather(*[process(f) for f in files])
+    return BatchResponse(results=list(results), total=len(results))
 
 @app.post("/ocr/url", response_model=TextResult, tags=["ocr"])
 async def ocr_url(body: UrlRequest, mode: OutputMode = Query("text")):
