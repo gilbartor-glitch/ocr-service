@@ -7,53 +7,57 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f7f7f5;--surface:#fff;--surface2:#f0efec;
-  --border:#e5e3dd;--border2:#d4d1c9;
-  --text:#1a1a1a;--text2:#5a5a5a;--text3:#999;
-  --accent:#1a6b4a;--accent-light:#e8f5ee;
-  --red:#e53935;--amber:#ef8c00;--blue:#1976d2;--purple:#7b1fa2;
-  --r:16px;--r2:12px;
+  --bg:#fafafa;--surface:#fff;--surface2:#f3f3f1;
+  --border:#e8e6e1;--border2:#d6d3cc;
+  --text:#111;--text2:#555;--text3:#999;
+  --accent:#16a34a;--accent-dark:#15803d;--accent-light:#dcfce7;
+  --red:#dc2626;--amber:#d97706;--blue:#2563eb;--purple:#7c3aed;--teal:#0d9488;
+  --r:20px;--r2:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 30px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.04);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:15px;min-height:100vh;-webkit-font-smoothing:antialiased}
 
 /* NAV */
-nav{display:flex;align-items:center;padding:0 24px;height:54px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
-.logo{font-size:19px;font-weight:900;letter-spacing:-.03em;color:var(--text)}
+nav{display:flex;align-items:center;padding:0 24px;height:56px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);background:rgba(255,255,255,.85)}
+.logo{font-size:20px;font-weight:900;letter-spacing:-.04em;color:var(--text)}
 .logo span{color:var(--accent)}
-.nav-status{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);font-weight:500}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.nav-status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);font-weight:500}
 .nav-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);transition:.3s}
 .nav-dot.on{background:#22c55e;box-shadow:0 0 6px #22c55e}
 
 /* CONTAINER */
-.container{max-width:720px;margin:0 auto;padding:24px 20px 80px}
+.container{max-width:700px;margin:0 auto;padding:32px 20px 80px}
 
 /* UPLOAD */
-.upload-zone{background:var(--surface);border:2px dashed var(--border2);border-radius:var(--r);padding:40px 24px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
-.upload-zone:hover,.upload-zone.over{border-color:var(--accent);background:var(--accent-light)}
+.upload-zone{background:var(--surface);border:2px dashed var(--border2);border-radius:var(--r);padding:48px 24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;box-shadow:var(--shadow)}
+.upload-zone:hover,.upload-zone.over{border-color:var(--accent);background:var(--accent-light);border-style:solid}
 .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.upload-icon{font-size:36px;margin-bottom:12px;opacity:.4}
-.upload-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px}
-.upload-hint{font-size:13px;color:var(--text3)}
-.upload-formats{margin-top:12px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
-.fmt-tag{font-size:11px;font-weight:600;color:var(--text3);background:var(--surface2);padding:3px 8px;border-radius:6px}
+.upload-icon{width:56px;height:56px;border-radius:16px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px}
+.upload-title{font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px}
+.upload-hint{font-size:14px;color:var(--text3)}
+.upload-formats{margin-top:16px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.fmt-tag{font-size:11px;font-weight:600;color:var(--text3);background:var(--surface2);padding:4px 10px;border-radius:8px;letter-spacing:.02em}
 
 /* FILE PREVIEW */
-.file-preview{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:12px 16px;margin-top:16px}
-.file-preview-icon{font-size:24px}
+.file-preview{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:14px 18px;margin-top:16px;box-shadow:var(--shadow)}
+.file-preview-icon{font-size:26px}
 .file-preview-name{font-size:14px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.file-preview-size{font-size:12px;color:var(--text3)}
-.file-preview-remove{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:none;cursor:pointer;font-size:14px;color:var(--text3);display:flex;align-items:center;justify-content:center;transition:.15s}
+.file-preview-size{font-size:12px;color:var(--text3);font-weight:500}
+.file-preview-remove{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:14px;color:var(--text3);display:flex;align-items:center;justify-content:center;transition:.15s}
 .file-preview-remove:hover{background:var(--red);color:#fff;border-color:var(--red)}
 
 /* PROCESS BTN */
-.process-btn{width:100%;padding:16px;background:var(--accent);color:#fff;border:none;border-radius:var(--r2);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
-.process-btn:hover{background:#14543a;transform:translateY(-1px);box-shadow:0 6px 20px rgba(26,107,74,.25)}
+.process-btn{width:100%;padding:16px;background:var(--accent);color:#fff;border:none;border-radius:var(--r2);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(22,163,74,.25)}
+.process-btn:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 6px 20px rgba(22,163,74,.3)}
 .process-btn:disabled{background:var(--border);color:var(--text3);cursor:not-allowed;transform:none;box-shadow:none}
 
-/* PROCESSING STEPS */
-.steps-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-top:24px}
-.step-row{display:flex;align-items:center;gap:12px;padding:10px 0;font-size:14px;font-weight:500;color:var(--text3)}
+/* PROCESSING */
+.steps-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:28px;margin-top:28px;box-shadow:var(--shadow)}
+.steps-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:16px}
+.step-row{display:flex;align-items:center;gap:12px;padding:12px 0;font-size:14px;font-weight:500;color:var(--text3)}
 .step-row+.step-row{border-top:1px solid var(--surface2)}
 .step-row.active{color:var(--text)}
 .step-row.done{color:var(--accent)}
@@ -62,79 +66,96 @@ nav{display:flex;align-items:center;padding:0 24px;height:54px;background:var(--
 .spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
 
 /* RESULTS */
-.results{margin-top:24px}
-.doc-type-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
-.doc-type-icon{font-size:20px}
-.doc-type-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
-.doc-type-name{font-size:17px;font-weight:800;color:var(--text);margin-top:1px}
+.results{margin-top:28px}
+
+/* HERO TILE — amount or primary info */
+.hero-tile{border-radius:var(--r);padding:28px;color:#fff;position:relative;overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-lg)}
+.hero-tile::after{content:'';position:absolute;top:-30%;right:-10%;width:200px;height:200px;background:rgba(255,255,255,.08);border-radius:50%}
+.hero-tile-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-bottom:8px}
+.hero-tile-value{font-size:36px;font-weight:900;line-height:1.1;position:relative;z-index:1}
+.hero-tile-sub{font-size:14px;opacity:.7;margin-top:6px;font-weight:500;position:relative;z-index:1}
 
 /* TILES GRID */
-.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-@keyframes tileIn{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}
-.tile{border-radius:var(--r);padding:20px;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;animation:tileIn .3s ease both;min-height:130px;display:flex;flex-direction:column}
-.tile:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.1)}
-.tile:active{transform:scale(.97)}
-.tile-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.7;margin-bottom:8px}
-.tile-value{font-size:22px;font-weight:800;line-height:1.2;margin-top:auto;word-break:break-word}
-.tile-sub{font-size:12px;opacity:.7;margin-top:4px;font-weight:500}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@keyframes tileIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+
+.tile{border-radius:var(--r);padding:20px;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;animation:tileIn .3s ease both;min-height:110px;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.tile:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.tile:active{transform:scale(.98)}
+.tile-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.7;margin-bottom:6px}
+.tile-value{font-size:20px;font-weight:800;line-height:1.2;margin-top:auto;word-break:break-word}
+.tile-sub{font-size:12px;opacity:.65;margin-top:4px;font-weight:500}
 .tile.wide{grid-column:span 2}
-.tile.action{background:var(--surface);border:1.5px solid var(--border);color:var(--text)}
-.tile.action:hover{border-color:var(--accent);background:var(--accent-light)}
-.tile.action .tile-label{color:var(--text3)}
-.tile.action .tile-value{font-size:16px}
-.tile.action .tile-icon{font-size:28px;margin-bottom:8px}
+
+/* ACTION TILES */
+.actions-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:24px 0 12px}
+.tile.action{background:var(--surface);border:1.5px solid var(--border);color:var(--text);min-height:auto;padding:18px 20px;flex-direction:row;align-items:center;gap:14px}
+.tile.action:hover{border-color:var(--accent);background:var(--accent-light);box-shadow:var(--shadow-lg)}
+.tile.action .tile-icon{font-size:24px;width:44px;height:44px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
+.tile.action:hover .tile-icon{background:var(--accent-light)}
+.tile.action .tile-text{display:flex;flex-direction:column}
+.tile.action .tile-value{font-size:15px;font-weight:700;margin:0}
+.tile.action .tile-sub{font-size:13px;opacity:.5;margin-top:2px}
+
 .tile.urgent{animation:tileIn .3s ease both,urgentPulse 2s ease 1s infinite}
-@keyframes urgentPulse{0%,100%{box-shadow:0 0 0 0 rgba(229,57,53,.4)}50%{box-shadow:0 0 0 8px rgba(229,57,53,0)}}
+@keyframes urgentPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.35)}50%{box-shadow:0 0 0 8px rgba(220,38,38,0)}}
 
 /* DETAIL ROWS (in modal) */
-.detail-row{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--surface2);font-size:14px}
+.detail-row{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--surface2);font-size:14px}
 .detail-row:last-child{border-bottom:none}
-.detail-key{font-weight:700;color:var(--text3);min-width:120px;flex-shrink:0;font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding-top:2px}
-.detail-val{color:var(--text);line-height:1.5}
+.detail-key{font-weight:700;color:var(--text3);min-width:110px;flex-shrink:0;font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding-top:2px}
+.detail-val{color:var(--text);line-height:1.5;font-weight:500}
 
 /* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .15s ease}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .15s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.modal{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;padding:24px;animation:slideUp .25s ease}
-.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
+.modal{background:var(--surface);border-radius:24px 24px 0 0;width:100%;max-width:560px;max-height:85vh;overflow-y:auto;padding:8px 24px 28px;animation:slideUp .25s ease}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:8px auto 16px}
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .modal-title{font-size:18px;font-weight:800}
-.modal-close{width:32px;height:32px;border-radius:50%;background:var(--surface2);border:none;color:var(--text2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.modal-close{width:32px;height:32px;border-radius:50%;background:var(--surface2);border:none;color:var(--text2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:.15s}
 .modal-close:hover{background:var(--border)}
 .modal-body{font-size:14px;line-height:1.7;color:var(--text2)}
 
 /* FORM ELEMENTS IN MODAL */
 .m-input-group{margin-bottom:14px}
 .m-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
-.m-input{width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);font-size:14px;color:var(--text);outline:none;font-family:inherit;transition:border .2s}
-.m-input:focus{border-color:var(--accent)}
+.m-input{width:100%;padding:11px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r2);font-size:14px;color:var(--text);outline:none;font-family:inherit;transition:border .2s}
+.m-input:focus{border-color:var(--accent);background:var(--surface)}
 .m-textarea{min-height:100px;resize:vertical}
 .m-btn{padding:12px 20px;border:none;border-radius:var(--r2);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.15s}
-.m-btn-primary{background:var(--accent);color:#fff}
-.m-btn-primary:hover{background:#14543a}
+.m-btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(22,163,74,.2)}
+.m-btn-primary:hover{background:var(--accent-dark)}
 .m-btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
 .m-btn-secondary:hover{background:var(--border)}
-.m-btn-row{display:flex;gap:8px;margin-top:16px}
+.m-btn-row{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
 .m-address{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:12px;font-size:13px;color:var(--text2);line-height:1.6;font-style:italic;margin-bottom:14px}
 
-/* LANGUAGE SELECT IN MODAL */
+/* LANGUAGE SELECT */
 .m-lang-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.m-lang-btn{padding:8px 16px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;color:var(--text)}
-.m-lang-btn:hover,.m-lang-btn.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
+.m-lang-btn{padding:9px 18px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;color:var(--text)}
+.m-lang-btn:hover,.m-lang-btn.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent-dark)}
+
+/* RESET BTN */
+.reset-btn{width:100%;padding:14px;background:var(--surface);color:var(--text2);border:1.5px solid var(--border);border-radius:var(--r2);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:20px;transition:.15s}
+.reset-btn:hover{border-color:var(--text3);color:var(--text)}
 
 /* RESPONSIVE */
 @media(max-width:520px){
   .tiles{grid-template-columns:1fr}
   .tile.wide{grid-column:span 1}
-  .container{padding:16px 14px 60px}
+  .container{padding:20px 14px 60px}
+  .hero-tile-value{font-size:28px}
 }
 </style>
 </head>
 <body>
 <nav>
   <span class="logo">Sat<span>uri</span></span>
-  <div class="nav-status"><span class="nav-dot" id="dot"></span><span id="sl">Connecting</span></div>
+  <div class="nav-right">
+    <div class="nav-status"><span class="nav-dot" id="dot"></span><span id="sl">Connecting</span></div>
+  </div>
 </nav>
 
 <div class="container">
@@ -217,7 +238,7 @@ function doRun(){
   runAsync().catch(function(e){
     document.getElementById('stepsArea').style.display='none';
     document.getElementById('resultsArea').style.display='block';
-    document.getElementById('resultsArea').innerHTML='<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:20px;color:#b91c1c;font-size:14px;margin-top:20px">'+esc(e.message)+'</div>';
+    document.getElementById('resultsArea').innerHTML='<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:14px;padding:20px;color:#b91c1c;font-size:14px;margin-top:24px">'+esc(e.message)+'</div>';
   }).finally(function(){btn.disabled=false;btn.innerHTML='Scan document';});
 }
 
@@ -244,6 +265,7 @@ async function runAsync(){
 
 function showSteps(){
   var h='<div class="steps-card">';
+  h+='<div class="steps-title">Processing your document</div>';
   h+='<div class="step-row waiting" id="s1"><span class="step-icon">&#x1F4D6;</span> Reading document...</div>';
   h+='<div class="step-row waiting" id="s2"><span class="step-icon">&#x1F9E0;</span> Analyzing contents...</div>';
   h+='</div>';
@@ -258,45 +280,56 @@ function setStep(n,s){
   if(s==='done')el.querySelector('.step-icon').innerHTML='&#x2705;';
 }
 
-/* --- Tile colors --- */
-var COLORS=[
-  {bg:'#1a6b4a',fg:'#fff'},
-  {bg:'#1976d2',fg:'#fff'},
-  {bg:'#e53935',fg:'#fff'},
-  {bg:'#ef8c00',fg:'#fff'},
-  {bg:'#7b1fa2',fg:'#fff'},
-  {bg:'#00838f',fg:'#fff'},
-  {bg:'#4e342e',fg:'#fff'},
-  {bg:'#37474f',fg:'#fff'},
-  {bg:'#558b2f',fg:'#fff'},
-  {bg:'#c62828',fg:'#fff'},
+/* --- Tile palette --- */
+var PALETTE=[
+  {bg:'#16a34a',fg:'#fff'},  // green
+  {bg:'#2563eb',fg:'#fff'},  // blue
+  {bg:'#dc2626',fg:'#fff'},  // red
+  {bg:'#d97706',fg:'#fff'},  // amber
+  {bg:'#7c3aed',fg:'#fff'},  // purple
+  {bg:'#0d9488',fg:'#fff'},  // teal
+  {bg:'#c2410c',fg:'#fff'},  // orange
+  {bg:'#334155',fg:'#fff'},  // slate
+  {bg:'#0369a1',fg:'#fff'},  // sky
+  {bg:'#4338ca',fg:'#fff'},  // indigo
 ];
 
 /* --- Render results --- */
 function renderResults(){
   var a=analysis||{};
-  var tiles=[];
-
-  // Data tiles
-  if(a.document_type) tiles.push({label:'Document',value:a.document_type,color:COLORS[0]});
-  if(a.amount) tiles.push({label:'Amount',value:(a.currency||'')+' '+a.amount,color:COLORS[2],urgent:a.payment_required});
-  if(a.due_date) tiles.push({label:'Due date',value:a.due_date,color:COLORS[3],urgent:true});
-  if(a.sender) tiles.push({label:'From',value:a.sender,color:COLORS[1]});
-  if(a.recipient) tiles.push({label:'To',value:a.recipient,color:COLORS[5]});
-  if(a.account_number) tiles.push({label:'Account',value:a.account_number,color:COLORS[7]});
-  if(a.reference_number) tiles.push({label:'Reference',value:a.reference_number,color:COLORS[6]});
-  if(a.period) tiles.push({label:'Period',value:a.period,color:COLORS[8]});
-  if(a.clearing_id) tiles.push({label:'Clearing ID',value:a.clearing_id,color:COLORS[4]});
-
   var h='<div class="results">';
 
-  // Data tiles grid
+  // HERO TILE — amount (most important for a bill)
+  if(a.amount){
+    var urgentClass=a.payment_required?' urgent':'';
+    h+='<div class="hero-tile'+urgentClass+'" style="background:linear-gradient(135deg,#dc2626,#b91c1c);cursor:pointer" onclick="showPayment()">';
+    h+='<div class="hero-tile-label">Amount due</div>';
+    h+='<div class="hero-tile-value">'+(a.currency||'')+' '+esc(a.amount)+'</div>';
+    if(a.due_date)h+='<div class="hero-tile-sub">Due '+esc(a.due_date)+'</div>';
+    h+='</div>';
+  }
+
+  // DATA TILES
+  var tiles=[];
+  if(a.document_type) tiles.push({label:'Document',value:a.document_type,ci:0});
+  if(a.due_date&&!a.amount) tiles.push({label:'Due date',value:a.due_date,ci:3,urgent:true});
+  if(a.sender) tiles.push({label:'From',value:a.sender,ci:1});
+  if(a.recipient) tiles.push({label:'To',value:a.recipient,ci:5});
+  if(a.account_number) tiles.push({label:'Account',value:a.account_number,ci:7});
+  if(a.reference_number) tiles.push({label:'Reference',value:a.reference_number,ci:4});
+  if(a.period) tiles.push({label:'Period',value:a.period,ci:8});
+  if(a.clearing_id) tiles.push({label:'Clearing ID',value:a.clearing_id,ci:6});
+
+  // If odd number of tiles, make last one wide
+  if(tiles.length%2===1)tiles[tiles.length-1].wide=true;
+
   if(tiles.length){
     h+='<div class="tiles">';
     tiles.forEach(function(t,i){
-      var cls='tile'+(t.urgent?' urgent':'');
-      var delay='animation-delay:'+(i*0.06)+'s;';
-      h+='<div class="'+cls+'" style="background:'+t.color.bg+';color:'+t.color.fg+';'+delay+'" onclick="showTileDetail('+i+')">';
+      var c=PALETTE[t.ci%PALETTE.length];
+      var cls='tile'+(t.wide?' wide':'')+(t.urgent?' urgent':'');
+      var delay='animation-delay:'+(i*0.05)+'s;';
+      h+='<div class="'+cls+'" style="background:'+c.bg+';color:'+c.fg+';'+delay+'" onclick="showTileDetail('+i+')">';
       h+='<div class="tile-label">'+esc(t.label)+'</div>';
       h+='<div class="tile-value">'+esc(t.value)+'</div>';
       h+='</div>';
@@ -304,81 +337,41 @@ function renderResults(){
     h+='</div>';
   }
 
-  // Action tiles
-  h+='<div class="tiles" style="margin-top:14px">';
+  // ACTIONS
+  h+='<div class="actions-label">Quick actions</div>';
+  h+='<div class="tiles">';
 
-  // Payment action
   if(a.payment_required||a.amount){
-    h+='<div class="tile action" style="animation-delay:.1s" onclick="showPayment()">';
-    h+='<div class="tile-icon">&#x1F4B3;</div>';
-    h+='<div class="tile-value">Pay now</div>';
-    h+='<div class="tile-sub">Complete payment instantly</div>';
-    h+='</div>';
+    h+=actionTile('&#x1F4B3;','Pay now','Payment details & barcode','showPayment()','.06s');
   }
-
-  // Calendar action
   if(a.deadline_date){
-    h+='<div class="tile action" style="animation-delay:.16s" onclick="showCalendar()">';
-    h+='<div class="tile-icon">&#x1F4C5;</div>';
-    h+='<div class="tile-value">Add to calendar</div>';
-    h+='<div class="tile-sub">Save the deadline</div>';
-    h+='</div>';
+    h+=actionTile('&#x1F4C5;','Add to calendar','Save the deadline','showCalendar()','.12s');
   }
-
-  // Reply action
   if(a.reply_address||(a.contact_details&&a.contact_details.email)){
-    h+='<div class="tile action" style="animation-delay:.22s" onclick="showReply()">';
-    h+='<div class="tile-icon">&#x2709;&#xFE0F;</div>';
-    h+='<div class="tile-value">Write a reply</div>';
-    h+='<div class="tile-sub">Respond to this document</div>';
-    h+='</div>';
+    h+=actionTile('&#x2709;&#xFE0F;','Write a reply','Respond to sender','showReply()','.18s');
   }
-
-  // Contact action
   var hasContacts=a.contact_details&&Object.keys(a.contact_details).some(function(k){return a.contact_details[k];});
   if(hasContacts){
-    h+='<div class="tile action" style="animation-delay:.28s" onclick="showContacts()">';
-    h+='<div class="tile-icon">&#x1F4DE;</div>';
-    h+='<div class="tile-value">Contact them</div>';
-    h+='<div class="tile-sub">Phone, email, website</div>';
-    h+='</div>';
+    h+=actionTile('&#x1F4DE;','Contact them','Phone, email, website','showContacts()','.24s');
   }
+  h+=actionTile('&#x1F9D3;','Explain simply','Plain language summary','showSimplify()','.3s');
+  h+=actionTile('&#x1F310;','Translate','Read in your language','showTranslate()','.36s');
 
-  // Simplify action
-  h+='<div class="tile action" style="animation-delay:.34s" onclick="showSimplify()">';
-  h+='<div class="tile-icon">&#x1F9D3;</div>';
-  h+='<div class="tile-value">Explain simply</div>';
-  h+='<div class="tile-sub">Plain language summary</div>';
-  h+='</div>';
-
-  // Translate action
-  h+='<div class="tile action" style="animation-delay:.4s" onclick="showTranslate()">';
-  h+='<div class="tile-icon">&#x1F310;</div>';
-  h+='<div class="tile-value">Translate</div>';
-  h+='<div class="tile-sub">Read in your language</div>';
-  h+='</div>';
-
-  // Full text action
-  h+='<div class="tile action wide" style="animation-delay:.46s" onclick="showFullText()">';
+  var wc=ocrText.split(/\s+/).filter(function(w){return w;}).length;
+  h+='<div class="tile action wide" style="animation-delay:.42s" onclick="showFullText()">';
   h+='<div class="tile-icon">&#x1F4C4;</div>';
-  h+='<div class="tile-value">View full extracted text</div>';
-  h+='<div class="tile-sub">'+ocrText.split(/\s+/).filter(function(w){return w;}).length+' words extracted</div>';
+  h+='<div class="tile-text"><div class="tile-value">View full text</div><div class="tile-sub">'+wc+' words extracted</div></div>';
   h+='</div>';
 
-  // Property details
   if(a.property_details&&Object.keys(a.property_details).some(function(k){return a.property_details[k];})){
-    h+='<div class="tile action wide" style="animation-delay:.52s" onclick="showProperty()">';
+    h+='<div class="tile action wide" style="animation-delay:.48s" onclick="showProperty()">';
     h+='<div class="tile-icon">&#x1F3E0;</div>';
-    h+='<div class="tile-value">Property details</div>';
-    h+='<div class="tile-sub">Address, block, parcel info</div>';
+    h+='<div class="tile-text"><div class="tile-value">Property details</div><div class="tile-sub">Address, block, parcel</div></div>';
     h+='</div>';
   }
 
   h+='</div>';
-
-  // New scan button
-  h+='<button class="process-btn" style="margin-top:24px;background:var(--surface2);color:var(--text);border:1px solid var(--border)" onclick="doReset()">Scan another document</button>';
-
+  h+='<button class="reset-btn" onclick="doReset()">Scan another document</button>';
   h+='</div>';
 
   document.getElementById('resultsArea').innerHTML=h;
@@ -386,13 +379,19 @@ function renderResults(){
   document.getElementById('uploadArea').style.display='none';
 }
 
-// Store tiles data globally for detail view
+function actionTile(icon,title,sub,onclick,delay){
+  return '<div class="tile action" style="animation-delay:'+delay+'" onclick="'+onclick+'">'
+    +'<div class="tile-icon">'+icon+'</div>'
+    +'<div class="tile-text"><div class="tile-value">'+esc(title)+'</div><div class="tile-sub">'+sub+'</div></div>'
+    +'</div>';
+}
+
+// Tile detail
 function showTileDetail(idx){
   var a=analysis||{};
   var tiles=[];
   if(a.document_type) tiles.push({label:'Document',value:a.document_type});
-  if(a.amount) tiles.push({label:'Amount',value:(a.currency||'')+' '+a.amount});
-  if(a.due_date) tiles.push({label:'Due date',value:a.due_date});
+  if(a.due_date&&!a.amount) tiles.push({label:'Due date',value:a.due_date});
   if(a.sender) tiles.push({label:'From',value:a.sender});
   if(a.recipient) tiles.push({label:'To',value:a.recipient});
   if(a.account_number) tiles.push({label:'Account',value:a.account_number});
@@ -403,19 +402,17 @@ function showTileDetail(idx){
   var t=tiles[idx];
   if(!t)return;
 
-  // Build related context
-  var h='<div style="font-size:32px;font-weight:900;color:var(--text);margin-bottom:16px;line-height:1.2">'+esc(t.value)+'</div>';
-
-  // Add related fields
+  var h='<div style="font-size:28px;font-weight:900;color:var(--text);margin-bottom:16px;line-height:1.2">'+esc(t.value)+'</div>';
   var related=tiles.filter(function(_,i){return i!==idx;});
+  if(a.amount){related.unshift({label:'Amount',value:(a.currency||'')+' '+a.amount});}
+  if(a.due_date&&a.amount){related.unshift({label:'Due date',value:a.due_date});}
   if(related.length){
-    h+='<div style="margin-top:8px">';
+    h+='<div>';
     related.forEach(function(r){
       h+='<div class="detail-row"><div class="detail-key">'+esc(r.label)+'</div><div class="detail-val">'+esc(r.value)+'</div></div>';
     });
     h+='</div>';
   }
-
   openModal(t.label,h);
 }
 
@@ -424,25 +421,24 @@ function showPayment(){
   var a=analysis||{};
   var h='';
   if(a.amount){
-    h+='<div style="font-size:40px;font-weight:900;color:var(--red);margin-bottom:4px">'+(a.currency||'')+' '+esc(a.amount)+'</div>';
+    h+='<div style="font-size:40px;font-weight:900;color:var(--red);margin-bottom:4px;letter-spacing:-.02em">'+(a.currency||'')+' '+esc(a.amount)+'</div>';
   }
-  if(a.due_date)h+='<div style="color:var(--amber);font-weight:600;font-size:14px;margin-bottom:16px">Due: '+esc(a.due_date)+'</div>';
+  if(a.due_date)h+='<div style="color:var(--amber);font-weight:700;font-size:14px;margin-bottom:20px">Due '+esc(a.due_date)+'</div>';
   if(a.barcode){
-    h+='<div class="m-input-group"><div class="m-label">Payment barcode / reference</div>';
-    h+='<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:16px;font-weight:700;font-family:monospace;word-break:break-all;letter-spacing:.05em">'+esc(a.barcode)+'</div></div>';
+    h+='<div class="m-input-group"><div class="m-label">Payment barcode</div>';
+    h+='<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:15px;font-weight:700;font-family:monospace;word-break:break-all;letter-spacing:.04em">'+esc(a.barcode)+'</div></div>';
   }
   if(a.clearing_id){
     h+='<div class="m-input-group"><div class="m-label">Clearing ID</div>';
-    h+='<div style="background:var(--surface2);padding:10px 12px;border-radius:8px;font-weight:600">'+esc(a.clearing_id)+'</div></div>';
+    h+='<div style="background:var(--surface2);padding:11px 14px;border-radius:10px;font-weight:600">'+esc(a.clearing_id)+'</div></div>';
   }
   if(a.account_number){
     h+='<div class="m-input-group"><div class="m-label">Account number</div>';
-    h+='<div style="background:var(--surface2);padding:10px 12px;border-radius:8px;font-weight:600">'+esc(a.account_number)+'</div></div>';
+    h+='<div style="background:var(--surface2);padding:11px 14px;border-radius:10px;font-weight:600">'+esc(a.account_number)+'</div></div>';
   }
-  // Contact for payment
   var phone=a.contact_details&&(a.contact_details.phone||a.contact_details.phone_payments);
   var website=a.contact_details&&a.contact_details.website;
-  h+='<div class="m-btn-row" style="flex-wrap:wrap">';
+  h+='<div class="m-btn-row">';
   if(a.barcode)h+='<button class="m-btn m-btn-primary" onclick="copyText(\''+esc(a.barcode).replace(/'/g,"\\'")+'\',this)">Copy barcode</button>';
   if(phone)h+='<a href="tel:'+esc(phone)+'" class="m-btn m-btn-primary" style="text-decoration:none;text-align:center">Call '+esc(phone)+'</a>';
   if(website)h+='<a href="'+(website.indexOf('http')===0?'':'https://')+esc(website)+'" target="_blank" class="m-btn m-btn-secondary" style="text-decoration:none;text-align:center">Pay online</a>';
@@ -456,10 +452,10 @@ function showCalendar(){
   var title=a.deadline_title||a.document_type||'Document deadline';
   var gcal='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(title)+'&dates='+a.deadline_date.replace(/-/g,'')+'%2F'+a.deadline_date.replace(/-/g,'')+'&details='+encodeURIComponent('From Saturi: '+(a.document_type||''));
   var h='<div style="font-size:24px;font-weight:800;margin-bottom:4px">'+esc(a.due_date||a.deadline_date)+'</div>';
-  h+='<div style="color:var(--text2);margin-bottom:20px">'+esc(title)+'</div>';
-  h+='<div class="m-btn-row" style="flex-wrap:wrap">';
-  h+='<a href="'+gcal+'" target="_blank" class="m-btn m-btn-primary" style="text-decoration:none;text-align:center">Add to Google Calendar</a>';
-  h+='<button class="m-btn m-btn-secondary" onclick="downloadICS()">Download .ics file</button>';
+  h+='<div style="color:var(--text2);margin-bottom:20px;font-size:14px">'+esc(title)+'</div>';
+  h+='<div class="m-btn-row">';
+  h+='<a href="'+gcal+'" target="_blank" class="m-btn m-btn-primary" style="text-decoration:none;text-align:center">Google Calendar</a>';
+  h+='<button class="m-btn m-btn-secondary" onclick="downloadICS()">Download .ics</button>';
   h+='</div>';
   openModal('Save deadline',h);
 }
@@ -481,7 +477,7 @@ function showReply(){
   var email=(a.contact_details&&(a.contact_details.email||a.contact_details.EMAIL))||'';
   var h='';
   if(addr)h+='<div class="m-input-group"><div class="m-label">Send to</div><div class="m-address">'+esc(addr)+'</div></div>';
-  if(email)h+='<a href="mailto:'+esc(email)+'" class="m-btn m-btn-primary" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:16px">&#x2709; Email '+esc(email)+'</a>';
+  if(email)h+='<a href="mailto:'+esc(email)+'" class="m-btn m-btn-primary" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:16px">Email '+esc(email)+'</a>';
   h+='<div class="m-input-group"><div class="m-label">Your name</div><input class="m-input" id="cpName" placeholder="Full name"/></div>';
   h+='<div class="m-input-group"><div class="m-label">Your address</div><input class="m-input" id="cpFrom" placeholder="Your return address"/></div>';
   h+='<div class="m-input-group"><div class="m-label">Message</div><textarea class="m-input m-textarea" id="cpMsg" placeholder="Type your reply..."></textarea></div>';
@@ -521,12 +517,11 @@ function showContacts(){
 }
 
 function showSimplify(){
-  openModal('Plain language','<div style="display:flex;align-items:center;gap:8px;color:var(--text3)"><span class="spinner"></span> Simplifying...</div>');
+  openModal('Plain language','<div style="display:flex;align-items:center;gap:10px;color:var(--text3);padding:20px 0"><span class="spinner"></span> Simplifying...</div>');
   fetch('/ai/eli12',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:ocrText})})
     .then(function(r){return r.json();})
     .then(function(d){
-      var t=d.result;
-      var rtl=isRtl(t);
+      var t=d.result;var rtl=isRtl(t);
       document.getElementById('modalBody').innerHTML='<div style="direction:'+(rtl?'rtl':'ltr')+';text-align:'+(rtl?'right':'left')+';line-height:1.8;color:var(--text)">'+t.split('\n').map(function(l){return esc(l);}).join('<br>')+'</div>'+
         '<div class="m-btn-row"><button class="m-btn m-btn-secondary" onclick="speakText(\''+btoa(unescape(encodeURIComponent(t)))+'\')">&#x1F50A; Listen</button><button class="m-btn m-btn-secondary" onclick="copyText(\''+esc(t).replace(/'/g,"\\'")+'\',this)">Copy</button></div>';
     })
@@ -554,7 +549,7 @@ function showTranslate(){
 function doTranslate(lang,btn){
   document.querySelectorAll('.m-lang-btn').forEach(function(b){b.classList.remove('selected');});
   btn.classList.add('selected');
-  document.getElementById('translateResult').innerHTML='<div style="display:flex;align-items:center;gap:8px;color:var(--text3);margin-top:8px"><span class="spinner"></span> Translating to '+lang+'...</div>';
+  document.getElementById('translateResult').innerHTML='<div style="display:flex;align-items:center;gap:10px;color:var(--text3);padding:12px 0"><span class="spinner"></span> Translating...</div>';
   fetch('/ai/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:ocrText,language:lang})})
     .then(function(r){return r.json();})
     .then(function(d){
