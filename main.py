@@ -70,20 +70,26 @@ async def _ocr_from_bytes(data: bytes) -> str:
 
     detected_type = _detect_type(data)
 
-    # For images: fix EXIF rotation
+    # For images: fix EXIF rotation and resize large images
     if detected_type != "application/pdf":
         try:
             from PIL import Image, ImageOps
             import io as _io
             pil_img = Image.open(_io.BytesIO(data))
             pil_img = ImageOps.exif_transpose(pil_img)
+            # Resize if too large (max 2000px on longest side)
+            max_dim = 2000
+            if max(pil_img.size) > max_dim:
+                ratio = max_dim / max(pil_img.size)
+                new_size = (int(pil_img.size[0] * ratio), int(pil_img.size[1] * ratio))
+                pil_img = pil_img.resize(new_size, Image.LANCZOS)
+                log.info(f"Resized image to {new_size}")
             buf = _io.BytesIO()
-            fmt = "JPEG" if detected_type != "image/png" else "PNG"
-            pil_img.save(buf, format=fmt)
+            pil_img.save(buf, format="JPEG", quality=85)
             data = buf.getvalue()
-            detected_type = "image/jpeg" if fmt == "JPEG" else "image/png"
+            detected_type = "image/jpeg"
         except Exception as e:
-            log.warning(f"EXIF rotate failed: {e}")
+            log.warning(f"Image processing failed: {e}")
 
     # For HEIC: convert to JPEG first
     if detected_type == "image/heic":
@@ -133,14 +139,14 @@ async def _ocr_from_bytes(data: bytes) -> str:
             "anthropic-version": "2023-06-01",
             "content-type": "application/json",
         }
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with httpx.AsyncClient(timeout=90.0) as client:
             resp = await client.post(
                 "https://api.anthropic.com/v1/messages",
                 headers=headers,
                 json={"model": "claude-sonnet-4-6", "max_tokens": 4096,
                       "messages": [{"role": "user", "content": [
                           content_block,
-                          {"type": "text", "text": "Extract ALL text from this image accurately. Rules:\n1. For tabular/grid data: output as a clean markdown table with proper columns and headers.\n2. Hebrew text must be accurate — use correct spelling for known names (cities, teams, organizations, people).\n3. Preserve all numbers, dates, times, and amounts exactly.\n4. Structure the output clearly with headings and sections where appropriate.\n5. Output ONLY the extracted content, no commentary."}
+                          {"type": "text", "text": "Extract ALL text from this image with perfect accuracy. This text is likely in Hebrew, Arabic, English, or mixed.\n\nCRITICAL RULES:\n1. Hebrew must be spelled EXACTLY as a native speaker would write it. Fix any OCR artifacts. Use proper Hebrew spelling for known names, places, organizations, teams, etc.\n2. For tabular or grid data: output as a clean markdown table with proper Hebrew column headers.\n3. Preserve all numbers, dates, times, currency amounts, and reference numbers exactly.\n4. Use markdown headings (# ##) for sections.\n5. Read RIGHT-TO-LEFT for Hebrew text — ensure word order is correct.\n6. Output ONLY the extracted content. No explanations or commentary."}
                       ]}]}
             )
         if resp.status_code == 200:
