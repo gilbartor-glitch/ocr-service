@@ -310,11 +310,30 @@ Document:
 """ + body.text
     )
     clean = result.replace('```json', '').replace('```', '').strip()
+    return AIResponse(result=json.dumps(_safe_parse(clean)))
+
+def _safe_parse(text: str) -> dict:
+    """Parse JSON, fixing common issues like unescaped quotes in Hebrew (e.g. בע"מ)."""
     try:
-        data = json.loads(clean)
-        return AIResponse(result=json.dumps(data))
-    except:
-        return AIResponse(result=clean)
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+    # Try fixing unescaped inner quotes: replace " that aren't JSON structural
+    import re
+    fixed = re.sub(r'(?<=\w)"(?=\w)', '\\"', text)
+    try:
+        return json.loads(fixed)
+    except json.JSONDecodeError:
+        pass
+    # Last resort: extract key-value pairs with regex
+    result = {}
+    for m in re.finditer(r'"(\w+)":\s*("(?:[^"\\]|\\.)*"|null|true|false|[\d.]+|\{[^}]*\})', text):
+        key, val = m.group(1), m.group(2)
+        try:
+            result[key] = json.loads(val)
+        except:
+            result[key] = val.strip('"')
+    return result if result else {"raw": text}
 
 ANALYZE_PROMPT = """Analyze this document image. It could be any type: bill, receipt, bank transfer, government letter, medical document, contract, etc.
 
@@ -374,11 +393,7 @@ async def analyze_vision(file: Annotated[UploadFile, File()]):
         raise HTTPException(504, "Analysis timed out")
 
     clean = result.replace('```json', '').replace('```', '').strip()
-    try:
-        parsed = json.loads(clean)
-        return AIResponse(result=json.dumps(parsed))
-    except:
-        return AIResponse(result=clean)
+    return AIResponse(result=json.dumps(_safe_parse(clean)))
 
 # ---------------------------------------------------------------------------
 # UI

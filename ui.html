@@ -244,47 +244,19 @@ function doRun(){
 
 async function runAsync(){
   setStep(1,'active');
-  setStep(2,'active');
-
-  // Read file once, create blobs for parallel requests
-  var buf=await selFile.arrayBuffer();
-  var type=selFile.type||'application/octet-stream';
-  var fname=selFile.name;
-
-  var fd1=new FormData();
-  fd1.append('file',new File([buf],fname,{type:type}));
-  var fd2=new FormData();
-  fd2.append('file',new File([buf],fname,{type:type}));
-
-  // Run OCR and vision analysis concurrently
-  var [ocrResult, analyzeResult] = await Promise.all([
-    fetch('/ocr/upload?mode=text',{method:'POST',body:fd1}).then(function(r){
-      if(!r.ok) return r.json().then(function(e){throw new Error(e.detail||r.statusText);});
-      return r.json();
-    }),
-    fetch('/ai/analyze-vision',{method:'POST',body:fd2}).then(function(r){
-      if(r.ok) return r.json();
-      console.warn('Vision analysis failed:',r.status);
-      return null;
-    }).catch(function(e){console.warn('Vision analysis error:',e);return null;})
-  ]);
-
-  ocrText=ocrResult.text;
+  var fd=new FormData();
+  fd.append('file',selFile);
+  var r=await fetch('/ocr/upload?mode=text',{method:'POST',body:fd});
+  if(!r.ok){var e=await r.json();throw new Error(e.detail||r.statusText);}
+  ocrText=(await r.json()).text;
   setStep(1,'done');
 
-  // Try parsing vision analysis result
+  setStep(2,'active');
   try{
-    if(analyzeResult) analysis=JSON.parse(analyzeResult.result);
+    var ar=await fetch('/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:ocrText})});
+    if(ar.ok){var ad=await ar.json();analysis=JSON.parse(ad.result);}
     else analysis=null;
   }catch(e){analysis=null;}
-
-  // Fallback: if vision analysis failed, use text-based analysis
-  if(!analysis && ocrText){
-    try{
-      var fallback=await fetch('/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:ocrText})});
-      if(fallback.ok){var fd=await fallback.json();try{analysis=JSON.parse(fd.result);}catch(e){}}
-    }catch(e){}
-  }
   setStep(2,'done');
 
   document.getElementById('stepsArea').style.display='none';
