@@ -316,6 +316,68 @@ Document:
     except:
         return AIResponse(result=clean)
 
+ANALYZE_PROMPT = """Extract ONLY these specific fields from this document image. Return a JSON object with null for missing fields:
+- document_type: e.g. "Property Tax Bill"
+- amount: main payment amount as string e.g. "2,478.80"
+- currency: currency symbol e.g. "₪"
+- due_date: due date as written e.g. "05/04/2026"
+- deadline_date: due date ISO format YYYY-MM-DD or null
+- deadline_title: e.g. "Payment due"
+- clearing_id: clearing/payment reference number
+- account_number: account or customer number
+- reference_number: reference or case number
+- period: billing period e.g. "03-04/2026"
+- sender: organization that sent this
+- recipient: recipient name
+- barcode: full barcode or payment slip number if present
+- payment_required: true or false
+- reply_address: postal reply address or null
+- contact_details: object with phone, fax, email, website keys if found
+- property_details: object with address, block, parcel, size, type, description keys if found
+
+Return ONLY valid JSON. No markdown."""
+
+@app.post("/ai/analyze-vision", response_model=AIResponse, tags=["ai"])
+async def analyze_vision(file: Annotated[UploadFile, File()]):
+    data = await file.read()
+    if len(data) > MAX_BYTES: raise HTTPException(413, "File too large.")
+    detected_type = _detect_type(data)
+
+    # For PDFs, render first page to image
+    if detected_type == "application/pdf":
+        try:
+            import fitz
+            doc = fitz.open(stream=data, filetype="pdf")
+            pix = doc[0].get_pixmap(matrix=fitz.Matrix(1.5, 1.5), colorspace=fitz.csRGB)
+            data = pix.tobytes("jpeg")
+            detected_type = "image/jpeg"
+        except Exception as e:
+            raise HTTPException(500, f"PDF rendering failed: {e}")
+
+    b64 = base64.b64encode(data).decode()
+    content_block = {"type": "image", "source": {"type": "base64", "media_type": detected_type, "data": b64}}
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={"x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json"},
+                json={"model": "claude-haiku-4-5-20251001", "max_tokens": 2048,
+                      "messages": [{"role": "user", "content": [content_block, {"type": "text", "text": ANALYZE_PROMPT}]}]}
+            )
+        if resp.status_code != 200:
+            raise HTTPException(502, f"Claude API error: {resp.status_code}")
+        result = resp.json()["content"][0]["text"].strip()
+    except httpx.TimeoutException:
+        raise HTTPException(504, "Analysis timed out")
+
+    clean = result.replace('```json', '').replace('```', '').strip()
+    try:
+        parsed = json.loads(clean)
+        return AIResponse(result=json.dumps(parsed))
+    except:
+        return AIResponse(result=clean)
+
 # ---------------------------------------------------------------------------
 # UI
 # ---------------------------------------------------------------------------

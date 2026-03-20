@@ -244,17 +244,30 @@ function doRun(){
 
 async function runAsync(){
   setStep(1,'active');
-  var fd=new FormData();
-  fd.append('file',selFile);
-  var r=await fetch('/ocr/upload?mode=text',{method:'POST',body:fd});
-  if(!r.ok){var e=await r.json();throw new Error(e.detail||r.statusText);}
-  ocrText=(await r.json()).text;
+  setStep(2,'active');
+
+  // Run OCR and vision analysis concurrently
+  var fd1=new FormData();
+  fd1.append('file',selFile);
+  var fd2=new FormData();
+  fd2.append('file',selFile);
+
+  var [ocrResult, analyzeResult] = await Promise.all([
+    fetch('/ocr/upload?mode=text',{method:'POST',body:fd1}).then(function(r){
+      if(!r.ok) return r.json().then(function(e){throw new Error(e.detail||r.statusText);});
+      return r.json();
+    }),
+    fetch('/ai/analyze-vision',{method:'POST',body:fd2}).then(function(r){
+      if(r.ok) return r.json();
+      return null;
+    }).catch(function(){return null;})
+  ]);
+
+  ocrText=ocrResult.text;
   setStep(1,'done');
 
-  setStep(2,'active');
   try{
-    var ar=await fetch('/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:ocrText})});
-    if(ar.ok){var ad=await ar.json();try{analysis=JSON.parse(ad.result);}catch(e){analysis=null;}}
+    if(analyzeResult) analysis=JSON.parse(analyzeResult.result);
     else analysis=null;
   }catch(e){analysis=null;}
   setStep(2,'done');
