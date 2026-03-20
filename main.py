@@ -13,14 +13,14 @@ ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
 @asynccontextmanager
 async def lifespan(app):
-    log.info("SimpliScan ready.")
+    log.info("Saturi ready.")
     if ANTHROPIC_API_KEY:
         log.info("Claude AI features enabled.")
     else:
         log.warning("ANTHROPIC_API_KEY not set — AI features disabled.")
     yield
 
-app = FastAPI(title="SimpliScan OCR", version="4.0.0", lifespan=lifespan)
+app = FastAPI(title="Saturi OCR", version="4.0.0", lifespan=lifespan)
 ALLOWED_ORIGINS = os.environ.get("CORS_ORIGINS", "https://ocr-service-4e7i.onrender.com,http://localhost:8000,http://localhost:3000").split(",")
 app.add_middleware(CORSMiddleware, allow_origins=ALLOWED_ORIGINS, allow_methods=["*"], allow_headers=["*"])
 
