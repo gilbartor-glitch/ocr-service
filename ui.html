@@ -300,9 +300,19 @@ function renderResults(){
   var a=analysis||{};
   var h='<div class="results">';
 
-  // DOCUMENT TITLE
-  if(a.document_type){
-    h+='<div class="doc-title">'+esc(a.document_type)+'</div>';
+  // DOCUMENT TITLE — always show something
+  var docTitle=a.document_type||'Scanned Document';
+  h+='<div class="doc-title">'+esc(docTitle)+'</div>';
+
+  // Check if analysis found any meaningful data
+  var hasData=a.amount||a.sender||a.recipient||a.account_number||a.reference_number||a.clearing_id||a.due_date;
+
+  // If no structured data, show the extracted text directly
+  if(!hasData&&ocrText){
+    var rtl=isRtl(ocrText);
+    h+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;box-shadow:var(--shadow);direction:'+(rtl?'rtl':'ltr')+';text-align:'+(rtl?'right':'left')+';font-size:14px;line-height:1.8;color:var(--text);max-height:300px;overflow-y:auto">';
+    h+=ocrText.split('\n').map(function(l){return esc(l);}).join('<br>');
+    h+='</div>';
   }
 
   // HERO TILE — amount (most important for a bill)

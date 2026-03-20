@@ -285,8 +285,9 @@ async def translate(body: AIRequest):
 async def analyze(body: AIRequest):
     if not body.text.strip(): raise HTTPException(400, "Empty text.")
     result = await _claude(
-        """Extract ONLY these specific fields from this document. Return a JSON object with null for missing fields:
-- document_type: clear, user-friendly purpose e.g. "Water & Sewage Bill", "Money Transfer", "Payment Receipt", "Property Tax (Arnona)", "Medical Referral"
+        """Analyze this text and extract fields. The text can be anything: a bill, receipt, bank transfer, legal document, medical document, sports data, menu, schedule, article, etc.
+Return a JSON object with null for missing fields:
+- document_type: clear, user-friendly description e.g. "Water & Sewage Bill", "Money Transfer", "Sports Betting Odds", "Restaurant Menu", "Medical Referral", "News Article"
 - amount: main payment amount as string e.g. "2,478.80"
 - currency: currency symbol e.g. "₪"
 - due_date: due date as written e.g. "05/04/2026"
