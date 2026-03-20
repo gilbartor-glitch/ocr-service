@@ -104,23 +104,9 @@ async def _ocr_from_bytes(data: bytes) -> str:
     b64 = base64.b64encode(data).decode()
 
     if detected_type == "application/pdf":
-        # Convert PDF to images using pymupdf, OCR pages concurrently
-        try:
-            import fitz  # pymupdf
-            import io as _io
-            doc = fitz.open(stream=data, filetype="pdf")
-            page_images = []
-            for page in doc:
-                mat = fitz.Matrix(2, 2)
-                pix = page.get_pixmap(matrix=mat)
-                page_images.append(pix.tobytes("jpeg"))
-            texts = await asyncio.gather(*[_ocr_from_bytes(img) for img in page_images])
-            return _clean_text("\n\n".join(texts))
-        except Exception as e:
-            log.warning(f"PDF to image failed: {e}")
-            return f"[PDF conversion failed: {e}]"
-
-    content_block = {"type": "image", "source": {"type": "base64", "media_type": detected_type, "data": b64}}
+        content_block = {"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": b64}}
+    else:
+        content_block = {"type": "image", "source": {"type": "base64", "media_type": detected_type, "data": b64}}
     extra_headers = {}
 
     try:
