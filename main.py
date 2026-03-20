@@ -104,10 +104,17 @@ async def _ocr_from_bytes(data: bytes) -> str:
     b64 = base64.b64encode(data).decode()
 
     if detected_type == "application/pdf":
-        # Convert PDF pages to smaller JPEG images and OCR concurrently
         try:
             import fitz  # pymupdf
             doc = fitz.open(stream=data, filetype="pdf")
+            # Try local text extraction first (instant, works for digital PDFs)
+            texts = [page.get_text() for page in doc]
+            combined = "\n\n".join(t.strip() for t in texts if t.strip())
+            if len(combined.split()) > 20:
+                log.info(f"PDF text extracted locally ({len(combined.split())} words)")
+                return _clean_text(combined)
+            # Fallback: scanned PDF — render to images and OCR via API
+            log.info("PDF has no embedded text, falling back to Vision OCR")
             page_images = []
             for page in doc:
                 pix = page.get_pixmap(matrix=fitz.Matrix(1.5, 1.5), colorspace=fitz.csRGB)
@@ -115,8 +122,8 @@ async def _ocr_from_bytes(data: bytes) -> str:
             texts = await asyncio.gather(*[_ocr_from_bytes(img) for img in page_images])
             return _clean_text("\n\n".join(texts))
         except Exception as e:
-            log.warning(f"PDF to image failed: {e}")
-            return f"[PDF conversion failed: {e}]"
+            log.warning(f"PDF processing failed: {e}")
+            return f"[PDF processing failed: {e}]"
 
     content_block = {"type": "image", "source": {"type": "base64", "media_type": detected_type, "data": b64}}
 
