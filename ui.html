@@ -246,12 +246,17 @@ async function runAsync(){
   setStep(1,'active');
   setStep(2,'active');
 
-  // Run OCR and vision analysis concurrently
-  var fd1=new FormData();
-  fd1.append('file',selFile);
-  var fd2=new FormData();
-  fd2.append('file',selFile);
+  // Read file once, create blobs for parallel requests
+  var buf=await selFile.arrayBuffer();
+  var type=selFile.type||'application/octet-stream';
+  var fname=selFile.name;
 
+  var fd1=new FormData();
+  fd1.append('file',new File([buf],fname,{type:type}));
+  var fd2=new FormData();
+  fd2.append('file',new File([buf],fname,{type:type}));
+
+  // Run OCR and vision analysis concurrently
   var [ocrResult, analyzeResult] = await Promise.all([
     fetch('/ocr/upload?mode=text',{method:'POST',body:fd1}).then(function(r){
       if(!r.ok) return r.json().then(function(e){throw new Error(e.detail||r.statusText);});
@@ -259,17 +264,27 @@ async function runAsync(){
     }),
     fetch('/ai/analyze-vision',{method:'POST',body:fd2}).then(function(r){
       if(r.ok) return r.json();
+      console.warn('Vision analysis failed:',r.status);
       return null;
-    }).catch(function(){return null;})
+    }).catch(function(e){console.warn('Vision analysis error:',e);return null;})
   ]);
 
   ocrText=ocrResult.text;
   setStep(1,'done');
 
+  // Try parsing vision analysis result
   try{
     if(analyzeResult) analysis=JSON.parse(analyzeResult.result);
     else analysis=null;
   }catch(e){analysis=null;}
+
+  // Fallback: if vision analysis failed, use text-based analysis
+  if(!analysis && ocrText){
+    try{
+      var fallback=await fetch('/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:ocrText})});
+      if(fallback.ok){var fd=await fallback.json();try{analysis=JSON.parse(fd.result);}catch(e){}}
+    }catch(e){}
+  }
   setStep(2,'done');
 
   document.getElementById('stepsArea').style.display='none';

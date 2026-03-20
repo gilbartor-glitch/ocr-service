@@ -316,21 +316,23 @@ Document:
     except:
         return AIResponse(result=clean)
 
-ANALYZE_PROMPT = """Extract ONLY these specific fields from this document image. Return a JSON object with null for missing fields:
-- document_type: e.g. "Property Tax Bill"
-- amount: main payment amount as string e.g. "2,478.80"
-- currency: currency symbol e.g. "₪"
-- due_date: due date as written e.g. "05/04/2026"
-- deadline_date: due date ISO format YYYY-MM-DD or null
-- deadline_title: e.g. "Payment due"
-- clearing_id: clearing/payment reference number
+ANALYZE_PROMPT = """Analyze this document image. It could be any type: bill, receipt, bank transfer, government letter, medical document, contract, etc.
+
+Extract these fields. Return a JSON object with null for missing fields:
+- document_type: specific type e.g. "Water Bill", "Bank Transfer", "Payment Receipt", "Medical Referral", "Municipal Tax Notice"
+- amount: main monetary amount as string e.g. "2,478.80"
+- currency: currency symbol e.g. "₪", "$"
+- due_date: due date or transaction date as written e.g. "05/04/2026"
+- deadline_date: same date in ISO format YYYY-MM-DD or null
+- deadline_title: e.g. "Payment due", "Transaction date"
+- clearing_id: clearing/payment/transaction reference number
 - account_number: account or customer number
-- reference_number: reference or case number
-- period: billing period e.g. "03-04/2026"
-- sender: organization that sent this
-- recipient: recipient name
+- reference_number: reference, invoice, or confirmation number
+- period: billing or relevant period e.g. "03-04/2026"
+- sender: organization or bank that issued this
+- recipient: recipient or account holder name
 - barcode: full barcode or payment slip number if present
-- payment_required: true or false
+- payment_required: true if payment is needed, false if already paid or informational
 - reply_address: postal reply address or null
 - contact_details: object with phone, fax, email, website keys if found
 - property_details: object with address, block, parcel, size, type, description keys if found
