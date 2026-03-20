@@ -541,9 +541,12 @@ function showTranslateModal(){
     .catch(function(){document.getElementById('modalBody').innerHTML='<div style="color:var(--red)">Translation failed.</div>';});
 }
 function showReply(){
-  var addr=analysis&&analysis.reply_address?analysis.reply_address:'';
+  var a=analysis||{};
+  var addr=a.reply_address||'';
+  var email=a.contact_details&&(a.contact_details.email||a.contact_details.EMAIL)||'';
   var h='';
   if(addr)h+='<div style="margin-bottom:14px"><div class="cp-lbl">Send to</div><div class="address-box">'+esc(addr)+'</div></div>';
+  if(email){h+='<a href="mailto:'+email+'" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:linear-gradient(135deg,#4285f4,#00acc1);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px;margin-bottom:14px">&#x2709; Send Email to '+esc(email)+'</a>';}
   h+='<div class="cp-row"><div class="cp-lbl">Your name</div><input class="cp-inp" id="cpName" placeholder="Full name"/></div>';
   h+='<div class="cp-row"><div class="cp-lbl">Your address</div><input class="cp-inp" id="cpFrom" placeholder="Your return address"/></div>';
   h+='<div class="cp-row"><div class="cp-lbl">Message</div><textarea class="cp-inp cp-ta" id="cpMsg" placeholder="Type your reply..."></textarea></div>';
