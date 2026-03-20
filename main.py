@@ -1,5 +1,5 @@
 from __future__ import annotations
-import asyncio, logging, re, httpx, os, base64, json
+import asyncio, ipaddress, logging, re, socket, httpx, os, base64, json
 from contextlib import asynccontextmanager
 from typing import Annotated, Literal
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
@@ -21,7 +21,8 @@ async def lifespan(app):
     yield
 
 app = FastAPI(title="SimpliScan OCR", version="4.0.0", lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+ALLOWED_ORIGINS = os.environ.get("CORS_ORIGINS", "https://ocr-service-4e7i.onrender.com,http://localhost:8000,http://localhost:3000").split(",")
+app.add_middleware(CORSMiddleware, allow_origins=ALLOWED_ORIGINS, allow_methods=["*"], allow_headers=["*"])
 
 ALLOWED = {"image/jpeg","image/png","image/webp","image/tiff","image/bmp","image/heic","image/heif","application/pdf"}
 MAX_BYTES = 20 * 1024 * 1024
@@ -29,6 +30,22 @@ MAX_BYTES = 20 * 1024 * 1024
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+def _is_private_url(url: str) -> bool:
+    """Block requests to private/internal network addresses (SSRF protection)."""
+    from urllib.parse import urlparse
+    hostname = urlparse(str(url)).hostname
+    if not hostname:
+        return True
+    try:
+        resolved = socket.getaddrinfo(hostname, None)
+        for _, _, _, _, addr in resolved:
+            ip = ipaddress.ip_address(addr[0])
+            if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
+                return True
+    except socket.gaierror:
+        return True
+    return False
+
 def _clean_text(raw):
     lines = raw.splitlines()
     cleaned = [re.sub(r"[^\S\n]+"," ",l).strip() for l in lines]
@@ -204,6 +221,8 @@ async def ocr_batch(files: Annotated[list[UploadFile], File()], mode: OutputMode
 
 @app.post("/ocr/url", response_model=TextResult, tags=["ocr"])
 async def ocr_url(body: UrlRequest, mode: OutputMode = Query("text")):
+    if _is_private_url(str(body.url)):
+        raise HTTPException(400, "URLs pointing to private or internal networks are not allowed.")
     try:
         async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as c:
             r = await c.get(str(body.url)); r.raise_for_status()
