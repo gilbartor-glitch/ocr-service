@@ -87,18 +87,30 @@ async def _ocr_from_bytes(data: bytes) -> str:
     b64 = base64.b64encode(data).decode()
 
     if detected_type == "application/pdf":
-        content_block = {"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": b64}}
-        extra_headers = {"anthropic-beta": "pdfs-2024-09-25"}
-    else:
-        content_block = {"type": "image", "source": {"type": "base64", "media_type": detected_type, "data": b64}}
-        extra_headers = {}
+        # Convert PDF to images using pymupdf
+        try:
+            import fitz  # pymupdf
+            import io as _io
+            doc = fitz.open(stream=data, filetype="pdf")
+            texts = []
+            for page in doc:
+                mat = fitz.Matrix(2, 2)
+                pix = page.get_pixmap(matrix=mat)
+                img_data = pix.tobytes("jpeg")
+                texts.append(await _ocr_from_bytes(img_data))
+            return _clean_text("\n\n".join(texts))
+        except Exception as e:
+            log.warning(f"PDF to image failed: {e}")
+            return f"[PDF conversion failed: {e}]"
+
+    content_block = {"type": "image", "source": {"type": "base64", "media_type": detected_type, "data": b64}}
+    extra_headers = {}
 
     try:
         headers = {
             "x-api-key": ANTHROPIC_API_KEY,
             "anthropic-version": "2023-06-01",
             "content-type": "application/json",
-            **extra_headers
         }
         async with httpx.AsyncClient(timeout=120.0) as client:
             resp = await client.post(
