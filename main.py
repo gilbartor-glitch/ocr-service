@@ -100,7 +100,7 @@ async def _ocr_from_bytes(data: bytes) -> str:
             "content-type": "application/json",
             **extra_headers
         }
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with httpx.AsyncClient(timeout=120.0) as client:
             resp = await client.post(
                 "https://api.anthropic.com/v1/messages",
                 headers=headers,
