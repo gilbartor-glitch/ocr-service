@@ -104,10 +104,21 @@ async def _ocr_from_bytes(data: bytes) -> str:
     b64 = base64.b64encode(data).decode()
 
     if detected_type == "application/pdf":
-        content_block = {"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": b64}}
-    else:
-        content_block = {"type": "image", "source": {"type": "base64", "media_type": detected_type, "data": b64}}
-    extra_headers = {}
+        # Convert PDF pages to smaller JPEG images and OCR concurrently
+        try:
+            import fitz  # pymupdf
+            doc = fitz.open(stream=data, filetype="pdf")
+            page_images = []
+            for page in doc:
+                pix = page.get_pixmap(matrix=fitz.Matrix(1.5, 1.5), colorspace=fitz.csRGB)
+                page_images.append(pix.tobytes("jpeg"))
+            texts = await asyncio.gather(*[_ocr_from_bytes(img) for img in page_images])
+            return _clean_text("\n\n".join(texts))
+        except Exception as e:
+            log.warning(f"PDF to image failed: {e}")
+            return f"[PDF conversion failed: {e}]"
+
+    content_block = {"type": "image", "source": {"type": "base64", "media_type": detected_type, "data": b64}}
 
     try:
         headers = {
@@ -115,14 +126,14 @@ async def _ocr_from_bytes(data: bytes) -> str:
             "anthropic-version": "2023-06-01",
             "content-type": "application/json",
         }
-        async with httpx.AsyncClient(timeout=120.0) as client:
+        async with httpx.AsyncClient(timeout=60.0) as client:
             resp = await client.post(
                 "https://api.anthropic.com/v1/messages",
                 headers=headers,
-                json={"model": "claude-sonnet-4-6", "max_tokens": 4096,
+                json={"model": "claude-haiku-4-5-20251001", "max_tokens": 4096,
                       "messages": [{"role": "user", "content": [
                           content_block,
-                          {"type": "text", "text": "This document may be rotated or tilted. Detect the correct reading orientation and extract ALL text exactly as it appears. The text is likely Hebrew, English, or mixed Hebrew/English. Preserve line breaks, numbers, and structure. Output ONLY the extracted text, nothing else."}
+                          {"type": "text", "text": "Extract ALL text exactly as it appears. The text is likely Hebrew, English, or mixed. Preserve line breaks, numbers, and structure. Output ONLY the extracted text."}
                       ]}]}
             )
         if resp.status_code == 200:
