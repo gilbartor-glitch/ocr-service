@@ -1,23 +1,22 @@
-const CACHE = 'saturi-v1';
-const PRECACHE = ['/', '/static/manifest.json', '/static/icon-192.png', '/static/icon-512.png'];
+const CACHE = 'saturi-v3';
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(PRECACHE)).then(() => self.skipWaiting()));
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(
+    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener('fetch', e => {
-  const url = new URL(e.request.url);
-  // Only cache GET requests for static assets and the main page
   if (e.request.method !== 'GET') return;
-  if (url.pathname.startsWith('/ocr/') || url.pathname.startsWith('/ai/')) return;
-
+  // Network first, cache fallback
   e.respondWith(
     fetch(e.request).then(r => {
-      if (r.ok && (url.pathname === '/' || url.pathname.startsWith('/static/'))) {
+      if (r.ok) {
         const clone = r.clone();
         caches.open(CACHE).then(c => c.put(e.request, clone));
       }
