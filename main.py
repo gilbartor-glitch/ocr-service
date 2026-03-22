@@ -426,6 +426,11 @@ async def serve_ui():
     p = os.path.join(os.path.dirname(__file__), "ui.html")
     return HTMLResponse(open(p).read())
 
+@app.get("/install", include_in_schema=False, response_class=HTMLResponse)
+async def serve_install():
+    p = os.path.join(os.path.dirname(__file__), "install.html")
+    return HTMLResponse(open(p).read())
+
 @app.get("/landing", include_in_schema=False, response_class=HTMLResponse)
 async def serve_landing():
     p = os.path.join(os.path.dirname(__file__), "landing.html")
