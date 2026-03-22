@@ -159,6 +159,11 @@ nav{display:flex;align-items:center;padding:0 24px;height:56px;background:var(--
 </style>
 </head>
 <body>
+<div id="splash" style="position:fixed;inset:0;z-index:9999;background:#fafafa;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+  <div style="font-size:32px;font-weight:900;color:#111;letter-spacing:-.04em">Sat<span style="color:#16a34a">uri</span></div>
+  <div style="width:24px;height:24px;border:3px solid #e8e6e1;border-top-color:#16a34a;border-radius:50%;animation:spin .6s linear infinite"></div>
+</div>
+<script>window.addEventListener('load',function(){document.getElementById('splash').style.display='none';});</script>
 <nav>
   <span class="logo">Sat<span>uri</span></span>
   <div class="nav-right">
