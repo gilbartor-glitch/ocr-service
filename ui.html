@@ -2,8 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>Saturi</title>
+<meta name="theme-color" content="#16a34a"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Saturi"/>
+<link rel="apple-touch-icon" href="/static/icon-192.png"/>
+<link rel="manifest" href="/static/manifest.json"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -660,6 +666,7 @@ function doReset(){
   if(isSpeaking){window.speechSynthesis.cancel();isSpeaking=false;}
 }
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/static/sw.js');}
 </script>
 </body>
 </html>
