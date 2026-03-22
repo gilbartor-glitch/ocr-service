@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Saturi — התקנה</title>
+<title>Saturi — Install</title>
 <meta name="theme-color" content="#16a34a"/>
 <link rel="apple-touch-icon" href="/static/icon-180.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -12,11 +12,14 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
 .page{max-width:480px;margin:0 auto;padding:32px 20px 60px}
-.logo-row{display:flex;align-items:center;gap:14px;margin-bottom:32px}
+.logo-row{display:flex;align-items:center;gap:14px;margin-bottom:24px}
 .logo-icon{width:56px;height:56px;border-radius:14px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.1)}
 .logo-icon img{width:100%;height:100%}
 .logo-name{font-size:28px;font-weight:900;letter-spacing:-.04em}
 .logo-name span{color:var(--accent)}
+.lang-toggle{display:flex;gap:6px;margin-bottom:24px}
+.lang-btn{padding:8px 16px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;color:var(--text)}
+.lang-btn.active{border-color:var(--accent);background:var(--accent-light);color:var(--accent-dark)}
 .hero-text{font-size:22px;font-weight:800;line-height:1.3;margin-bottom:8px}
 .hero-sub{font-size:15px;color:var(--text2);line-height:1.6;margin-bottom:28px}
 .badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-light);color:var(--accent-dark);padding:6px 14px;border-radius:100px;font-size:13px;font-weight:700;margin-bottom:20px}
@@ -30,7 +33,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 .platform{display:none}
 .platform.active{display:block}
 .tabs{display:flex;gap:8px;margin-bottom:20px}
-.tab{flex:1;padding:12px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:.15s;color:var(--text)}
+.tab{flex:1;padding:12px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:.15s;color:var(--text)}
 .tab.active{border-color:var(--accent);background:var(--accent-light);color:var(--accent-dark)}
 .step{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #f0efec}
 .step:last-child{border-bottom:none}
@@ -54,6 +57,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 .etag{background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--text2)}
 .footer{text-align:center;margin-top:36px;font-size:12px;color:var(--text3);line-height:1.8}
 .footer a{color:var(--accent);text-decoration:none;font-weight:600}
+[data-lang]{display:none}
+[data-lang].active{display:block}
 </style>
 </head>
 <body>
@@ -63,134 +68,168 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
     <div class="logo-name">Sat<span>uri</span></div>
   </div>
 
-  <div class="badge"><span class="badge-dot"></span> גרסת אלפא</div>
-  <div class="hero-text">סרוק כל מסמך. הבן אותו מיד.</div>
-  <div class="hero-sub">קיבלת מכתב מהעירייה, חשבון מים, או דו"ח מהבנק — ולא ברור מה כתוב שם? Saturi עושה את העבודה בשבילך.</div>
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLang('he',this)">עברית</button>
+    <button class="lang-btn" onclick="setLang('en',this)">English</button>
+  </div>
 
-  <div class="how-it-works">
-    <div class="how-title">איך זה עובד?</div>
-    <div class="how-step">
-      <div class="how-icon">📸</div>
-      <div>
-        <div class="how-label">צלם או העלה</div>
-        <div class="how-desc">צלם תמונה של המסמך, או העלה קובץ PDF / תמונה מהגלריה</div>
+  <!-- HEBREW -->
+  <div data-lang="he" class="active">
+    <div class="badge"><span class="badge-dot"></span> גרסת אלפא</div>
+    <div class="hero-text">סרוק כל מסמך. הבן אותו מיד.</div>
+    <div class="hero-sub">קיבלת מכתב מהעירייה, חשבון מים, או דו"ח מהבנק — ולא ברור מה כתוב שם? Saturi עושה את העבודה בשבילך.</div>
+
+    <div class="how-it-works">
+      <div class="how-title">איך זה עובד?</div>
+      <div class="how-step"><div class="how-icon">📸</div><div><div class="how-label">צלם או העלה</div><div class="how-desc">צלם תמונה של המסמך, או העלה קובץ PDF / תמונה מהגלריה</div></div></div>
+      <div class="how-step"><div class="how-icon">🧠</div><div><div class="how-label">AI קורא ומנתח</div><div class="how-desc">בינה מלאכותית מזהה את סוג המסמך, מחלצת את הסכומים, התאריכים, ומספרי החשבון — תוך שניות</div></div></div>
+      <div class="how-step"><div class="how-icon">🎯</div><div><div class="how-label">מידע ברור בכרטיסים צבעוניים</div><div class="how-desc">כל פרט חשוב מוצג בכרטיס גדול וברור — סכום לתשלום, תאריך אחרון, מספר חשבון, ועוד</div></div></div>
+      <div class="how-step"><div class="how-icon">⚡</div><div><div class="how-label">פעולה מיידית</div><div class="how-desc">שלם, הוסף ליומן, תרגם, כתוב תגובה, או התקשר — ישירות מהאפליקציה</div></div></div>
+    </div>
+
+    <div class="examples">
+      <div class="examples-title">מה אפשר לסרוק?</div>
+      <div class="example-tags">
+        <span class="etag">💧 חשבון מים</span><span class="etag">🏠 ארנונה</span><span class="etag">🏦 דף בנק</span>
+        <span class="etag">💸 העברה כספית</span><span class="etag">📋 מכתב מהעירייה</span><span class="etag">🏥 מסמך רפואי</span>
+        <span class="etag">⚖️ מכתב משפטי</span><span class="etag">🧾 קבלה</span><span class="etag">📊 טבלאות ונתונים</span><span class="etag">🌐 כל שפה</span>
       </div>
     </div>
-    <div class="how-step">
-      <div class="how-icon">🧠</div>
-      <div>
-        <div class="how-label">AI קורא ומנתח</div>
-        <div class="how-desc">בינה מלאכותית מזהה את סוג המסמך, מחלצת את הסכומים, התאריכים, ומספרי החשבון — תוך שניות</div>
+
+    <div class="qr-card" id="qrCard-he"><img src="/static/qr.png" alt="QR Code"/><div class="qr-label">סרוק כדי לפתוח על הטלפון</div></div>
+    <a href="https://ocr-service-4e7i.onrender.com" class="open-btn">🚀 פתח את Saturi</a>
+
+    <div class="section-title">📲 התקנה על הטלפון</div>
+    <div class="tabs" id="tabs-he">
+      <button class="tab active" onclick="showPlatform('ios-he',this,'tabs-he')">iPhone (Safari)</button>
+      <button class="tab" onclick="showPlatform('android-he',this,'tabs-he')">Android (Chrome)</button>
+      <button class="tab" onclick="showPlatform('chrome-he',this,'tabs-he')">Chrome (מחשב)</button>
+    </div>
+    <div class="platform active" id="ios-he">
+      <div class="step"><div class="step-num">1</div><div class="step-text">פתח את הקישור <strong>בדפדפן Safari</strong> (לא Chrome)</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">לחץ על כפתור <strong>השיתוף</strong> (ריבוע עם חץ למעלה, בתחתית המסך)</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">גלול למטה ולחץ על <strong>״הוסף למסך הבית״</strong></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">לחץ <strong>״הוסף״</strong> — האייקון הירוק יופיע במסך הבית!</div></div>
+    </div>
+    <div class="platform" id="android-he">
+      <div class="step"><div class="step-num">1</div><div class="step-text">פתח את הקישור <strong>בדפדפן Chrome</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">לחץ על <strong>שלוש הנקודות</strong> (תפריט, למעלה מימין)</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">לחץ על <strong>״הוסף למסך הבית״</strong> או <strong>״התקן אפליקציה״</strong></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">לחץ <strong>״התקן״</strong> — האפליקציה תופיע כמו אפליקציה רגילה!</div></div>
+    </div>
+    <div class="platform" id="chrome-he">
+      <div class="step"><div class="step-num">1</div><div class="step-text">פתח את הקישור <strong>בדפדפן Chrome</strong> במחשב</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">חפש את <strong>אייקון ההתקנה</strong> (&#x2B07;) בצד ימין של שורת הכתובת</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">לחץ <strong>״התקן״</strong> בחלון הקופץ</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">האפליקציה תיפתח <strong>בחלון נפרד</strong> ותתווסף לשולחן העבודה!</div></div>
+    </div>
+
+    <div class="features">
+      <div class="feat"><div class="feat-icon">📄</div><div class="feat-label">סריקת מסמכים</div></div>
+      <div class="feat"><div class="feat-icon">🧠</div><div class="feat-label">ניתוח חכם</div></div>
+      <div class="feat"><div class="feat-icon">🌐</div><div class="feat-label">תרגום מיידי</div></div>
+      <div class="feat"><div class="feat-icon">💳</div><div class="feat-label">תשלום מהיר</div></div>
+    </div>
+    <div class="footer">גרסת אלפא — <a href="https://ocr-service-4e7i.onrender.com">ocr-service-4e7i.onrender.com</a><br>נבנה עם ❤️ על ידי Saturi</div>
+  </div>
+
+  <!-- ENGLISH -->
+  <div data-lang="en">
+    <div class="badge"><span class="badge-dot"></span> Alpha Version</div>
+    <div class="hero-text">Scan any document. Understand it instantly.</div>
+    <div class="hero-sub">Got a utility bill, bank statement, or government letter you can't figure out? Saturi reads it, extracts the key info, and helps you act on it — in seconds.</div>
+
+    <div class="how-it-works">
+      <div class="how-title">How it works</div>
+      <div class="how-step"><div class="how-icon">📸</div><div><div class="how-label">Snap or upload</div><div class="how-desc">Take a photo of any document, or upload a PDF / image from your files</div></div></div>
+      <div class="how-step"><div class="how-icon">🧠</div><div><div class="how-label">AI reads & analyzes</div><div class="how-desc">AI identifies the document type and extracts amounts, dates, account numbers, and key details — in seconds</div></div></div>
+      <div class="how-step"><div class="how-icon">🎯</div><div><div class="how-label">Clear, colorful cards</div><div class="how-desc">Every important detail is displayed as a large, easy-to-read tile — amount due, deadline, account number, and more</div></div></div>
+      <div class="how-step"><div class="how-icon">⚡</div><div><div class="how-label">Take action instantly</div><div class="how-desc">Pay, add to calendar, translate, write a reply, or call — right from the app</div></div></div>
+    </div>
+
+    <div class="examples">
+      <div class="examples-title">What can you scan?</div>
+      <div class="example-tags">
+        <span class="etag">💧 Water bills</span><span class="etag">🏠 Property tax</span><span class="etag">🏦 Bank statements</span>
+        <span class="etag">💸 Money transfers</span><span class="etag">📋 Government letters</span><span class="etag">🏥 Medical documents</span>
+        <span class="etag">⚖️ Legal notices</span><span class="etag">🧾 Receipts</span><span class="etag">📊 Tables & data</span><span class="etag">🌐 Any language</span>
       </div>
     </div>
-    <div class="how-step">
-      <div class="how-icon">🎯</div>
-      <div>
-        <div class="how-label">מידע ברור בכרטיסים צבעוניים</div>
-        <div class="how-desc">כל פרט חשוב מוצג בכרטיס גדול וברור — סכום לתשלום, תאריך אחרון, מספר חשבון, ועוד</div>
-      </div>
-    </div>
-    <div class="how-step">
-      <div class="how-icon">⚡</div>
-      <div>
-        <div class="how-label">פעולה מיידית</div>
-        <div class="how-desc">שלם, הוסף ליומן, תרגם, כתוב תגובה, או התקשר — ישירות מהאפליקציה</div>
-      </div>
-    </div>
-  </div>
 
-  <div class="examples">
-    <div class="examples-title">מה אפשר לסרוק?</div>
-    <div class="example-tags">
-      <span class="etag">💧 חשבון מים</span>
-      <span class="etag">🏠 ארנונה</span>
-      <span class="etag">🏦 דף בנק</span>
-      <span class="etag">💸 העברה כספית</span>
-      <span class="etag">📋 מכתב מהעירייה</span>
-      <span class="etag">🏥 מסמך רפואי</span>
-      <span class="etag">⚖️ מכתב משפטי</span>
-      <span class="etag">🧾 קבלה</span>
-      <span class="etag">📊 טבלאות ונתונים</span>
-      <span class="etag">🌐 כל שפה</span>
-    </div>
-  </div>
+    <div class="qr-card" id="qrCard-en"><img src="/static/qr.png" alt="QR Code"/><div class="qr-label">Scan to open on your phone</div></div>
+    <a href="https://ocr-service-4e7i.onrender.com" class="open-btn">🚀 Open Saturi</a>
 
-  <div class="qr-card" id="qrCard">
-    <img src="/static/qr.png" alt="QR Code"/>
-    <div class="qr-label">סרוק כדי לפתוח על הטלפון</div>
-  </div>
+    <div class="section-title">📲 Install on your device</div>
+    <div class="tabs" id="tabs-en">
+      <button class="tab active" onclick="showPlatform('ios-en',this,'tabs-en')">iPhone (Safari)</button>
+      <button class="tab" onclick="showPlatform('android-en',this,'tabs-en')">Android (Chrome)</button>
+      <button class="tab" onclick="showPlatform('chrome-en',this,'tabs-en')">Chrome (Desktop)</button>
+    </div>
+    <div class="platform active" id="ios-en">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Open the link in <strong>Safari</strong> (not Chrome)</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Tap the <strong>Share button</strong> (square with arrow, at the bottom)</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Scroll down and tap <strong>"Add to Home Screen"</strong></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Tap <strong>"Add"</strong> — the green icon will appear on your home screen!</div></div>
+    </div>
+    <div class="platform" id="android-en">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Open the link in <strong>Chrome</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Tap the <strong>three dots menu</strong> (top right)</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Tap <strong>"Add to Home Screen"</strong> or <strong>"Install app"</strong></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Tap <strong>"Install"</strong> — the app will appear like a native app!</div></div>
+    </div>
+    <div class="platform" id="chrome-en">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Open the link in <strong>Chrome</strong> on your computer</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Look for the <strong>install icon</strong> (&#x2B07;) on the right side of the address bar</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Click <strong>"Install"</strong> in the popup</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">The app will open in its <strong>own window</strong> and appear on your desktop!</div></div>
+    </div>
 
-  <a href="https://ocr-service-4e7i.onrender.com" class="open-btn" id="openBtn">🚀 פתח את Saturi</a>
-
-  <div class="section-title">📲 התקנה על הטלפון</div>
-  <div class="tabs">
-    <button class="tab active" onclick="showPlatform('ios',this)">iPhone</button>
-    <button class="tab" onclick="showPlatform('android',this)">Android</button>
-  </div>
-
-  <div class="platform active" id="ios">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-text">פתח את הקישור <strong>בדפדפן Safari</strong> (לא Chrome)</div>
+    <div class="features">
+      <div class="feat"><div class="feat-icon">📄</div><div class="feat-label">Document scanning</div></div>
+      <div class="feat"><div class="feat-icon">🧠</div><div class="feat-label">Smart analysis</div></div>
+      <div class="feat"><div class="feat-icon">🌐</div><div class="feat-label">Instant translation</div></div>
+      <div class="feat"><div class="feat-icon">💳</div><div class="feat-label">Quick payment</div></div>
     </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-text">לחץ על כפתור <strong>השיתוף</strong> (ריבוע עם חץ למעלה, בתחתית המסך)</div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-text">גלול למטה ולחץ על <strong>״הוסף למסך הבית״</strong></div>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-text">לחץ <strong>״הוסף״</strong> — האייקון הירוק יופיע במסך הבית!</div>
-    </div>
-  </div>
-
-  <div class="platform" id="android">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-text">פתח את הקישור <strong>בדפדפן Chrome</strong></div>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-text">לחץ על <strong>שלוש הנקודות</strong> (תפריט, למעלה מימין)</div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-text">לחץ על <strong>״הוסף למסך הבית״</strong> או <strong>״התקן אפליקציה״</strong></div>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-text">לחץ <strong>״התקן״</strong> — האפליקציה תופיע כמו אפליקציה רגילה!</div>
-    </div>
-  </div>
-
-  <div class="features">
-    <div class="feat"><div class="feat-icon">📄</div><div class="feat-label">סריקת מסמכים</div></div>
-    <div class="feat"><div class="feat-icon">🧠</div><div class="feat-label">ניתוח חכם</div></div>
-    <div class="feat"><div class="feat-icon">🌐</div><div class="feat-label">תרגום מיידי</div></div>
-    <div class="feat"><div class="feat-icon">💳</div><div class="feat-label">תשלום מהיר</div></div>
-  </div>
-
-  <div class="footer">
-    גרסת אלפא — <a href="https://ocr-service-4e7i.onrender.com">ocr-service-4e7i.onrender.com</a><br>
-    נבנה עם ❤️ על ידי Saturi
+    <div class="footer">Alpha version — <a href="https://ocr-service-4e7i.onrender.com">ocr-service-4e7i.onrender.com</a><br>Built with ❤️ by Saturi</div>
   </div>
 </div>
 
 <script>
-function showPlatform(p, btn){
-  document.querySelectorAll('.platform').forEach(function(el){el.classList.remove('active');});
-  document.querySelectorAll('.tab').forEach(function(el){el.classList.remove('active');});
-  document.getElementById(p).classList.add('active');
+function setLang(lang, btn){
+  document.querySelectorAll('[data-lang]').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.lang-btn').forEach(function(el){el.classList.remove('active');});
+  document.querySelector('[data-lang="'+lang+'"]').classList.add('active');
   btn.classList.add('active');
+  document.documentElement.dir = lang==='he'?'rtl':'ltr';
+  document.documentElement.lang = lang;
+}
+function showPlatform(id, btn, tabsId){
+  var tabs = document.getElementById(tabsId);
+  tabs.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  btn.classList.add('active');
+  // Hide all platforms in same language group
+  var lang = id.split('-')[1];
+  ['ios-','android-','chrome-'].forEach(function(p){
+    var el=document.getElementById(p+lang);
+    if(el)el.classList.remove('active');
+  });
+  document.getElementById(id).classList.add('active');
 }
 // Auto-detect platform
 var ua=navigator.userAgent||'';
-if(/android/i.test(ua)){showPlatform('android',document.querySelectorAll('.tab')[1]);}
+if(/android/i.test(ua)){
+  showPlatform('android-he',document.querySelectorAll('#tabs-he .tab')[1],'tabs-he');
+  showPlatform('android-en',document.querySelectorAll('#tabs-en .tab')[1],'tabs-en');
+}
 // Hide QR on mobile
-if(/iPhone|iPad|Android/i.test(ua)){document.getElementById('qrCard').style.display='none';}
+if(/iPhone|iPad|Android/i.test(ua)){
+  document.getElementById('qrCard-he').style.display='none';
+  document.getElementById('qrCard-en').style.display='none';
+}
+// Auto-detect language
+if(!/he|iw/.test(navigator.language||'')){
+  setLang('en',document.querySelectorAll('.lang-btn')[1]);
+}
 </script>
 </body>
 </html>
