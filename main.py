@@ -407,13 +407,19 @@ async def analyze_vision(file: Annotated[UploadFile, File()]):
 # ---------------------------------------------------------------------------
 # UI
 # ---------------------------------------------------------------------------
-@app.get("/apple-touch-icon.png", include_in_schema=False)
-@app.get("/apple-touch-icon-precomposed.png", include_in_schema=False)
-@app.get("/favicon.ico", include_in_schema=False)
-async def apple_touch_icon():
+async def _serve_icon():
     from fastapi.responses import FileResponse
     icon = os.path.join(os.path.dirname(__file__), "static", "icon-180.png")
     return FileResponse(icon, media_type="image/png", headers={"Cache-Control": "no-cache, must-revalidate"})
+
+@app.get("/apple-touch-icon.png", include_in_schema=False)
+async def apple_icon(): return await _serve_icon()
+
+@app.get("/apple-touch-icon-precomposed.png", include_in_schema=False)
+async def apple_icon_pre(): return await _serve_icon()
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon(): return await _serve_icon()
 
 @app.get("/", include_in_schema=False, response_class=HTMLResponse)
 async def serve_ui():
