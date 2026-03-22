@@ -41,6 +41,17 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 .feat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
 .feat-icon{font-size:24px;margin-bottom:6px}
 .feat-label{font-size:12px;font-weight:700;color:var(--text2)}
+.how-it-works{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:28px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.how-title{font-size:17px;font-weight:800;margin-bottom:16px}
+.how-step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f0efec;align-items:flex-start}
+.how-step:last-child{border-bottom:none}
+.how-icon{font-size:28px;width:44px;height:44px;background:var(--accent-light);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.how-label{font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px}
+.how-desc{font-size:13px;color:var(--text2);line-height:1.5}
+.examples{margin-bottom:28px}
+.examples-title{font-size:17px;font-weight:800;margin-bottom:14px}
+.example-tags{display:flex;flex-wrap:wrap;gap:8px}
+.etag{background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--text2)}
 .footer{text-align:center;margin-top:36px;font-size:12px;color:var(--text3);line-height:1.8}
 .footer a{color:var(--accent);text-decoration:none;font-weight:600}
 </style>
@@ -54,7 +65,55 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 
   <div class="badge"><span class="badge-dot"></span> גרסת אלפא</div>
   <div class="hero-text">סרוק כל מסמך. הבן אותו מיד.</div>
-  <div class="hero-sub">צלם תמונה של חשבון, מכתב רשמי, או כל מסמך — ותקבל את כל המידע החשוב בשניות. בעברית, באנגלית, ובעוד שפות.</div>
+  <div class="hero-sub">קיבלת מכתב מהעירייה, חשבון מים, או דו"ח מהבנק — ולא ברור מה כתוב שם? Saturi עושה את העבודה בשבילך.</div>
+
+  <div class="how-it-works">
+    <div class="how-title">איך זה עובד?</div>
+    <div class="how-step">
+      <div class="how-icon">📸</div>
+      <div>
+        <div class="how-label">צלם או העלה</div>
+        <div class="how-desc">צלם תמונה של המסמך, או העלה קובץ PDF / תמונה מהגלריה</div>
+      </div>
+    </div>
+    <div class="how-step">
+      <div class="how-icon">🧠</div>
+      <div>
+        <div class="how-label">AI קורא ומנתח</div>
+        <div class="how-desc">בינה מלאכותית מזהה את סוג המסמך, מחלצת את הסכומים, התאריכים, ומספרי החשבון — תוך שניות</div>
+      </div>
+    </div>
+    <div class="how-step">
+      <div class="how-icon">🎯</div>
+      <div>
+        <div class="how-label">מידע ברור בכרטיסים צבעוניים</div>
+        <div class="how-desc">כל פרט חשוב מוצג בכרטיס גדול וברור — סכום לתשלום, תאריך אחרון, מספר חשבון, ועוד</div>
+      </div>
+    </div>
+    <div class="how-step">
+      <div class="how-icon">⚡</div>
+      <div>
+        <div class="how-label">פעולה מיידית</div>
+        <div class="how-desc">שלם, הוסף ליומן, תרגם, כתוב תגובה, או התקשר — ישירות מהאפליקציה</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="examples">
+    <div class="examples-title">מה אפשר לסרוק?</div>
+    <div class="example-tags">
+      <span class="etag">💧 חשבון מים</span>
+      <span class="etag">🏠 ארנונה</span>
+      <span class="etag">🏦 דף בנק</span>
+      <span class="etag">💸 העברה כספית</span>
+      <span class="etag">📋 מכתב מהעירייה</span>
+      <span class="etag">🏥 מסמך רפואי</span>
+      <span class="etag">⚖️ מכתב משפטי</span>
+      <span class="etag">🧾 קבלה</span>
+      <span class="etag">📊 טבלאות ונתונים</span>
+      <span class="etag">🌐 כל שפה</span>
+    </div>
+  </div>
 
   <div class="qr-card" id="qrCard">
     <img src="/static/qr.png" alt="QR Code"/>
