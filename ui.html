@@ -1,24 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Saturi</title>
-<meta name="theme-color" content="#16a34a"/>
+<title>Juice — חשמל חכם</title>
+<meta name="theme-color" content="#f59e0b"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-<meta name="apple-mobile-web-app-title" content="Saturi"/>
-<link rel="apple-touch-icon" href="/static/icon-192.png?v=2"/>
-<link rel="apple-touch-icon" sizes="180x180" href="/static/icon-180.png?v=2"/>
+<meta name="apple-mobile-web-app-title" content="Juice"/>
+<link rel="apple-touch-icon" href="/static/icon-192.png?v=3"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/static/icon-180.png?v=3"/>
 <link rel="manifest" href="/static/manifest.json"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#fafafa;--surface:#fff;--surface2:#f3f3f1;
-  --border:#e8e6e1;--border2:#d6d3cc;
-  --text:#111;--text2:#555;--text3:#999;
-  --accent:#16a34a;--accent-dark:#15803d;--accent-light:#dcfce7;
-  --red:#dc2626;--amber:#d97706;--blue:#2563eb;--purple:#7c3aed;--teal:#0d9488;
+  --bg:#fffbeb;--surface:#fff;--surface2:#fef3c7;
+  --border:#fde68a;--border2:#fbbf24;
+  --text:#111;--text2:#555;--text3:#92400e;
+  --accent:#f59e0b;--accent-dark:#d97706;--accent-light:#fef3c7;
+  --green:#16a34a;--green-light:#dcfce7;
+  --red:#dc2626;--blue:#2563eb;--purple:#7c3aed;--teal:#0d9488;
   --r:20px;--r2:14px;
   --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
   --shadow-lg:0 10px 30px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.04);
@@ -26,29 +27,27 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:15px;min-height:100vh;-webkit-font-smoothing:antialiased}
 
-/* NAV */
-nav{display:flex;align-items:center;padding:0 24px;height:56px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);background:rgba(255,255,255,.85)}
-.logo{font-size:20px;font-weight:900;letter-spacing:-.04em;color:var(--text)}
+nav{display:flex;align-items:center;padding:0 24px;height:56px;background:rgba(255,251,235,.9);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.logo{font-size:22px;font-weight:900;letter-spacing:-.04em;color:var(--text);display:flex;align-items:center;gap:8px}
+.logo-icon{font-size:26px}
 .logo span{color:var(--accent)}
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:14px}
 .nav-status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);font-weight:500}
 .nav-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);transition:.3s}
-.nav-dot.on{background:#22c55e;box-shadow:0 0 6px #22c55e}
+.nav-dot.on{background:var(--green);box-shadow:0 0 6px var(--green)}
 
-/* CONTAINER */
 .container{max-width:700px;margin:0 auto;padding:32px 20px 80px}
 
 /* UPLOAD */
 .upload-zone{background:var(--surface);border:2px dashed var(--border2);border-radius:var(--r);padding:48px 24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;box-shadow:var(--shadow)}
 .upload-zone:hover,.upload-zone.over{border-color:var(--accent);background:var(--accent-light);border-style:solid}
 .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.upload-icon{width:56px;height:56px;border-radius:16px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px}
-.upload-title{font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px}
+.upload-icon{font-size:56px;margin-bottom:16px}
+.upload-title{font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px}
 .upload-hint{font-size:14px;color:var(--text3)}
 .upload-formats{margin-top:16px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
-.fmt-tag{font-size:11px;font-weight:600;color:var(--text3);background:var(--surface2);padding:4px 10px;border-radius:8px;letter-spacing:.02em}
+.fmt-tag{font-size:11px;font-weight:600;color:var(--text3);background:var(--surface2);padding:4px 10px;border-radius:8px}
 
-/* FILE PREVIEW */
 .file-preview{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:14px 18px;margin-top:16px;box-shadow:var(--shadow)}
 .file-preview-icon{font-size:26px}
 .file-preview-name{font-size:14px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -56,63 +55,65 @@ nav{display:flex;align-items:center;padding:0 24px;height:56px;background:var(--
 .file-preview-remove{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:14px;color:var(--text3);display:flex;align-items:center;justify-content:center;transition:.15s}
 .file-preview-remove:hover{background:var(--red);color:#fff;border-color:var(--red)}
 
-/* PROCESS BTN */
-.process-btn{width:100%;padding:16px;background:var(--accent);color:#fff;border:none;border-radius:var(--r2);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(22,163,74,.25)}
-.process-btn:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 6px 20px rgba(22,163,74,.3)}
+.process-btn{width:100%;padding:16px;background:var(--accent);color:#fff;border:none;border-radius:var(--r2);font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;margin-top:16px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(245,158,11,.3)}
+.process-btn:hover{background:var(--accent-dark);transform:translateY(-1px)}
 .process-btn:disabled{background:var(--border);color:var(--text3);cursor:not-allowed;transform:none;box-shadow:none}
 
-/* PROCESSING */
 .steps-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:28px;margin-top:28px;box-shadow:var(--shadow)}
 .steps-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:16px}
 .step-row{display:flex;align-items:center;gap:12px;padding:12px 0;font-size:14px;font-weight:500;color:var(--text3)}
 .step-row+.step-row{border-top:1px solid var(--surface2)}
 .step-row.active{color:var(--text)}
-.step-row.done{color:var(--accent)}
+.step-row.done{color:var(--green)}
 .step-icon{width:24px;text-align:center;font-size:16px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
 
 /* RESULTS */
 .results{margin-top:28px}
-.doc-title{font-size:28px;font-weight:900;color:var(--text);margin-bottom:20px;line-height:1.2;letter-spacing:-.03em}
+.doc-title{font-size:24px;font-weight:900;color:var(--text);margin-bottom:20px;line-height:1.2;letter-spacing:-.02em}
 
-/* HERO TILE — amount or primary info */
-.hero-tile{border-radius:var(--r);padding:28px;color:#fff;position:relative;overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-lg)}
-.hero-tile::after{content:'';position:absolute;top:-30%;right:-10%;width:200px;height:200px;background:rgba(255,255,255,.08);border-radius:50%}
-.hero-tile-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-bottom:8px}
-.hero-tile-value{font-size:36px;font-weight:900;line-height:1.1;position:relative;z-index:1}
-.hero-tile-sub{font-size:14px;opacity:.7;margin-top:6px;font-weight:500;position:relative;z-index:1}
+/* BILL SUMMARY */
+.bill-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
+.bill-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--surface2);font-size:14px}
+.bill-row:last-child{border-bottom:none}
+.bill-label{color:var(--text3);font-weight:500}
+.bill-value{font-weight:700;color:var(--text)}
 
-/* TILES GRID */
-.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-@keyframes tileIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+/* SAVINGS HERO */
+.savings-hero{border-radius:var(--r);padding:28px;color:#fff;position:relative;overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-lg);background:linear-gradient(135deg,#16a34a,#15803d);cursor:pointer}
+.savings-hero::after{content:'';position:absolute;top:-30%;left:-10%;width:200px;height:200px;background:rgba(255,255,255,.08);border-radius:50%}
+.savings-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-bottom:8px}
+.savings-value{font-size:36px;font-weight:900;line-height:1.1;position:relative;z-index:1}
+.savings-sub{font-size:14px;opacity:.8;margin-top:6px;font-weight:500;position:relative;z-index:1}
 
-.tile{border-radius:var(--r);padding:20px;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;animation:tileIn .3s ease both;min-height:110px;display:flex;flex-direction:column;box-shadow:var(--shadow)}
-.tile:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
-.tile:active{transform:scale(.98)}
-.tile-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.7;margin-bottom:6px}
-.tile-value{font-size:20px;font-weight:800;line-height:1.2;margin-top:auto;word-break:break-word}
-.tile-sub{font-size:12px;opacity:.65;margin-top:4px;font-weight:500}
-.tile.wide{grid-column:span 2}
+/* CURRENT BILL HERO */
+.bill-hero{border-radius:var(--r);padding:28px;color:#fff;position:relative;overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-lg);background:linear-gradient(135deg,#dc2626,#b91c1c)}
+.bill-hero::after{content:'';position:absolute;top:-30%;right:-10%;width:200px;height:200px;background:rgba(255,255,255,.08);border-radius:50%}
 
-/* ACTION TILES */
-.actions-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:24px 0 12px}
-.tile.action{background:var(--surface);border:1.5px solid var(--border);color:var(--text);min-height:auto;padding:18px 20px;flex-direction:row;align-items:center;gap:14px}
-.tile.action:hover{border-color:var(--accent);background:var(--accent-light);box-shadow:var(--shadow-lg)}
-.tile.action .tile-icon{font-size:24px;width:44px;height:44px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
-.tile.action:hover .tile-icon{background:var(--accent-light)}
-.tile.action .tile-text{display:flex;flex-direction:column}
-.tile.action .tile-value{font-size:15px;font-weight:700;margin:0}
-.tile.action .tile-sub{font-size:13px;opacity:.5;margin-top:2px}
+/* SAVINGS ITEMS */
+.saving-item{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.15s;box-shadow:var(--shadow)}
+.saving-item:hover{border-color:var(--green);background:var(--green-light);box-shadow:var(--shadow-lg)}
+.saving-icon{font-size:28px;width:48px;height:48px;border-radius:14px;background:var(--green-light);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.saving-text{flex:1}
+.saving-title{font-size:15px;font-weight:700;margin-bottom:2px}
+.saving-desc{font-size:12px;color:var(--text3)}
+.saving-amount{text-align:left;flex-shrink:0}
+.saving-nis{font-size:18px;font-weight:900;color:var(--green)}
+.saving-period{font-size:11px;color:var(--text3)}
 
-.tile.urgent{animation:tileIn .3s ease both,urgentPulse 2s ease 1s infinite}
-@keyframes urgentPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.35)}50%{box-shadow:0 0 0 8px rgba(220,38,38,0)}}
+/* EFFORT BADGE */
+.effort{display:inline-flex;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.effort-easy{background:#dcfce7;color:#16a34a}
+.effort-medium{background:#fef3c7;color:#d97706}
 
-/* DETAIL ROWS (in modal) */
-.detail-row{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--surface2);font-size:14px}
-.detail-row:last-child{border-bottom:none}
-.detail-key{font-weight:700;color:var(--text3);min-width:110px;flex-shrink:0;font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding-top:2px}
-.detail-val{color:var(--text);line-height:1.5;font-weight:500}
+/* SOLAR CARD */
+.solar-card{background:linear-gradient(135deg,#2563eb,#1d4ed8);border-radius:var(--r);padding:24px;color:#fff;margin-top:16px;box-shadow:var(--shadow-lg);cursor:pointer}
+
+.section-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:24px 0 12px}
+
+.reset-btn{width:100%;padding:14px;background:var(--surface);color:var(--text2);border:1.5px solid var(--border);border-radius:var(--r2);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:20px;transition:.15s}
+.reset-btn:hover{border-color:var(--text3);color:var(--text)}
 
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .15s ease}
@@ -125,47 +126,28 @@ nav{display:flex;align-items:center;padding:0 24px;height:56px;background:var(--
 .modal-close{width:32px;height:32px;border-radius:50%;background:var(--surface2);border:none;color:var(--text2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:.15s}
 .modal-close:hover{background:var(--border)}
 .modal-body{font-size:14px;line-height:1.7;color:var(--text2)}
+.detail-row{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--surface2);font-size:14px}
+.detail-row:last-child{border-bottom:none}
+.detail-key{font-weight:700;color:var(--text3);min-width:100px;flex-shrink:0;font-size:12px}
+.detail-val{color:var(--text);line-height:1.5;font-weight:500}
 
-/* FORM ELEMENTS IN MODAL */
-.m-input-group{margin-bottom:14px}
-.m-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
-.m-input{width:100%;padding:11px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r2);font-size:14px;color:var(--text);outline:none;font-family:inherit;transition:border .2s}
-.m-input:focus{border-color:var(--accent);background:var(--surface)}
-.m-textarea{min-height:100px;resize:vertical}
-.m-btn{padding:12px 20px;border:none;border-radius:var(--r2);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.15s}
-.m-btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(22,163,74,.2)}
-.m-btn-primary:hover{background:var(--accent-dark)}
-.m-btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
-.m-btn-secondary:hover{background:var(--border)}
-.m-btn-row{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
-.m-address{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:12px;font-size:13px;color:var(--text2);line-height:1.6;font-style:italic;margin-bottom:14px}
+@keyframes tileIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
 
-/* LANGUAGE SELECT */
-.m-lang-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.m-lang-btn{padding:9px 18px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;color:var(--text)}
-.m-lang-btn:hover,.m-lang-btn.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent-dark)}
-
-/* RESET BTN */
-.reset-btn{width:100%;padding:14px;background:var(--surface);color:var(--text2);border:1.5px solid var(--border);border-radius:var(--r2);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:20px;transition:.15s}
-.reset-btn:hover{border-color:var(--text3);color:var(--text)}
-
-/* RESPONSIVE */
 @media(max-width:520px){
-  .tiles{grid-template-columns:1fr}
-  .tile.wide{grid-column:span 1}
   .container{padding:20px 14px 60px}
-  .hero-tile-value{font-size:28px}
+  .savings-value{font-size:28px}
 }
 </style>
 </head>
 <body>
-<div id="splash" style="position:fixed;inset:0;z-index:9999;background:#fafafa;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
-  <div style="font-size:32px;font-weight:900;color:#111;letter-spacing:-.04em">Sat<span style="color:#16a34a">uri</span></div>
-  <div style="width:24px;height:24px;border:3px solid #e8e6e1;border-top-color:#16a34a;border-radius:50%;animation:spin .6s linear infinite"></div>
+<div id="splash" style="position:fixed;inset:0;z-index:9999;background:#fffbeb;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+  <div style="font-size:36px;font-weight:900;color:#111;letter-spacing:-.04em;display:flex;align-items:center;gap:10px"><span style="font-size:40px">&#x26A1;</span> J<span style="color:#f59e0b">uice</span></div>
+  <div style="font-size:14px;color:#92400e;font-weight:500">&#1495;&#1513;&#1502;&#1500; &#1495;&#1499;&#1501;</div>
+  <div style="width:24px;height:24px;border:3px solid #fde68a;border-top-color:#f59e0b;border-radius:50%;animation:spin .6s linear infinite"></div>
 </div>
 <script>window.addEventListener('load',function(){document.getElementById('splash').style.display='none';});</script>
 <nav>
-  <span class="logo">Sat<span>uri</span></span>
+  <span class="logo"><span class="logo-icon">&#x26A1;</span> J<span>uice</span></span>
   <div class="nav-right">
     <div class="nav-status"><span class="nav-dot" id="dot"></span><span id="sl">Connecting</span></div>
   </div>
@@ -174,18 +156,21 @@ nav{display:flex;align-items:center;padding:0 24px;height:56px;background:var(--
 <div class="container">
   <!-- UPLOAD -->
   <div id="uploadArea">
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:24px;font-weight:900;margin-bottom:6px">&#x1F50D; Scan your electricity bill</div>
+      <div style="font-size:15px;color:var(--text3)">Upload your &#1495;&#1513;&#1489;&#1493;&#1503; &#1495;&#1513;&#1502;&#1500; and see how much you can save</div>
+    </div>
     <div class="upload-zone" id="dz" ondragover="dzOver(event)" ondragleave="dzLeave()" ondrop="dzDrop(event)">
-      <input type="file" id="fileIn" accept="image/*,.heic,.heif,.pdf,application/pdf" onchange="fileChange(event)"/>
-      <div class="upload-icon">&#x1F4C4;</div>
-      <div class="upload-title">Drop a document here</div>
-      <div class="upload-hint">or tap to choose a file</div>
+      <input type="file" id="fileIn" accept="image/*,.heic,.heif,.pdf,application/pdf" capture="environment" onchange="fileChange(event)"/>
+      <div class="upload-icon">&#x1F4F8;</div>
+      <div class="upload-title">Take a photo or upload your bill</div>
+      <div class="upload-hint">PDF or photo of your electricity bill</div>
       <div class="upload-formats">
-        <span class="fmt-tag">JPEG</span><span class="fmt-tag">PNG</span><span class="fmt-tag">PDF</span>
-        <span class="fmt-tag">WEBP</span><span class="fmt-tag">TIFF</span><span class="fmt-tag">HEIC</span>
+        <span class="fmt-tag">PDF</span><span class="fmt-tag">JPEG</span><span class="fmt-tag">PNG</span><span class="fmt-tag">HEIC</span>
       </div>
     </div>
     <div id="filePreview"></div>
-    <button class="process-btn" id="runBtn" onclick="doRun()" disabled>Scan document</button>
+    <button class="process-btn" id="runBtn" onclick="doRun()" disabled>&#x26A1; Analyze my bill</button>
   </div>
 
   <!-- PROCESSING -->
@@ -208,15 +193,12 @@ nav{display:flex;align-items:center;padding:0 24px;height:56px;background:var(--
 </div>
 
 <script>
-var selFile=null, ocrText='', analysis=null, isSpeaking=false;
+var selFile=null, billData=null, savingsData=null;
 
 fetch('/health').then(function(r){if(r.ok){document.getElementById('dot').className='nav-dot on';document.getElementById('sl').textContent='Online';}}).catch(function(){});
 
 /* --- Upload --- */
-function fileChange(e){
-  selFile=e.target.files[0]||null;
-  renderPreview();
-}
+function fileChange(e){selFile=e.target.files[0]||null;renderPreview();}
 function dzOver(e){e.preventDefault();document.getElementById('dz').classList.add('over');}
 function dzLeave(){document.getElementById('dz').classList.remove('over');}
 function dzDrop(e){
@@ -228,177 +210,138 @@ function renderPreview(){
   var el=document.getElementById('filePreview');
   if(!selFile){el.innerHTML='';document.getElementById('runBtn').disabled=true;return;}
   var size=selFile.size>1024*1024?(selFile.size/1024/1024).toFixed(1)+' MB':(selFile.size/1024).toFixed(0)+' KB';
-  var icon=selFile.type==='application/pdf'||selFile.name.toLowerCase().endsWith('.pdf')?'&#x1F4D1;':'&#x1F5BC;';
-  el.innerHTML='<div class="file-preview">'+
-    '<div class="file-preview-icon">'+icon+'</div>'+
-    '<div class="file-preview-name">'+esc(selFile.name)+'</div>'+
-    '<div class="file-preview-size">'+size+'</div>'+
-    '<button class="file-preview-remove" onclick="removeFile()">&#x2715;</button>'+
-    '</div>';
+  el.innerHTML='<div class="file-preview"><div class="file-preview-icon">&#x1F4C4;</div><div class="file-preview-name">'+esc(selFile.name)+'</div><div class="file-preview-size">'+size+'</div><button class="file-preview-remove" onclick="removeFile()">&#x2715;</button></div>';
   document.getElementById('runBtn').disabled=false;
 }
-function removeFile(){
-  selFile=null;document.getElementById('fileIn').value='';renderPreview();
-}
+function removeFile(){selFile=null;document.getElementById('fileIn').value='';renderPreview();}
 
 /* --- Process --- */
 function doRun(){
   if(!selFile)return;
   var btn=document.getElementById('runBtn');
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Processing...';
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Analyzing...';
   document.getElementById('resultsArea').style.display='none';
   showSteps();
   runAsync().catch(function(e){
     document.getElementById('stepsArea').style.display='none';
     document.getElementById('resultsArea').style.display='block';
     document.getElementById('resultsArea').innerHTML='<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:14px;padding:20px;color:#b91c1c;font-size:14px;margin-top:24px">'+esc(e.message)+'</div>';
-  }).finally(function(){btn.disabled=false;btn.innerHTML='Scan document';});
+  }).finally(function(){btn.disabled=false;btn.innerHTML='&#x26A1; Analyze my bill';});
 }
 
 async function runAsync(){
   setStep(1,'active');
   var fd=new FormData();
   fd.append('file',selFile);
-  var r=await fetch('/ocr/upload?mode=text',{method:'POST',body:fd});
+  var r=await fetch('/electricity/analyze',{method:'POST',body:fd});
   if(!r.ok){var e=await r.json();throw new Error(e.detail||r.statusText);}
-  ocrText=(await r.json()).text;
   setStep(1,'done');
-
   setStep(2,'active');
-  try{
-    var ar=await fetch('/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:ocrText})});
-    if(ar.ok){var ad=await ar.json();analysis=JSON.parse(ad.result);}
-    else analysis=null;
-  }catch(e){analysis=null;}
+  var data=await r.json();
+  var parsed=JSON.parse(data.result);
+  billData=parsed.bill;
+  savingsData=parsed.savings;
   setStep(2,'done');
-
+  setStep(3,'active');
+  await new Promise(function(ok){setTimeout(ok,500);});
+  setStep(3,'done');
   document.getElementById('stepsArea').style.display='none';
   renderResults();
 }
 
 function showSteps(){
   var h='<div class="steps-card">';
-  h+='<div class="steps-title">Processing your document</div>';
-  h+='<div class="step-row waiting" id="s1"><span class="step-icon">&#x1F4D6;</span> Reading document...</div>';
-  h+='<div class="step-row waiting" id="s2"><span class="step-icon">&#x1F9E0;</span> Analyzing contents...</div>';
+  h+='<div class="steps-title">Analyzing your bill</div>';
+  h+='<div class="step-row waiting" id="s1"><span class="step-icon">&#x1F4D6;</span> Reading electricity bill...</div>';
+  h+='<div class="step-row waiting" id="s2"><span class="step-icon">&#x1F9E0;</span> Extracting consumption data...</div>';
+  h+='<div class="step-row waiting" id="s3"><span class="step-icon">&#x1F4B0;</span> Calculating savings...</div>';
   h+='</div>';
   document.getElementById('stepsArea').innerHTML=h;
   document.getElementById('stepsArea').style.display='block';
 }
 function setStep(n,s){
-  var el=document.getElementById('s'+n);
-  if(!el)return;
+  var el=document.getElementById('s'+n);if(!el)return;
   el.className='step-row '+s;
   if(s==='active')el.querySelector('.step-icon').innerHTML='<span class="spinner"></span>';
   if(s==='done')el.querySelector('.step-icon').innerHTML='&#x2705;';
 }
 
-/* --- Tile palette --- */
-var PALETTE=[
-  {bg:'#16a34a',fg:'#fff'},  // green
-  {bg:'#2563eb',fg:'#fff'},  // blue
-  {bg:'#dc2626',fg:'#fff'},  // red
-  {bg:'#d97706',fg:'#fff'},  // amber
-  {bg:'#7c3aed',fg:'#fff'},  // purple
-  {bg:'#0d9488',fg:'#fff'},  // teal
-  {bg:'#c2410c',fg:'#fff'},  // orange
-  {bg:'#334155',fg:'#fff'},  // slate
-  {bg:'#0369a1',fg:'#fff'},  // sky
-  {bg:'#4338ca',fg:'#fff'},  // indigo
-];
-
-/* --- Render results --- */
+/* --- Render Results --- */
 function renderResults(){
-  var a=analysis||{};
-  var h='<div class="results">';
+  var b=billData||{};
+  var s=savingsData||{};
+  var h='<div class="results" style="animation:tileIn .4s ease">';
 
-  // DOCUMENT TITLE — always show something
-  var docTitle=a.document_type||'Scanned Document';
-  h+='<div class="doc-title">'+esc(docTitle)+'</div>';
+  // Title
+  h+='<div class="doc-title">&#x26A1; Bill Analysis</div>';
 
-  // Check if analysis found any meaningful data
-  var hasData=a.amount||a.sender||a.recipient||a.account_number||a.reference_number||a.clearing_id||a.due_date;
+  // Current bill hero
+  h+='<div class="bill-hero">';
+  h+='<div class="savings-label">Your monthly cost</div>';
+  h+='<div class="savings-value">&#x20AA; '+fmt(s.current_bill?.monthly_cost||0)+'</div>';
+  h+='<div class="savings-sub">'+fmt(s.current_bill?.monthly_kwh||0)+' kWh/month &middot; '+(s.current_bill?.tariff_type==='flat'?'Flat tariff':'Taoz tariff')+'</div>';
+  h+='</div>';
 
-  // If no structured data, show the extracted text directly
-  if(!hasData&&ocrText){
-    h+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;box-shadow:var(--shadow);font-size:14px;max-height:400px;overflow-y:auto">';
-    h+=renderMarkdown(ocrText);
+  // Savings hero
+  if(s.total_monthly_saving>0){
+    h+='<div class="savings-hero" onclick="showSavingsDetail()">';
+    h+='<div class="savings-label">You can save</div>';
+    h+='<div class="savings-value">&#x20AA; '+fmt(s.total_monthly_saving)+' / month</div>';
+    h+='<div class="savings-sub">&#x20AA; '+fmt(s.total_annual_saving)+' per year &middot; '+s.saving_percentage+'% reduction</div>';
     h+='</div>';
   }
 
-  // HERO TILE — amount (most important for a bill)
-  if(a.amount){
-    var urgentClass=a.payment_required?' urgent':'';
-    var heroLabel=a.payment_required?'Amount due':'Amount';
-    h+='<div class="hero-tile'+urgentClass+'" style="background:linear-gradient(135deg,#dc2626,#b91c1c);cursor:pointer" onclick="showPayment()">';
-    h+='<div class="hero-tile-label">'+heroLabel+'</div>';
-    h+='<div class="hero-tile-value">'+(a.currency||'')+' '+esc(a.amount)+'</div>';
-    if(a.due_date)h+='<div class="hero-tile-sub">Due '+esc(a.due_date)+'</div>';
-    h+='</div>';
-  }
+  // Bill details card
+  h+='<div class="section-label">Bill Details</div>';
+  h+='<div class="bill-card">';
+  if(b.recipient) h+=billRow('Customer',b.recipient);
+  if(b.period) h+=billRow('Period',b.period);
+  if(b.consumption_kwh) h+=billRow('Consumption',fmt(b.consumption_kwh)+' kWh');
+  if(b.rate_per_kwh) h+=billRow('Rate',b.rate_per_kwh+' ag/kWh');
+  if(b.tariff_type) h+=billRow('Tariff',b.tariff_type==='flat'?'Flat (&#1488;&#1495;&#1497;&#1491;)':'Taoz (&#1514;&#1506;"&#1494;)');
+  if(b.kva) h+=billRow('Connection',b.kva+' KVA'+(b.connection_type==='three'?' (3-phase)':' (1-phase)'));
+  if(b.sender) h+=billRow('Supplier',b.sender);
+  if(b.meter_number) h+=billRow('Meter',b.meter_number);
+  h+='</div>';
 
-  // DATA TILES
-  var tiles=[];
-  if(a.due_date&&!a.amount) tiles.push({label:'Due date',value:a.due_date,ci:3,urgent:true});
-  if(a.sender) tiles.push({label:'From',value:a.sender,ci:1});
-  if(a.recipient) tiles.push({label:'To',value:a.recipient,ci:5});
-  if(a.account_number) tiles.push({label:'Account',value:a.account_number,ci:7});
-  if(a.reference_number) tiles.push({label:'Reference',value:a.reference_number,ci:4});
-  if(a.period) tiles.push({label:'Period',value:a.period,ci:8});
-  if(a.clearing_id) tiles.push({label:'Clearing ID',value:a.clearing_id,ci:6});
-
-  // If odd number of tiles, make last one wide
-  if(tiles.length%2===1)tiles[tiles.length-1].wide=true;
-
-  if(tiles.length){
-    h+='<div class="tiles">';
-    tiles.forEach(function(t,i){
-      var c=PALETTE[t.ci%PALETTE.length];
-      var cls='tile'+(t.wide?' wide':'')+(t.urgent?' urgent':'');
-      var delay='animation-delay:'+(i*0.05)+'s;';
-      h+='<div class="'+cls+'" style="background:'+c.bg+';color:'+c.fg+';'+delay+'" onclick="showTileDetail('+i+')">';
-      h+='<div class="tile-label">'+esc(t.label)+'</div>';
-      h+='<div class="tile-value">'+esc(t.value)+'</div>';
+  // Savings recommendations
+  if(s.savings&&s.savings.length){
+    h+='<div class="section-label">Savings Recommendations</div>';
+    var icons={'supplier_switch':'&#x1F504;','taoz_switch':'&#x23F0;','smart_scheduling':'&#x1F4A7;','ac_optimization':'&#x2744;&#xFE0F;'};
+    s.savings.forEach(function(item,i){
+      var icon=icons[item.type]||'&#x1F4B0;';
+      h+='<div class="saving-item" style="animation:tileIn .3s ease '+(i*0.08)+'s both" onclick="showSavingDetail('+i+')">';
+      h+='<div class="saving-icon">'+icon+'</div>';
+      h+='<div class="saving-text">';
+      h+='<div class="saving-title">'+esc(item.title_he||item.title)+'</div>';
+      h+='<div class="saving-desc">'+esc(item.description)+' <span class="effort effort-'+item.effort+'">'+esc(item.effort_he||item.effort)+'</span></div>';
+      h+='</div>';
+      h+='<div class="saving-amount"><div class="saving-nis">-&#x20AA;'+fmt(item.monthly_saving)+'</div><div class="saving-period">per month</div></div>';
       h+='</div>';
     });
+  }
+
+  // Optimized bill
+  if(s.optimized_monthly_cost){
+    h+='<div class="section-label">After Optimization</div>';
+    h+='<div style="background:var(--green-light);border:1.5px solid #86efac;border-radius:var(--r);padding:24px;display:flex;justify-content:space-between;align-items:center">';
+    h+='<div><div style="font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em">New monthly cost</div>';
+    h+='<div style="font-size:28px;font-weight:900;color:var(--green)">&#x20AA; '+fmt(s.optimized_monthly_cost)+'</div></div>';
+    h+='<div style="text-align:left"><div style="font-size:12px;color:var(--text3)">vs. current</div>';
+    h+='<div style="font-size:20px;font-weight:800;color:var(--red);text-decoration:line-through">&#x20AA; '+fmt(s.current_bill?.monthly_cost||0)+'</div></div>';
     h+='</div>';
   }
 
-  // ACTIONS
-  h+='<div class="actions-label">Quick actions</div>';
-  h+='<div class="tiles">';
-
-  if(a.payment_required||a.amount){
-    h+=actionTile('&#x1F4B3;','Pay now','Payment details & barcode','showPayment()','.06s');
-  }
-  if(a.deadline_date){
-    h+=actionTile('&#x1F4C5;','Add to calendar','Save the deadline','showCalendar()','.12s');
-  }
-  if(a.reply_address||(a.contact_details&&a.contact_details.email)){
-    h+=actionTile('&#x2709;&#xFE0F;','Write a reply','Respond to sender','showReply()','.18s');
-  }
-  var hasContacts=a.contact_details&&Object.keys(a.contact_details).some(function(k){return a.contact_details[k];});
-  if(hasContacts){
-    h+=actionTile('&#x1F4DE;','Contact them','Phone, email, website','showContacts()','.24s');
-  }
-  h+=actionTile('&#x1F9D3;','Explain simply','Plain language summary','showSimplify()','.3s');
-  h+=actionTile('&#x1F310;','Translate','Read in your language','showTranslate()','.36s');
-
-  var wc=ocrText.split(/\s+/).filter(function(w){return w;}).length;
-  h+='<div class="tile action wide" style="animation-delay:.42s" onclick="showFullText()">';
-  h+='<div class="tile-icon">&#x1F4C4;</div>';
-  h+='<div class="tile-text"><div class="tile-value">View full text</div><div class="tile-sub">'+wc+' words extracted</div></div>';
-  h+='</div>';
-
-  if(a.property_details&&Object.keys(a.property_details).some(function(k){return a.property_details[k];})){
-    h+='<div class="tile action wide" style="animation-delay:.48s" onclick="showProperty()">';
-    h+='<div class="tile-icon">&#x1F3E0;</div>';
-    h+='<div class="tile-text"><div class="tile-value">Property details</div><div class="tile-sub">Address, block, parcel</div></div>';
+  // Solar card
+  if(s.solar){
+    h+='<div class="solar-card" onclick="showSolar()">';
+    h+='<div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-bottom:8px">&#x2600;&#xFE0F; Solar Panels</div>';
+    h+='<div style="font-size:24px;font-weight:900">Save &#x20AA;'+fmt(s.solar.monthly_saving)+'/month</div>';
+    h+='<div style="font-size:14px;opacity:.8;margin-top:4px">ROI in '+s.solar.payback_years+' years &middot; Tap for details</div>';
     h+='</div>';
   }
 
-  h+='</div>';
-  h+='<button class="reset-btn" onclick="doReset()">Scan another document</button>';
+  h+='<button class="reset-btn" onclick="doReset()">&#x1F4F8; Scan another bill</button>';
   h+='</div>';
 
   document.getElementById('resultsArea').innerHTML=h;
@@ -406,236 +349,48 @@ function renderResults(){
   document.getElementById('uploadArea').style.display='none';
 }
 
-function actionTile(icon,title,sub,onclick,delay){
-  return '<div class="tile action" style="animation-delay:'+delay+'" onclick="'+onclick+'">'
-    +'<div class="tile-icon">'+icon+'</div>'
-    +'<div class="tile-text"><div class="tile-value">'+esc(title)+'</div><div class="tile-sub">'+sub+'</div></div>'
-    +'</div>';
+function billRow(label,value){
+  return '<div class="bill-row"><span class="bill-label">'+label+'</span><span class="bill-value">'+value+'</span></div>';
 }
 
-// Tile detail
-function showTileDetail(idx){
-  var a=analysis||{};
-  var tiles=[];
-  if(a.due_date&&!a.amount) tiles.push({label:'Due date',value:a.due_date});
-  if(a.sender) tiles.push({label:'From',value:a.sender});
-  if(a.recipient) tiles.push({label:'To',value:a.recipient});
-  if(a.account_number) tiles.push({label:'Account',value:a.account_number});
-  if(a.reference_number) tiles.push({label:'Reference',value:a.reference_number});
-  if(a.period) tiles.push({label:'Period',value:a.period});
-  if(a.clearing_id) tiles.push({label:'Clearing ID',value:a.clearing_id});
-
-  var t=tiles[idx];
-  if(!t)return;
-
-  var h='<div style="font-size:28px;font-weight:900;color:var(--text);margin-bottom:16px;line-height:1.2">'+esc(t.value)+'</div>';
-  var related=tiles.filter(function(_,i){return i!==idx;});
-  if(a.amount){related.unshift({label:'Amount',value:(a.currency||'')+' '+a.amount});}
-  if(a.due_date&&a.amount){related.unshift({label:'Due date',value:a.due_date});}
-  if(related.length){
-    h+='<div>';
-    related.forEach(function(r){
-      h+='<div class="detail-row"><div class="detail-key">'+esc(r.label)+'</div><div class="detail-val">'+esc(r.value)+'</div></div>';
+/* --- Modals --- */
+function showSavingsDetail(){
+  var s=savingsData||{};
+  var h='<div style="font-size:32px;font-weight:900;color:var(--green);margin-bottom:8px">&#x20AA; '+fmt(s.total_annual_saving)+' / year</div>';
+  h+='<div style="color:var(--text2);margin-bottom:20px">That\'s &#x20AA;'+fmt(s.total_monthly_saving)+' every month back in your pocket.</div>';
+  if(s.savings){
+    s.savings.forEach(function(item){
+      h+='<div class="detail-row"><div class="detail-key">'+esc(item.title_he||item.title)+'</div><div class="detail-val" style="color:var(--green);font-weight:700">-&#x20AA;'+fmt(item.monthly_saving)+'/mo</div></div>';
     });
-    h+='</div>';
   }
-  openModal(t.label,h);
+  openModal('Total Savings',h);
 }
 
-/* --- Action modals --- */
-function showPayment(){
-  var a=analysis||{};
-  var h='';
-  if(a.amount){
-    h+='<div style="font-size:40px;font-weight:900;color:var(--red);margin-bottom:4px;letter-spacing:-.02em">'+(a.currency||'')+' '+esc(a.amount)+'</div>';
+function showSavingDetail(idx){
+  var s=savingsData||{};
+  var item=s.savings[idx];if(!item)return;
+  var h='<div style="font-size:28px;font-weight:900;color:var(--green);margin-bottom:4px">-&#x20AA;'+fmt(item.monthly_saving)+' / month</div>';
+  h+='<div style="color:var(--text2);margin-bottom:20px">=&#x20AA;'+fmt(item.annual_saving)+' per year</div>';
+  h+='<div class="detail-row"><div class="detail-key">How</div><div class="detail-val">'+esc(item.description)+'</div></div>';
+  h+='<div class="detail-row"><div class="detail-key">Effort</div><div class="detail-val"><span class="effort effort-'+item.effort+'">'+esc(item.effort_he||item.effort)+'</span></div></div>';
+  if(item.device){
+    h+='<div class="detail-row"><div class="detail-key">Device</div><div class="detail-val">'+esc(item.device)+' (~&#x20AA;'+item.device_cost+')</div></div>';
+    var payback=item.device_cost/item.monthly_saving;
+    h+='<div class="detail-row"><div class="detail-key">Payback</div><div class="detail-val">'+payback.toFixed(1)+' months</div></div>';
   }
-  if(a.due_date)h+='<div style="color:var(--amber);font-weight:700;font-size:14px;margin-bottom:20px">Due '+esc(a.due_date)+'</div>';
-  if(a.barcode){
-    h+='<div class="m-input-group"><div class="m-label">Payment barcode</div>';
-    h+='<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:15px;font-weight:700;font-family:monospace;word-break:break-all;letter-spacing:.04em">'+esc(a.barcode)+'</div></div>';
-  }
-  if(a.clearing_id){
-    h+='<div class="m-input-group"><div class="m-label">Clearing ID</div>';
-    h+='<div style="background:var(--surface2);padding:11px 14px;border-radius:10px;font-weight:600">'+esc(a.clearing_id)+'</div></div>';
-  }
-  if(a.account_number){
-    h+='<div class="m-input-group"><div class="m-label">Account number</div>';
-    h+='<div style="background:var(--surface2);padding:11px 14px;border-radius:10px;font-weight:600">'+esc(a.account_number)+'</div></div>';
-  }
-  var phone=a.contact_details&&(a.contact_details.phone||a.contact_details.phone_payments);
-  var website=a.contact_details&&a.contact_details.website;
-  h+='<div class="m-btn-row">';
-  if(a.barcode)h+='<button class="m-btn m-btn-primary" onclick="copyText(\''+esc(a.barcode).replace(/'/g,"\\'")+'\',this)">Copy barcode</button>';
-  if(phone)h+='<a href="tel:'+esc(phone)+'" class="m-btn m-btn-primary" style="text-decoration:none;text-align:center">Call '+esc(phone)+'</a>';
-  if(website)h+='<a href="'+(website.indexOf('http')===0?'':'https://')+esc(website)+'" target="_blank" class="m-btn m-btn-secondary" style="text-decoration:none;text-align:center">Pay online</a>';
-  h+='</div>';
-  openModal('Payment',h);
+  openModal(item.title_he||item.title,h);
 }
 
-function showCalendar(){
-  var a=analysis||{};
-  if(!a.deadline_date)return;
-  var title=a.deadline_title||a.document_type||'Document deadline';
-  var gcal='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(title)+'&dates='+a.deadline_date.replace(/-/g,'')+'%2F'+a.deadline_date.replace(/-/g,'')+'&details='+encodeURIComponent('From Saturi: '+(a.document_type||''));
-  var h='<div style="font-size:24px;font-weight:800;margin-bottom:4px">'+esc(a.due_date||a.deadline_date)+'</div>';
-  h+='<div style="color:var(--text2);margin-bottom:20px;font-size:14px">'+esc(title)+'</div>';
-  h+='<div class="m-btn-row">';
-  h+='<a href="'+gcal+'" target="_blank" class="m-btn m-btn-primary" style="text-decoration:none;text-align:center">Google Calendar</a>';
-  h+='<button class="m-btn m-btn-secondary" onclick="downloadICS()">Download .ics</button>';
-  h+='</div>';
-  openModal('Save deadline',h);
+function showSolar(){
+  var s=savingsData?.solar;if(!s)return;
+  var h='<div style="font-size:28px;font-weight:900;color:var(--blue);margin-bottom:16px">&#x2600;&#xFE0F; Solar Panel Estimate</div>';
+  h+='<div class="detail-row"><div class="detail-key">Monthly saving</div><div class="detail-val" style="font-weight:700;color:var(--green)">&#x20AA;'+fmt(s.monthly_saving)+'</div></div>';
+  h+='<div class="detail-row"><div class="detail-key">Annual saving</div><div class="detail-val" style="font-weight:700;color:var(--green)">&#x20AA;'+fmt(s.annual_saving)+'</div></div>';
+  h+='<div class="detail-row"><div class="detail-key">Est. installation</div><div class="detail-val">~&#x20AA;'+fmt(s.estimated_cost)+'</div></div>';
+  h+='<div class="detail-row"><div class="detail-key">Payback period</div><div class="detail-val">'+s.payback_years+' years</div></div>';
+  openModal('Solar Panels',h);
 }
 
-function downloadICS(){
-  var a=analysis||{};
-  if(!a.deadline_date)return;
-  var d=a.deadline_date.replace(/-/g,'');
-  var title=a.deadline_title||a.document_type||'Document deadline';
-  var ics='BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART;VALUE=DATE:'+d+'\nDTEND;VALUE=DATE:'+d+'\nSUMMARY:'+title+'\nDESCRIPTION:From Saturi\nEND:VEVENT\nEND:VCALENDAR';
-  var blob=new Blob([ics],{type:'text/calendar'});
-  var url=URL.createObjectURL(blob);
-  var link=document.createElement('a');link.href=url;link.download='deadline.ics';link.click();
-}
-
-function showReply(){
-  var a=analysis||{};
-  var addr=a.reply_address||'';
-  var email=(a.contact_details&&(a.contact_details.email||a.contact_details.EMAIL))||'';
-  var h='';
-  if(addr)h+='<div class="m-input-group"><div class="m-label">Send to</div><div class="m-address">'+esc(addr)+'</div></div>';
-  if(email)h+='<a href="mailto:'+esc(email)+'" class="m-btn m-btn-primary" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:16px">Email '+esc(email)+'</a>';
-  h+='<div class="m-input-group"><div class="m-label">Your name</div><input class="m-input" id="cpName" placeholder="Full name"/></div>';
-  h+='<div class="m-input-group"><div class="m-label">Your address</div><input class="m-input" id="cpFrom" placeholder="Your return address"/></div>';
-  h+='<div class="m-input-group"><div class="m-label">Message</div><textarea class="m-input m-textarea" id="cpMsg" placeholder="Type your reply..."></textarea></div>';
-  h+='<div class="m-btn-row"><button class="m-btn m-btn-primary" onclick="copyLetter(\''+addr.replace(/'/g,"\\'").replace(/\n/g,' ')+'\')">Copy formatted letter</button><button class="m-btn m-btn-secondary" onclick="closeModal()">Cancel</button></div>';
-  openModal('Write a reply',h);
-}
-
-function copyLetter(addr){
-  var name=(document.getElementById('cpName').value||'').trim();
-  var from=(document.getElementById('cpFrom').value||'').trim();
-  var msg=(document.getElementById('cpMsg').value||'').trim();
-  var today=new Date().toLocaleDateString('en-GB');
-  var letter=(name?name+'\n':'')+(from?from+'\n':'')+'\n'+today+'\n\nTo:\n'+addr+'\n\n'+msg+'\n\nSincerely,\n'+(name||'');
-  navigator.clipboard.writeText(letter).then(function(){
-    var btns=document.querySelectorAll('.m-btn-primary');
-    var btn=btns[btns.length-1];
-    var orig=btn.innerHTML;btn.innerHTML='&#x2705; Copied!';setTimeout(function(){btn.innerHTML=orig;},2000);
-  });
-}
-
-function showContacts(){
-  var a=analysis||{};
-  var c=a.contact_details||{};
-  var h='';
-  Object.keys(c).forEach(function(k){
-    if(!c[k])return;
-    var val=String(c[k]);
-    var label=k.replace(/_/g,' ');
-    h+='<div class="detail-row"><div class="detail-key">'+esc(label)+'</div><div class="detail-val">';
-    if(k.indexOf('phone')>=0||k.indexOf('fax')>=0)h+='<a href="tel:'+esc(val)+'" style="color:var(--accent);font-weight:600;text-decoration:none">'+esc(val)+'</a>';
-    else if(k==='email')h+='<a href="mailto:'+esc(val)+'" style="color:var(--accent);font-weight:600;text-decoration:none">'+esc(val)+'</a>';
-    else if(k==='website')h+='<a href="'+(val.indexOf('http')===0?'':'https://')+esc(val)+'" target="_blank" style="color:var(--accent);font-weight:600;text-decoration:none">'+esc(val)+'</a>';
-    else h+=esc(val);
-    h+='</div></div>';
-  });
-  openModal('Contact details',h||'<div style="color:var(--text3)">No contact details found.</div>');
-}
-
-function showSimplify(){
-  openModal('Plain language','<div style="display:flex;align-items:center;gap:10px;color:var(--text3);padding:20px 0"><span class="spinner"></span> Simplifying...</div>');
-  fetch('/ai/eli12',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:ocrText})})
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var t=d.result;var rtl=isRtl(t);
-      document.getElementById('modalBody').innerHTML='<div style="direction:'+(rtl?'rtl':'ltr')+';text-align:'+(rtl?'right':'left')+';line-height:1.8;color:var(--text)">'+t.split('\n').map(function(l){return esc(l);}).join('<br>')+'</div>'+
-        '<div class="m-btn-row"><button class="m-btn m-btn-secondary" onclick="speakText(\''+btoa(unescape(encodeURIComponent(t)))+'\')">&#x1F50A; Listen</button><button class="m-btn m-btn-secondary" onclick="copyText(\''+esc(t).replace(/'/g,"\\'")+'\',this)">Copy</button></div>';
-    })
-    .catch(function(){document.getElementById('modalBody').innerHTML='<div style="color:var(--red)">Failed. Please try again.</div>';});
-}
-
-function showTranslate(){
-  var langs=[
-    {code:'Hebrew',flag:'&#x1F1EE;&#x1F1F1;',name:'Hebrew'},
-    {code:'English',flag:'&#x1F1FA;&#x1F1F8;',name:'English'},
-    {code:'Arabic',flag:'&#x1F1F8;&#x1F1E6;',name:'Arabic'},
-    {code:'Russian',flag:'&#x1F1F7;&#x1F1FA;',name:'Russian'},
-    {code:'French',flag:'&#x1F1EB;&#x1F1F7;',name:'French'},
-    {code:'Spanish',flag:'&#x1F1EA;&#x1F1F8;',name:'Spanish'},
-    {code:'Amharic',flag:'&#x1F1EA;&#x1F1F9;',name:'Amharic'},
-  ];
-  var h='<div class="m-label" style="margin-bottom:10px">Choose language</div><div class="m-lang-grid">';
-  langs.forEach(function(l){
-    h+='<button class="m-lang-btn" onclick="doTranslate(\''+l.code+'\',this)">'+l.flag+' '+l.name+'</button>';
-  });
-  h+='</div><div id="translateResult"></div>';
-  openModal('Translate',h);
-}
-
-function doTranslate(lang,btn){
-  document.querySelectorAll('.m-lang-btn').forEach(function(b){b.classList.remove('selected');});
-  btn.classList.add('selected');
-  document.getElementById('translateResult').innerHTML='<div style="display:flex;align-items:center;gap:10px;color:var(--text3);padding:12px 0"><span class="spinner"></span> Translating...</div>';
-  fetch('/ai/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:ocrText,language:lang})})
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var t=d.result;var rtl=isRtl(t);
-      document.getElementById('translateResult').innerHTML='<div style="direction:'+(rtl?'rtl':'ltr')+';text-align:'+(rtl?'right':'left')+';line-height:1.8;color:var(--text);margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">'+t.split('\n').map(function(l){return esc(l);}).join('<br>')+'</div>'+
-        '<div class="m-btn-row"><button class="m-btn m-btn-secondary" onclick="copyText(\''+esc(t).replace(/'/g,"\\'")+'\',this)">Copy</button></div>';
-    })
-    .catch(function(){document.getElementById('translateResult').innerHTML='<div style="color:var(--red)">Translation failed.</div>';});
-}
-
-function renderMarkdown(text){
-  var rtl=isRtl(text);
-  var lines=text.split('\n');
-  var html='';var inTable=false;
-  for(var i=0;i<lines.length;i++){
-    var line=lines[i].trim();
-    // Detect markdown table rows
-    if(line.indexOf('|')===0||(/^\|.*\|$/).test(line)){
-      if(!inTable){html+='<table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0">';inTable=true;}
-      // Skip separator rows (|---|---|)
-      if(/^\|[\s\-:|]+\|$/.test(line))continue;
-      var cells=line.split('|').filter(function(c,idx,arr){return idx>0&&idx<arr.length-1;});
-      var tag=(!inTable||i<=1&&lines[i+1]&&/^\|[\s\-:|]+\|$/.test(lines[i+1].trim()))?'th':'td';
-      html+='<tr>';
-      cells.forEach(function(c){
-        var style='padding:8px 10px;border-bottom:1px solid var(--border);text-align:'+(rtl?'right':'left')+';';
-        if(tag==='th')style+='font-weight:700;background:var(--surface2);font-size:12px;';
-        html+='<'+tag+' style="'+style+'">'+esc(c.trim())+'</'+tag+'>';
-      });
-      html+='</tr>';
-    } else {
-      if(inTable){html+='</table>';inTable=false;}
-      if(line.indexOf('##')===0)html+='<div style="font-weight:700;font-size:15px;margin:14px 0 6px">'+esc(line.replace(/^#+\s*/,''))+'</div>';
-      else if(line.indexOf('#')===0)html+='<div style="font-weight:800;font-size:17px;margin:16px 0 8px">'+esc(line.replace(/^#+\s*/,''))+'</div>';
-      else if(line)html+='<div style="line-height:1.8">'+esc(line)+'</div>';
-      else html+='<br>';
-    }
-  }
-  if(inTable)html+='</table>';
-  return '<div style="direction:'+(rtl?'rtl':'ltr')+';text-align:'+(rtl?'right':'left')+';color:var(--text)">'+html+'</div>';
-}
-
-function showFullText(){
-  var h=renderMarkdown(ocrText);
-  h+='<div class="m-btn-row"><button class="m-btn m-btn-secondary" onclick="speakText(\''+btoa(unescape(encodeURIComponent(ocrText)))+'\')">&#x1F50A; Listen</button><button class="m-btn m-btn-secondary" onclick="copyText(\''+esc(ocrText).replace(/'/g,"\\'")+'\',this)">Copy</button></div>';
-  openModal('Full text',h);
-}
-
-function showProperty(){
-  var a=analysis||{};
-  var p=a.property_details||{};
-  var h='';
-  Object.keys(p).forEach(function(k){
-    if(!p[k])return;
-    h+='<div class="detail-row"><div class="detail-key">'+esc(k.replace(/_/g,' '))+'</div><div class="detail-val">'+esc(String(p[k]))+'</div></div>';
-  });
-  openModal('Property details',h||'<div style="color:var(--text3)">No property details found.</div>');
-}
-
-/* --- Modal --- */
 function openModal(title,bodyHtml){
   document.getElementById('modalTitle').textContent=title;
   document.getElementById('modalBody').innerHTML=bodyHtml;
@@ -646,32 +401,19 @@ function closeModal(e){
     document.getElementById('modalOverlay').style.display='none';
 }
 
-/* --- Utilities --- */
-function isRtl(text){var c=0;for(var i=0;i<text.length;i++){var code=text.charCodeAt(i);if(code>=1488&&code<=1514)c++;}return c>2;}
-function speakText(b64){
-  if(isSpeaking){window.speechSynthesis.cancel();isSpeaking=false;return;}
-  var text=decodeURIComponent(escape(atob(b64)));
-  var u=new SpeechSynthesisUtterance(text);u.lang=isRtl(text)?'he-IL':'en-US';u.rate=0.88;
-  u.onend=function(){isSpeaking=false;};
-  isSpeaking=true;window.speechSynthesis.speak(u);
-}
-function copyText(text,btn){
-  navigator.clipboard.writeText(text).then(function(){
-    var orig=btn.innerHTML;btn.innerHTML='&#x2705; Copied';setTimeout(function(){btn.innerHTML=orig;},1500);
-  });
-}
+/* --- Utils --- */
+function fmt(n){return Math.round(Number(n)||0).toLocaleString();}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function doReset(){
-  selFile=null;ocrText='';analysis=null;
+  selFile=null;billData=null;savingsData=null;
   document.getElementById('fileIn').value='';
   document.getElementById('filePreview').innerHTML='';
   document.getElementById('runBtn').disabled=true;
-  document.getElementById('runBtn').innerHTML='Scan document';
+  document.getElementById('runBtn').innerHTML='&#x26A1; Analyze my bill';
   document.getElementById('resultsArea').style.display='none';
   document.getElementById('resultsArea').innerHTML='';
   document.getElementById('uploadArea').style.display='block';
-  if(isSpeaking){window.speechSynthesis.cancel();isSpeaking=false;}
 }
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/static/sw.js');}
 </script>
 </body>

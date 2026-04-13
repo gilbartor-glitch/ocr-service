@@ -9,19 +9,19 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, HttpUrl
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s  %(name)s  %(message)s")
-log = logging.getLogger("ocr_service")
+log = logging.getLogger("juice")
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
 @asynccontextmanager
 async def lifespan(app):
-    log.info("Saturi ready.")
+    log.info("Juice ready.")
     if ANTHROPIC_API_KEY:
         log.info("Claude AI features enabled.")
     else:
         log.warning("ANTHROPIC_API_KEY not set — AI features disabled.")
     yield
 
-app = FastAPI(title="Saturi OCR", version="4.0.0", lifespan=lifespan)
+app = FastAPI(title="Juice — Smart Electricity", version="1.0.0", lifespan=lifespan)
 ALLOWED_ORIGINS = os.environ.get("CORS_ORIGINS", "https://ocr-service-4e7i.onrender.com,http://localhost:8000,http://localhost:3000").split(",")
 app.add_middleware(CORSMiddleware, allow_origins=ALLOWED_ORIGINS, allow_methods=["*"], allow_headers=["*"])
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
@@ -203,8 +203,8 @@ def _build(filename, text, mode):
 # ---------------------------------------------------------------------------
 @app.get("/health", tags=["meta"])
 async def health():
-    return {"status":"ok","model":"claude-vision","languages":["en","he","any"],
-            "ai": bool(ANTHROPIC_API_KEY), "version":"4.0.0"}
+    return {"status":"ok","model":"claude-vision","app":"Juice",
+            "ai": bool(ANTHROPIC_API_KEY), "version":"1.0.0"}
 
 @app.post("/ocr/upload", response_model=TextResult, tags=["ocr"])
 async def ocr_single(file: Annotated[UploadFile, File()], mode: OutputMode = Query("text")):
@@ -344,28 +344,228 @@ def _safe_parse(text: str) -> dict:
             result[key] = val.strip('"')
     return result if result else {"raw": text}
 
-ANALYZE_PROMPT = """Analyze this document image. It could be any type: bill, receipt, bank transfer, government letter, medical document, contract, etc.
+ANALYZE_PROMPT = """Analyze this Israeli electricity bill image (חשבון חשמל).
 
 Extract these fields. Return a JSON object with null for missing fields:
-- document_type: clear, user-friendly purpose e.g. "Water & Sewage Bill", "Money Transfer", "Payment Receipt", "Property Tax (Arnona)", "Medical Referral", "Court Summons", "Insurance Claim", "Salary Slip", "Bank Statement"
-- amount: main monetary amount as string e.g. "2,478.80"
-- currency: currency symbol e.g. "₪", "$"
-- due_date: due date or transaction date as written e.g. "05/04/2026"
+- document_type: "Electricity Bill"
+- amount: total payment amount as string e.g. "1,421.25"
+- currency: "₪"
+- due_date: payment deadline as written
 - deadline_date: same date in ISO format YYYY-MM-DD or null
-- deadline_title: e.g. "Payment due", "Transaction date"
-- clearing_id: clearing/payment/transaction reference number
-- account_number: account or customer number
-- reference_number: reference, invoice, or confirmation number
-- period: billing or relevant period e.g. "03-04/2026"
-- sender: organization or bank that issued this
-- recipient: recipient or account holder name
-- barcode: full barcode or payment slip number if present
-- payment_required: true if payment is needed, false if already paid or informational
-- reply_address: postal reply address or null
-- contact_details: object with phone, fax, email, website keys if found
-- property_details: object with address, block, parcel, size, type, description keys if found
+- period: billing period e.g. "21/01/2026 - 19/03/2026"
+- period_days: number of days in billing period as integer
+- sender: electricity supplier name
+- recipient: customer name
+- account_number: contract or account number
+- meter_number: electricity meter number
+- barcode: payment barcode number if visible
+- payment_required: true/false
+- tariff_type: "flat" if תעריף אחיד, "taoz" if תע״ז time-of-use, or other
+- consumption_kwh: total kWh consumed as number e.g. 2061
+- rate_per_kwh: rate in agorot per kWh as number e.g. 54.51
+- kva: KVA capacity as number e.g. 17.32
+- kva_charge: KVA charge amount in NIS as number
+- fixed_charges: total fixed charges in NIS as number
+- connection_type: "single" or "three" phase
+- breaker_amps: breaker size in amps as number
+- consumption_breakdown: if Taoz bill, object with {peak_kwh, shoulder_kwh, offpeak_kwh} else null
+- contact_details: object with phone, website keys if found
 
 Return ONLY valid JSON. No markdown."""
+
+# ---------------------------------------------------------------------------
+# Electricity Savings Calculator
+# ---------------------------------------------------------------------------
+# 2026 tariff rates (agorot per kWh, before VAT)
+TARIFFS_2026 = {
+    "flat": 54.51,
+    "taoz": {
+        "winter": {"peak": 62.88, "shoulder": 57.96, "offpeak": 54.23},
+        "transition": {"peak": 34.13, "shoulder": 29.86, "offpeak": 26.86},
+        "summer": {"peak": 145.97, "shoulder": 46.55, "offpeak": 41.82},
+    }
+}
+SUPPLIER_DISCOUNTS = {
+    "cellcom": {"name": "Cellcom Energy", "discount": 0.08},
+    "bezeq": {"name": "Bezeq Energy", "discount": 0.06},
+    "hot": {"name": "Hot Energy", "discount": 0.07},
+    "partner": {"name": "Partner Power", "discount": 0.07},
+    "pazgas": {"name": "Pazgas Electric", "discount": 0.06},
+    "electra": {"name": "Super Power (Electra)", "discount": 0.08},
+    "amisragas": {"name": "Amisragas Electric", "discount": 0.06},
+}
+VAT_RATE = 0.18
+
+def calculate_savings(bill_data: dict) -> dict:
+    """Calculate potential savings from tariff switch, supplier switch, and smart scheduling."""
+    consumption = bill_data.get("consumption_kwh") or 0
+    period_days = bill_data.get("period_days") or 60
+    rate = bill_data.get("rate_per_kwh") or 54.51
+    amount = 0
+    try:
+        amount = float(str(bill_data.get("amount", "0")).replace(",", ""))
+    except (ValueError, TypeError):
+        amount = consumption * rate / 100 * (1 + VAT_RATE)
+
+    tariff = bill_data.get("tariff_type") or "flat"
+    monthly_kwh = consumption / period_days * 30 if period_days > 0 else consumption / 2
+    monthly_cost = amount / period_days * 30 if period_days > 0 else amount / 2
+
+    savings = []
+    total_monthly_saving = 0
+
+    # 1. Supplier switch savings
+    best_supplier = max(SUPPLIER_DISCOUNTS.items(), key=lambda x: x[1]["discount"])
+    supplier_saving = monthly_cost * best_supplier[1]["discount"]
+    savings.append({
+        "type": "supplier_switch",
+        "title": "Switch supplier",
+        "title_he": "החלפת ספק",
+        "description": f"Switch to {best_supplier[1]['name']} for {best_supplier[1]['discount']:.0%} discount",
+        "monthly_saving": round(supplier_saving, 0),
+        "annual_saving": round(supplier_saving * 12, 0),
+        "effort": "easy",
+        "effort_he": "קל",
+    })
+    total_monthly_saving += supplier_saving
+
+    # 2. Taoz optimization (if currently on flat tariff)
+    if tariff == "flat" and monthly_kwh > 500:
+        # Estimate: if 30% of usage can shift to off-peak (water heater, dryer, dishwasher at night)
+        shiftable_pct = 0.30
+        shiftable_kwh = monthly_kwh * shiftable_pct
+        # Average saving: difference between flat rate and off-peak rate (weighted across seasons)
+        avg_offpeak = (TARIFFS_2026["taoz"]["winter"]["offpeak"] +
+                       TARIFFS_2026["taoz"]["transition"]["offpeak"] +
+                       TARIFFS_2026["taoz"]["summer"]["offpeak"]) / 3
+        avg_peak = (TARIFFS_2026["taoz"]["winter"]["peak"] +
+                    TARIFFS_2026["taoz"]["transition"]["peak"] +
+                    TARIFFS_2026["taoz"]["summer"]["peak"]) / 3
+        # But remaining 70% may cost more during peak/shoulder
+        remaining_kwh = monthly_kwh * 0.7
+        # Assume 40% of remaining is peak, 60% shoulder
+        remaining_cost = remaining_kwh * (0.4 * avg_peak + 0.6 * ((avg_peak + avg_offpeak) / 2)) / 100
+        shifted_cost = shiftable_kwh * avg_offpeak / 100
+        taoz_total = remaining_cost + shifted_cost
+        flat_total = monthly_kwh * TARIFFS_2026["flat"] / 100
+        taoz_saving = flat_total - taoz_total
+        if taoz_saving > 0:
+            savings.append({
+                "type": "taoz_switch",
+                "title": "Switch to Taoz tariff",
+                "title_he": "מעבר לתעריף תע״ז",
+                "description": f"Shift {shiftable_pct:.0%} of usage to off-peak hours",
+                "monthly_saving": round(taoz_saving, 0),
+                "annual_saving": round(taoz_saving * 12, 0),
+                "effort": "medium",
+                "effort_he": "בינוני",
+            })
+            total_monthly_saving += taoz_saving
+
+    # 3. Smart scheduling (water heater, AC)
+    # Water heater: ~15% of residential bill, shift to night = ~40% saving on that portion
+    water_heater_saving = monthly_cost * 0.15 * 0.40
+    savings.append({
+        "type": "smart_scheduling",
+        "title": "Smart water heater",
+        "title_he": "דוד חשמל חכם",
+        "description": "Heat water only during off-peak hours (Switcher device)",
+        "monthly_saving": round(water_heater_saving, 0),
+        "annual_saving": round(water_heater_saving * 12, 0),
+        "effort": "easy",
+        "effort_he": "קל",
+        "device": "Switcher",
+        "device_cost": 150,
+    })
+    total_monthly_saving += water_heater_saving
+
+    # 4. AC optimization (summer months)
+    if monthly_kwh > 800:
+        ac_saving = monthly_cost * 0.10  # ~10% from smart AC scheduling
+        savings.append({
+            "type": "ac_optimization",
+            "title": "Smart AC scheduling",
+            "title_he": "ניהול מזגן חכם",
+            "description": "Pre-cool before peak hours, auto-adjust temperature",
+            "monthly_saving": round(ac_saving, 0),
+            "annual_saving": round(ac_saving * 12, 0),
+            "effort": "medium",
+            "effort_he": "בינוני",
+            "device": "Sensibo",
+            "device_cost": 250,
+        })
+        total_monthly_saving += ac_saving
+
+    # 5. Solar recommendation (for high consumers)
+    solar = None
+    if monthly_kwh > 800:
+        solar_saving = monthly_cost * 0.65  # Solar can offset ~65% of bill
+        solar = {
+            "monthly_saving": round(solar_saving, 0),
+            "annual_saving": round(solar_saving * 12, 0),
+            "estimated_cost": 30000,
+            "payback_years": round(30000 / (solar_saving * 12), 1) if solar_saving > 0 else 0,
+        }
+
+    return {
+        "current_bill": {
+            "monthly_cost": round(monthly_cost, 0),
+            "annual_cost": round(monthly_cost * 12, 0),
+            "monthly_kwh": round(monthly_kwh, 0),
+            "tariff_type": tariff,
+            "rate_per_kwh": rate,
+            "supplier": bill_data.get("sender") or "IEC",
+        },
+        "savings": savings,
+        "total_monthly_saving": round(total_monthly_saving, 0),
+        "total_annual_saving": round(total_monthly_saving * 12, 0),
+        "saving_percentage": round(total_monthly_saving / monthly_cost * 100, 0) if monthly_cost > 0 else 0,
+        "optimized_monthly_cost": round(monthly_cost - total_monthly_saving, 0),
+        "solar": solar,
+    }
+
+@app.post("/electricity/analyze", response_model=AIResponse, tags=["electricity"])
+async def analyze_electricity(file: Annotated[UploadFile, File()]):
+    """Analyze an electricity bill and return savings recommendations."""
+    data = await file.read()
+    if len(data) > MAX_BYTES: raise HTTPException(413, "File too large.")
+    detected_type = _detect_type(data)
+
+    if detected_type == "application/pdf":
+        try:
+            import fitz
+            doc = fitz.open(stream=data, filetype="pdf")
+            page_images = []
+            for page in doc:
+                pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), colorspace=fitz.csRGB)
+                page_images.append(pix.tobytes("jpeg"))
+            data = page_images[0] if page_images else data
+            detected_type = "image/jpeg"
+        except Exception as e:
+            raise HTTPException(500, f"PDF rendering failed: {e}")
+
+    b64 = base64.b64encode(data).decode()
+    content_block = {"type": "image", "source": {"type": "base64", "media_type": detected_type, "data": b64}}
+
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={"x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json"},
+                json={"model": "claude-sonnet-4-6", "max_tokens": 2048,
+                      "messages": [{"role": "user", "content": [content_block, {"type": "text", "text": ANALYZE_PROMPT}]}]}
+            )
+        if resp.status_code != 200:
+            raise HTTPException(502, f"API error: {resp.status_code}")
+        raw = resp.json()["content"][0]["text"].strip()
+    except httpx.TimeoutException:
+        raise HTTPException(504, "Analysis timed out")
+
+    clean = raw.replace('```json', '').replace('```', '').strip()
+    bill_data = _safe_parse(clean)
+    savings = calculate_savings(bill_data)
+    result = {"bill": bill_data, "savings": savings}
+    return AIResponse(result=json.dumps(result))
 
 @app.post("/ai/analyze-vision", response_model=AIResponse, tags=["ai"])
 async def analyze_vision(file: Annotated[UploadFile, File()]):

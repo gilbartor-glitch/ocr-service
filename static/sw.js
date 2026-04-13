@@ -1,4 +1,4 @@
-const CACHE = 'saturi-v3';
+const CACHE = 'juice-v1';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -13,7 +13,6 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-  // Network first, cache fallback
   e.respondWith(
     fetch(e.request).then(r => {
       if (r.ok) {
