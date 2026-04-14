@@ -486,22 +486,23 @@ def calculate_savings(bill_data: dict) -> dict:
     })
     total_monthly_saving += water_heater_saving
 
-    # 4. AC optimization (summer months)
-    if monthly_kwh > 800:
-        ac_saving = monthly_cost * 0.10  # ~10% from smart AC scheduling
-        savings.append({
-            "type": "ac_optimization",
-            "title": "Smart AC scheduling",
-            "title_he": "ניהול מזגן חכם",
-            "description": "Pre-cool before peak hours, auto-adjust temperature",
-            "monthly_saving": round(ac_saving, 0),
-            "annual_saving": round(ac_saving * 12, 0),
-            "effort": "medium",
-            "effort_he": "בינוני",
-            "device": "Sensibo",
-            "device_cost": 250,
-        })
-        total_monthly_saving += ac_saving
+    # 4. AC optimization — show for every residential bill (Israeli homes overwhelmingly have AC)
+    # Heavy consumers (>800 kWh) get 10%, lighter consumers 7% (less AC-dominant)
+    ac_pct = 0.10 if monthly_kwh > 800 else 0.07
+    ac_saving = monthly_cost * ac_pct
+    savings.append({
+        "type": "ac_optimization",
+        "title": "Smart AC scheduling",
+        "title_he": "ניהול מזגן חכם",
+        "description": "Pre-cool before peak hours, auto-adjust temperature, turn off when nobody's home",
+        "monthly_saving": round(ac_saving, 0),
+        "annual_saving": round(ac_saving * 12, 0),
+        "effort": "medium",
+        "effort_he": "בינוני",
+        "device": "Sensibo",
+        "device_cost": 500,
+    })
+    total_monthly_saving += ac_saving
 
     # 5. Solar recommendation (for high consumers)
     solar = None
@@ -595,6 +596,22 @@ def calculate_savings_lite(bill_data: dict) -> dict:
         "device_cost": 150,
     })
     total_monthly_saving += water_heater_saving
+
+    # 3. Smart AC — conservative estimate (assumes AC present, which is true for ~95% of Israeli homes)
+    ac_saving = monthly_cost * 0.08
+    savings.append({
+        "type": "ac_optimization",
+        "title": "Smart AC scheduling",
+        "title_he": "ניהול מזגן חכם",
+        "description": "Assuming you have AC — pre-cool before peak, auto-adjust, turn off when you're out (Sensibo)",
+        "monthly_saving": round(ac_saving, 0),
+        "annual_saving": round(ac_saving * 12, 0),
+        "effort": "medium",
+        "effort_he": "בינוני",
+        "device": "Sensibo",
+        "device_cost": 500,
+    })
+    total_monthly_saving += ac_saving
 
     return {
         "lite_mode": True,
