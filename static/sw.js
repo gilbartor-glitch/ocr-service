@@ -1,4 +1,4 @@
-const CACHE = 'juice-v4-he-desc';
+const CACHE = 'juice-v5-digital-energy';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
