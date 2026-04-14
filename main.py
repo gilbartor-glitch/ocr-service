@@ -544,6 +544,42 @@ async def analyze_electricity(file: Annotated[UploadFile, File()]):
         except Exception as e:
             raise HTTPException(500, f"PDF rendering failed: {e}")
 
+    # HEIC -> JPEG
+    if detected_type == "image/heic":
+        try:
+            import subprocess, tempfile
+            with tempfile.NamedTemporaryFile(suffix='.heic', delete=False) as f:
+                f.write(data); tmp_in = f.name
+            tmp_out = tmp_in.replace('.heic', '.jpg')
+            subprocess.run(['convert', tmp_in, tmp_out], check=True, timeout=10)
+            data = open(tmp_out, 'rb').read()
+            detected_type = "image/jpeg"
+            for p in [tmp_in, tmp_out]:
+                try: os.unlink(p)
+                except: pass
+        except Exception as e:
+            log.warning(f"HEIC conversion failed: {e}")
+
+    # Normalize image: fix EXIF orientation, resize if too large (Claude limit ~5MB)
+    if detected_type and detected_type.startswith("image/"):
+        try:
+            from PIL import Image, ImageOps
+            import io as _io
+            pil_img = Image.open(_io.BytesIO(data))
+            pil_img = ImageOps.exif_transpose(pil_img)
+            if pil_img.mode not in ("RGB", "L"):
+                pil_img = pil_img.convert("RGB")
+            max_dim = 2000
+            if max(pil_img.size) > max_dim:
+                ratio = max_dim / max(pil_img.size)
+                pil_img = pil_img.resize((int(pil_img.size[0]*ratio), int(pil_img.size[1]*ratio)), Image.LANCZOS)
+            buf = _io.BytesIO()
+            pil_img.save(buf, format="JPEG", quality=85)
+            data = buf.getvalue()
+            detected_type = "image/jpeg"
+        except Exception as e:
+            log.warning(f"Image normalization failed: {e}")
+
     b64 = base64.b64encode(data).decode()
     content_block = {"type": "image", "source": {"type": "base64", "media_type": detected_type, "data": b64}}
 
@@ -556,13 +592,19 @@ async def analyze_electricity(file: Annotated[UploadFile, File()]):
                       "messages": [{"role": "user", "content": [content_block, {"type": "text", "text": ANALYZE_PROMPT}]}]}
             )
         if resp.status_code != 200:
-            raise HTTPException(502, f"API error: {resp.status_code}")
+            log.warning(f"Claude Vision {resp.status_code}: {resp.text[:300]}")
+            raise HTTPException(502, f"Vision API returned {resp.status_code}. Make sure the image is a clear photo of an Israeli electricity bill (חשבון חשמל).")
         raw = resp.json()["content"][0]["text"].strip()
     except httpx.TimeoutException:
         raise HTTPException(504, "Analysis timed out")
 
     clean = raw.replace('```json', '').replace('```', '').strip()
     bill_data = _safe_parse(clean)
+
+    # Validate this is actually an electricity bill
+    if not bill_data.get("consumption_kwh") and not bill_data.get("rate_per_kwh") and not bill_data.get("meter_number"):
+        raise HTTPException(422, "This doesn't look like an electricity bill. Please upload an Israeli חשבון חשמל that shows kWh consumption, the meter number, and tariff details — not a credit card statement, payment confirmation, or other document.")
+
     savings = calculate_savings(bill_data)
     result = {"bill": bill_data, "savings": savings}
     return AIResponse(result=json.dumps(result))
