@@ -344,32 +344,39 @@ def _safe_parse(text: str) -> dict:
             result[key] = val.strip('"')
     return result if result else {"raw": text}
 
-ANALYZE_PROMPT = """Analyze this Israeli electricity bill image (חשבון חשמל).
+ANALYZE_PROMPT = """Analyze this image — it relates to an Israeli electricity charge.
 
-Extract these fields. Return a JSON object with null for missing fields:
-- document_type: "Electricity Bill"
-- amount: total payment amount as string e.g. "1,421.25"
+The image can be one of TWO formats:
+  A) A full electricity bill (חשבון חשמל) from IEC or another supplier — contains kWh consumption, period, tariff, meter number, etc.
+  B) A charge notice / credit-card line item / payment confirmation from a private electricity supplier (Cellcom Energy, Bezeq Energy, Hot Energy, Partner Power, Pazgas Electric, Electra, Amisragas, etc.) — typically only shows the supplier name, an amount, and a date. Most fields will be null.
+
+Extract whatever fields are present. Return a JSON object with null for missing fields:
+- document_type: "Electricity Bill" for format A, "Electricity Charge Notice" for format B
+- is_charge_notice: true if format B (no consumption data visible), false if format A
+- amount: payment amount as string e.g. "1,421.25" or "285.11"
 - currency: "₪"
-- due_date: payment deadline as written
+- due_date: payment deadline / charge date as written
 - deadline_date: same date in ISO format YYYY-MM-DD or null
-- period: billing period e.g. "21/01/2026 - 19/03/2026"
-- period_days: number of days in billing period as integer
-- sender: electricity supplier name
-- recipient: customer name
-- account_number: contract or account number
-- meter_number: electricity meter number
-- barcode: payment barcode number if visible
+- period: billing period e.g. "21/01/2026 - 19/03/2026" or null
+- period_days: number of days in billing period as integer or null
+- sender: electricity supplier name (e.g. "חברת החשמל", "Bezeq Energy", "Cellcom Energy"). For credit-card notices, extract the merchant name shown.
+- recipient: customer name or null
+- account_number: contract or account number or null
+- meter_number: electricity meter number or null
+- barcode: payment barcode number if visible or null
 - payment_required: true/false
-- tariff_type: "flat" if תעריף אחיד, "taoz" if תע״ז time-of-use, or other
-- consumption_kwh: total kWh consumed as number e.g. 2061
-- rate_per_kwh: rate in agorot per kWh as number e.g. 54.51
-- kva: KVA capacity as number e.g. 17.32
-- kva_charge: KVA charge amount in NIS as number
-- fixed_charges: total fixed charges in NIS as number
-- connection_type: "single" or "three" phase
-- breaker_amps: breaker size in amps as number
+- tariff_type: "flat" if תעריף אחיד, "taoz" if תע״ז time-of-use, or null
+- consumption_kwh: total kWh consumed as number, or null if not shown
+- rate_per_kwh: rate in agorot per kWh as number, or null
+- kva: KVA capacity as number or null
+- kva_charge: KVA charge amount in NIS as number or null
+- fixed_charges: total fixed charges in NIS as number or null
+- connection_type: "single" or "three" phase, or null
+- breaker_amps: breaker size in amps as number or null
 - consumption_breakdown: if Taoz bill, object with {peak_kwh, shoulder_kwh, offpeak_kwh} else null
-- contact_details: object with phone, website keys if found
+- contact_details: object with phone, website keys if found, else null
+
+CRITICAL: If the image is clearly NOT related to electricity at all (random photo, generic receipt with no electricity supplier, etc.), set sender to null AND amount to null so the system can reject it.
 
 Return ONLY valid JSON. No markdown."""
 
@@ -524,6 +531,91 @@ def calculate_savings(bill_data: dict) -> dict:
         "solar": solar,
     }
 
+def _detect_supplier(sender: str | None) -> tuple[str | None, float]:
+    """Return (supplier_key, current_discount). Defaults to (None, 0) = customer is on IEC."""
+    if not sender:
+        return None, 0.0
+    s = sender.lower()
+    # IEC variants
+    if any(t in s for t in ["חברת החשמל", "חברת חשמל", "iec", "israel electric"]):
+        return "iec", 0.0
+    for key, info in SUPPLIER_DISCOUNTS.items():
+        if key in s or info["name"].lower() in s:
+            return key, info["discount"]
+    return None, 0.0
+
+def calculate_savings_lite(bill_data: dict) -> dict:
+    """Charge-only analysis: we have an amount and a supplier, but no kWh/tariff details."""
+    try:
+        amount = float(str(bill_data.get("amount", "0")).replace(",", ""))
+    except (ValueError, TypeError):
+        amount = 0.0
+    # Charge notices from suppliers are typically monthly debits
+    monthly_cost = amount
+
+    current_key, current_discount = _detect_supplier(bill_data.get("sender"))
+
+    savings = []
+    total_monthly_saving = 0.0
+
+    # 1. Better-supplier switch (only if we know who they're with and a better deal exists)
+    candidates = {k: v for k, v in SUPPLIER_DISCOUNTS.items() if k != current_key}
+    best = max(candidates.items(), key=lambda x: x[1]["discount"])
+    if best[1]["discount"] > current_discount:
+        # Reverse-engineer IEC-equivalent price, then re-discount with the better supplier
+        iec_equiv = monthly_cost / (1 - current_discount) if current_discount < 1 else monthly_cost
+        new_cost = iec_equiv * (1 - best[1]["discount"])
+        supplier_saving = monthly_cost - new_cost
+        if supplier_saving > 0:
+            current_label = "IEC" if current_key in (None, "iec") else SUPPLIER_DISCOUNTS[current_key]["name"]
+            savings.append({
+                "type": "supplier_switch",
+                "title": f"Switch to {best[1]['name']}",
+                "title_he": f"מעבר ל{best[1]['name']}",
+                "description": f"{best[1]['discount']:.0%} off IEC vs. your current {current_discount:.0%} ({current_label})",
+                "monthly_saving": round(supplier_saving, 0),
+                "annual_saving": round(supplier_saving * 12, 0),
+                "effort": "easy",
+                "effort_he": "קל",
+            })
+            total_monthly_saving += supplier_saving
+
+    # 2. Smart water heater — % of bill estimate (works without kWh)
+    water_heater_saving = monthly_cost * 0.06  # ~15% of bill * 40% saving
+    savings.append({
+        "type": "smart_scheduling",
+        "title": "Smart water heater",
+        "title_he": "דוד חשמל חכם",
+        "description": "Heat water only during off-peak hours (Switcher device)",
+        "monthly_saving": round(water_heater_saving, 0),
+        "annual_saving": round(water_heater_saving * 12, 0),
+        "effort": "easy",
+        "effort_he": "קל",
+        "device": "Switcher",
+        "device_cost": 150,
+    })
+    total_monthly_saving += water_heater_saving
+
+    return {
+        "lite_mode": True,
+        "prompt_for_kwh": True,
+        "current_bill": {
+            "monthly_cost": round(monthly_cost, 0),
+            "annual_cost": round(monthly_cost * 12, 0),
+            "monthly_kwh": None,
+            "tariff_type": None,
+            "rate_per_kwh": None,
+            "supplier": bill_data.get("sender") or "Unknown",
+            "current_discount": current_discount,
+        },
+        "savings": savings,
+        "total_monthly_saving": round(total_monthly_saving, 0),
+        "total_annual_saving": round(total_monthly_saving * 12, 0),
+        "saving_percentage": round(total_monthly_saving / monthly_cost * 100, 0) if monthly_cost > 0 else 0,
+        "optimized_monthly_cost": round(monthly_cost - total_monthly_saving, 0),
+        "solar": None,
+    }
+
 @app.post("/electricity/analyze", response_model=AIResponse, tags=["electricity"])
 async def analyze_electricity(file: Annotated[UploadFile, File()]):
     """Analyze an electricity bill and return savings recommendations."""
@@ -601,11 +693,17 @@ async def analyze_electricity(file: Annotated[UploadFile, File()]):
     clean = raw.replace('```json', '').replace('```', '').strip()
     bill_data = _safe_parse(clean)
 
-    # Validate this is actually an electricity bill
-    if not bill_data.get("consumption_kwh") and not bill_data.get("rate_per_kwh") and not bill_data.get("meter_number"):
-        raise HTTPException(422, "This doesn't look like an electricity bill. Please upload an Israeli חשבון חשמל that shows kWh consumption, the meter number, and tariff details — not a credit card statement, payment confirmation, or other document.")
+    has_consumption = bool(bill_data.get("consumption_kwh") or bill_data.get("rate_per_kwh") or bill_data.get("meter_number"))
+    has_charge = bool(bill_data.get("amount") and bill_data.get("sender"))
 
-    savings = calculate_savings(bill_data)
+    if has_consumption:
+        savings = calculate_savings(bill_data)
+    elif has_charge:
+        # Lite mode: only a charge notice (e.g. credit-card line from Bezeq Energy)
+        savings = calculate_savings_lite(bill_data)
+    else:
+        raise HTTPException(422, "This doesn't look like an electricity document. Please upload either a detailed electricity bill (חשבון חשמל) or a charge notice from your supplier showing the supplier name and amount.")
+
     result = {"bill": bill_data, "savings": savings}
     return AIResponse(result=json.dumps(result))
 

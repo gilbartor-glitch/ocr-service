@@ -275,11 +275,24 @@ function renderResults(){
   // Title
   h+='<div class="doc-title">&#x26A1; Bill Analysis</div>';
 
+  // Lite-mode banner: charge notice without consumption details
+  if(s.lite_mode){
+    var supplierName=esc(s.current_bill?.supplier||'your supplier');
+    h+='<div style="background:#fef3c7;border:1.5px solid #fcd34d;border-radius:14px;padding:16px;margin-bottom:16px;font-size:14px;color:#78350f;line-height:1.5">';
+    h+='<div style="font-weight:800;margin-bottom:4px">&#x1F4A1; We can only see the charge</div>';
+    h+='To unlock full optimization (Taoz tariff, smart-device savings tuned to your usage, solar ROI) — open the <b>'+supplierName+'</b> app, download your latest detailed bill (חשבונית מפורטת / קריאת מונה), and re-upload it here.';
+    h+='</div>';
+  }
+
   // Current bill hero
   h+='<div class="bill-hero">';
   h+='<div class="savings-label">Your monthly cost</div>';
   h+='<div class="savings-value">&#x20AA; '+fmt(s.current_bill?.monthly_cost||0)+'</div>';
-  h+='<div class="savings-sub">'+fmt(s.current_bill?.monthly_kwh||0)+' kWh/month &middot; '+(s.current_bill?.tariff_type==='flat'?'Flat tariff':'Taoz tariff')+'</div>';
+  if(s.lite_mode){
+    h+='<div class="savings-sub">monthly charge from '+esc(s.current_bill?.supplier||'supplier')+'</div>';
+  } else {
+    h+='<div class="savings-sub">'+fmt(s.current_bill?.monthly_kwh||0)+' kWh/month &middot; '+(s.current_bill?.tariff_type==='flat'?'Flat tariff':'Taoz tariff')+'</div>';
+  }
   h+='</div>';
 
   // Savings hero
