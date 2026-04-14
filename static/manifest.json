@@ -4,8 +4,8 @@
   "description": "Scan your electricity bill, see how much you can save",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fffbeb",
-  "theme_color": "#f59e0b",
+  "background_color": "#004977",
+  "theme_color": "#004977",
   "orientation": "portrait-primary",
   "icons": [
     {"src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},

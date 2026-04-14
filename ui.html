@@ -1,153 +1,210 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Juice — חשמל חכם</title>
-<meta name="theme-color" content="#f59e0b"/>
+<title>Juice — Smart Electricity</title>
+<meta name="theme-color" content="#004977"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Juice"/>
-<link rel="apple-touch-icon" href="/static/icon-192.png?v=3"/>
-<link rel="apple-touch-icon" sizes="180x180" href="/static/icon-180.png?v=3"/>
+<link rel="apple-touch-icon" href="/static/icon-192.png?v=4"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/static/icon-180.png?v=4"/>
 <link rel="manifest" href="/static/manifest.json"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#fffbeb;--surface:#fff;--surface2:#fef3c7;
-  --border:#fde68a;--border2:#fbbf24;
-  --text:#111;--text2:#555;--text3:#92400e;
-  --accent:#f59e0b;--accent-dark:#d97706;--accent-light:#fef3c7;
-  --green:#16a34a;--green-light:#dcfce7;
-  --red:#dc2626;--blue:#2563eb;--purple:#7c3aed;--teal:#0d9488;
-  --r:20px;--r2:14px;
-  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-  --shadow-lg:0 10px 30px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.04);
+  /* Capital One palette */
+  --navy:#004977;
+  --navy-dark:#003457;
+  --navy-light:#0070a8;
+  --red:#D03027;
+  --red-dark:#a51e17;
+  --green:#008140;
+  --green-light:#e6f4ec;
+  --bg:#f4f5f7;
+  --surface:#ffffff;
+  --surface-alt:#fafbfc;
+  --border:#d4d9e0;
+  --border-strong:#b5bdc9;
+  --text:#121212;
+  --text2:#3b4452;
+  --text3:#6b7585;
+  --blue:#0070a8;
+  --amber:#b06b00;
+  --amber-bg:#fff4df;
+  --r:12px;
+  --r2:8px;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.04);
+  --shadow-md:0 4px 8px rgba(16,24,40,.06),0 2px 4px rgba(16,24,40,.04);
+  --shadow-lg:0 12px 24px rgba(16,24,40,.10),0 4px 8px rgba(16,24,40,.04);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:15px;min-height:100vh;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-size:15px;min-height:100vh;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 
-nav{display:flex;align-items:center;padding:0 24px;height:56px;background:rgba(255,251,235,.9);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
-.logo{font-size:22px;font-weight:900;letter-spacing:-.04em;color:var(--text);display:flex;align-items:center;gap:8px}
-.logo-icon{font-size:26px}
-.logo span{color:var(--accent)}
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:14px}
-.nav-status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);font-weight:500}
-.nav-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);transition:.3s}
-.nav-dot.on{background:var(--green);box-shadow:0 0 6px var(--green)}
+/* NAV */
+nav{display:flex;align-items:center;padding:0 20px;height:60px;background:var(--navy);position:sticky;top:0;z-index:100;box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 2px 8px rgba(0,73,119,.15)}
+.brand{display:flex;align-items:center;gap:10px;color:#fff}
+.brand-mark{width:30px;height:30px;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px}
+.brand-name{font-size:19px;font-weight:800;letter-spacing:-.01em;color:#fff}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nav-status{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.85);font-weight:500}
+.nav-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4);transition:.25s}
+.nav-dot.on{background:#4ade80;box-shadow:0 0 0 3px rgba(74,222,128,.22)}
 
-.container{max-width:700px;margin:0 auto;padding:32px 20px 80px}
+.container{max-width:720px;margin:0 auto;padding:28px 18px 80px}
 
-/* UPLOAD */
-.upload-zone{background:var(--surface);border:2px dashed var(--border2);border-radius:var(--r);padding:48px 24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;box-shadow:var(--shadow)}
-.upload-zone:hover,.upload-zone.over{border-color:var(--accent);background:var(--accent-light);border-style:solid}
+/* HEADER */
+.page-head{margin-bottom:22px}
+.page-kicker{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--navy);margin-bottom:6px}
+.page-title{font-size:28px;font-weight:800;letter-spacing:-.02em;color:var(--text);line-height:1.15;margin-bottom:6px}
+.page-sub{font-size:15px;color:var(--text3);line-height:1.45}
+
+/* UPLOAD CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow)}
+.upload-card{padding:22px}
+.upload-zone{position:relative;border:1.5px dashed var(--border-strong);border-radius:var(--r2);padding:28px 16px;text-align:center;transition:all .18s;background:var(--surface-alt)}
+.upload-zone.over{border-color:var(--navy);background:#eef5fb}
 .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.upload-icon{font-size:56px;margin-bottom:16px}
-.upload-title{font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px}
-.upload-hint{font-size:14px;color:var(--text3)}
-.upload-formats{margin-top:16px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
-.fmt-tag{font-size:11px;font-weight:600;color:var(--text3);background:var(--surface2);padding:4px 10px;border-radius:8px}
+.upload-icon{width:52px;height:52px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 12px}
+.upload-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px}
+.upload-hint{font-size:13px;color:var(--text3);line-height:1.45}
+.upload-formats{margin-top:14px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.fmt-tag{font-size:11px;font-weight:600;color:var(--text3);background:#eef0f3;padding:4px 9px;border-radius:4px;letter-spacing:.02em}
 
-.file-preview{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:14px 18px;margin-top:16px;box-shadow:var(--shadow)}
-.file-preview-icon{font-size:26px}
-.file-preview-name{font-size:14px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.file-preview-size{font-size:12px;color:var(--text3);font-weight:500}
-.file-preview-remove{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:14px;color:var(--text3);display:flex;align-items:center;justify-content:center;transition:.15s}
+.upload-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.action-btn{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 12px;border:1px solid var(--border);border-radius:var(--r2);background:var(--surface);font-family:inherit;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;transition:.15s;-webkit-user-select:none;user-select:none}
+.action-btn:hover{border-color:var(--navy);background:#f5f9fc}
+.action-btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.action-btn svg{width:18px;height:18px;flex-shrink:0}
+
+.file-preview{display:flex;align-items:center;gap:12px;background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--r2);padding:12px 14px;margin-top:14px}
+.file-preview-icon{width:36px;height:36px;border-radius:6px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.file-preview-meta{flex:1;min-width:0}
+.file-preview-name{font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-preview-size{font-size:12px;color:var(--text3);font-weight:500;margin-top:1px}
+.file-preview-remove{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--text3);display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
 .file-preview-remove:hover{background:var(--red);color:#fff;border-color:var(--red)}
 
-.process-btn{width:100%;padding:16px;background:var(--accent);color:#fff;border:none;border-radius:var(--r2);font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;margin-top:16px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(245,158,11,.3)}
-.process-btn:hover{background:var(--accent-dark);transform:translateY(-1px)}
-.process-btn:disabled{background:var(--border);color:var(--text3);cursor:not-allowed;transform:none;box-shadow:none}
+.process-btn{width:100%;padding:15px 16px;background:var(--red);color:#fff;border:none;border-radius:var(--r2);font-family:inherit;font-size:15px;font-weight:700;letter-spacing:.01em;cursor:pointer;margin-top:14px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 2px 6px rgba(208,48,39,.18)}
+.process-btn:hover{background:var(--red-dark);box-shadow:0 4px 10px rgba(208,48,39,.25)}
+.process-btn:disabled{background:#c9cdd4;color:#fff;cursor:not-allowed;box-shadow:none;opacity:.8}
 
-.steps-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:28px;margin-top:28px;box-shadow:var(--shadow)}
-.steps-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:16px}
+/* STEPS */
+.steps-card{padding:22px 24px;margin-top:20px}
+.steps-title{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--navy);margin-bottom:12px}
 .step-row{display:flex;align-items:center;gap:12px;padding:12px 0;font-size:14px;font-weight:500;color:var(--text3)}
-.step-row+.step-row{border-top:1px solid var(--surface2)}
+.step-row+.step-row{border-top:1px solid var(--border)}
 .step-row.active{color:var(--text)}
 .step-row.done{color:var(--green)}
 .step-icon{width:24px;text-align:center;font-size:16px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+.spinner-dark{border-color:var(--border);border-top-color:var(--navy)}
 
 /* RESULTS */
-.results{margin-top:28px}
-.doc-title{font-size:24px;font-weight:900;color:var(--text);margin-bottom:20px;line-height:1.2;letter-spacing:-.02em}
+.results{margin-top:22px}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--navy);margin:22px 0 10px}
+.doc-title{font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--text);margin-bottom:14px}
 
-/* BILL SUMMARY */
-.bill-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
-.bill-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--surface2);font-size:14px}
+/* HERO CARDS */
+.hero{border-radius:var(--r);padding:24px;color:#fff;position:relative;overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow-md)}
+.bill-hero{background:linear-gradient(135deg,var(--navy),var(--navy-dark))}
+.savings-hero{background:linear-gradient(135deg,var(--green),#00652f);cursor:pointer;transition:.2s}
+.savings-hero:hover{box-shadow:var(--shadow-lg);transform:translateY(-1px)}
+.hero::after{content:'';position:absolute;top:-30%;right:-15%;width:240px;height:240px;background:rgba(255,255,255,.06);border-radius:50%}
+.hero-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.85;margin-bottom:8px;position:relative;z-index:1}
+.hero-value{font-size:36px;font-weight:800;letter-spacing:-.02em;line-height:1;position:relative;z-index:1}
+.hero-value .cur{font-size:22px;font-weight:600;margin-right:4px;opacity:.9}
+.hero-sub{font-size:13px;opacity:.88;margin-top:8px;font-weight:500;position:relative;z-index:1}
+.hero-chev{position:absolute;right:20px;top:50%;transform:translateY(-50%);opacity:.6;z-index:1}
+
+/* LITE BANNER */
+.lite-banner{background:var(--amber-bg);border:1px solid #f3d383;border-radius:var(--r2);padding:14px 16px;margin-bottom:14px;font-size:13.5px;color:var(--amber);line-height:1.5;display:flex;gap:12px}
+.lite-banner-icon{flex-shrink:0;font-size:18px;line-height:1}
+.lite-banner-title{font-weight:700;color:#5a3a00;margin-bottom:4px;font-size:14px}
+
+/* BILL CARD (details) */
+.bill-card{padding:6px 20px;margin-bottom:4px}
+.bill-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--border);font-size:14px}
 .bill-row:last-child{border-bottom:none}
 .bill-label{color:var(--text3);font-weight:500}
-.bill-value{font-weight:700;color:var(--text)}
+.bill-value{font-weight:600;color:var(--text);text-align:right;word-break:break-word;max-width:60%}
 
-/* SAVINGS HERO */
-.savings-hero{border-radius:var(--r);padding:28px;color:#fff;position:relative;overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-lg);background:linear-gradient(135deg,#16a34a,#15803d);cursor:pointer}
-.savings-hero::after{content:'';position:absolute;top:-30%;left:-10%;width:200px;height:200px;background:rgba(255,255,255,.08);border-radius:50%}
-.savings-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-bottom:8px}
-.savings-value{font-size:36px;font-weight:900;line-height:1.1;position:relative;z-index:1}
-.savings-sub{font-size:14px;opacity:.8;margin-top:6px;font-weight:500;position:relative;z-index:1}
+/* SAVING ITEMS */
+.saving-item{padding:16px 18px;margin-bottom:8px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.15s}
+.saving-item:hover{border-color:var(--navy);background:var(--surface-alt)}
+.saving-icon{font-size:22px;width:44px;height:44px;border-radius:10px;background:var(--green-light);color:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.saving-text{flex:1;min-width:0}
+.saving-title{font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:2px}
+.saving-desc{font-size:12.5px;color:var(--text3);line-height:1.4}
+.saving-desc .effort{margin-right:4px}
+.saving-amount{text-align:right;flex-shrink:0}
+.saving-nis{font-size:17px;font-weight:800;color:var(--green);letter-spacing:-.01em}
+.saving-period{font-size:11px;color:var(--text3);margin-top:1px;font-weight:500}
 
-/* CURRENT BILL HERO */
-.bill-hero{border-radius:var(--r);padding:28px;color:#fff;position:relative;overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-lg);background:linear-gradient(135deg,#dc2626,#b91c1c)}
-.bill-hero::after{content:'';position:absolute;top:-30%;right:-10%;width:200px;height:200px;background:rgba(255,255,255,.08);border-radius:50%}
+.effort{display:inline-flex;padding:2px 7px;border-radius:4px;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.effort-easy{background:var(--green-light);color:var(--green)}
+.effort-medium{background:#fff4df;color:var(--amber)}
 
-/* SAVINGS ITEMS */
-.saving-item{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.15s;box-shadow:var(--shadow)}
-.saving-item:hover{border-color:var(--green);background:var(--green-light);box-shadow:var(--shadow-lg)}
-.saving-icon{font-size:28px;width:48px;height:48px;border-radius:14px;background:var(--green-light);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.saving-text{flex:1}
-.saving-title{font-size:15px;font-weight:700;margin-bottom:2px}
-.saving-desc{font-size:12px;color:var(--text3)}
-.saving-amount{text-align:left;flex-shrink:0}
-.saving-nis{font-size:18px;font-weight:900;color:var(--green)}
-.saving-period{font-size:11px;color:var(--text3)}
+/* OPTIMIZED CARD */
+.optimized{padding:20px 22px;display:flex;justify-content:space-between;align-items:center;border-left:4px solid var(--green)}
+.opt-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:4px}
+.opt-value{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.opt-from{text-align:right}
+.opt-from-label{font-size:11px;color:var(--text3);font-weight:500}
+.opt-from-value{font-size:16px;font-weight:700;color:var(--text3);text-decoration:line-through;margin-top:2px}
 
-/* EFFORT BADGE */
-.effort{display:inline-flex;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
-.effort-easy{background:#dcfce7;color:#16a34a}
-.effort-medium{background:#fef3c7;color:#d97706}
+/* SOLAR */
+.solar-card{background:linear-gradient(135deg,var(--blue),var(--navy));border-radius:var(--r);padding:22px;color:#fff;margin-top:14px;box-shadow:var(--shadow-md);cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.solar-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-lg)}
+.solar-card::after{content:'';position:absolute;top:-40%;left:-10%;width:220px;height:220px;background:radial-gradient(circle,rgba(255,255,255,.15),transparent 70%);border-radius:50%}
 
-/* SOLAR CARD */
-.solar-card{background:linear-gradient(135deg,#2563eb,#1d4ed8);border-radius:var(--r);padding:24px;color:#fff;margin-top:16px;box-shadow:var(--shadow-lg);cursor:pointer}
-
-.section-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:24px 0 12px}
-
-.reset-btn{width:100%;padding:14px;background:var(--surface);color:var(--text2);border:1.5px solid var(--border);border-radius:var(--r2);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:20px;transition:.15s}
-.reset-btn:hover{border-color:var(--text3);color:var(--text)}
+.reset-btn{width:100%;padding:13px;background:var(--surface);color:var(--navy);border:1px solid var(--border);border-radius:var(--r2);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:18px;transition:.15s}
+.reset-btn:hover{border-color:var(--navy);background:#f5f9fc}
 
 /* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .15s ease}
+.modal-overlay{position:fixed;inset:0;background:rgba(18,18,18,.45);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .15s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.modal{background:var(--surface);border-radius:24px 24px 0 0;width:100%;max-width:560px;max-height:85vh;overflow-y:auto;padding:8px 24px 28px;animation:slideUp .25s ease}
-.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:8px auto 16px}
-.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-.modal-title{font-size:18px;font-weight:800}
-.modal-close{width:32px;height:32px;border-radius:50%;background:var(--surface2);border:none;color:var(--text2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:.15s}
+.modal{background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:560px;max-height:85vh;overflow-y:auto;padding:6px 22px 24px;animation:slideUp .25s ease}
+.modal-handle{width:36px;height:4px;background:var(--border-strong);border-radius:2px;margin:8px auto 14px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.modal-title{font-size:17px;font-weight:800;letter-spacing:-.01em}
+.modal-close{width:32px;height:32px;border-radius:50%;background:var(--bg);border:none;color:var(--text2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:.15s}
 .modal-close:hover{background:var(--border)}
-.modal-body{font-size:14px;line-height:1.7;color:var(--text2)}
-.detail-row{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--surface2);font-size:14px}
+.modal-body{font-size:14px;line-height:1.65;color:var(--text2)}
+.detail-row{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px}
 .detail-row:last-child{border-bottom:none}
-.detail-key{font-weight:700;color:var(--text3);min-width:100px;flex-shrink:0;font-size:12px}
+.detail-key{font-weight:600;color:var(--text3);min-width:110px;flex-shrink:0;font-size:12.5px}
 .detail-val{color:var(--text);line-height:1.5;font-weight:500}
 
-@keyframes tileIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes tileIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ERROR */
+.error-box{background:#fef2f2;border:1px solid #fecaca;border-radius:var(--r2);padding:16px 18px;color:var(--red-dark);font-size:14px;margin-top:16px;line-height:1.5}
+.error-title{font-weight:700;margin-bottom:4px;color:var(--red)}
 
 @media(max-width:520px){
   .container{padding:20px 14px 60px}
-  .savings-value{font-size:28px}
+  .hero-value{font-size:32px}
+  .page-title{font-size:24px}
 }
 </style>
 </head>
 <body>
-<div id="splash" style="position:fixed;inset:0;z-index:9999;background:#fffbeb;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
-  <img src="/static/juice-logo.png" alt="Juice" style="height:48px">
-  <div style="font-size:14px;color:#92400e;font-weight:500">Smart Electricity</div>
-  <div style="width:24px;height:24px;border:3px solid #fde68a;border-top-color:#f59e0b;border-radius:50%;animation:spin .6s linear infinite"></div>
+<div id="splash" style="position:fixed;inset:0;z-index:9999;background:#004977;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px">
+  <div style="width:56px;height:56px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:30px">&#x26A1;</div>
+  <div style="font-size:22px;color:#fff;font-weight:800;letter-spacing:-.01em">Juice</div>
+  <div style="width:22px;height:22px;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite"></div>
 </div>
-<script>window.addEventListener('load',function(){document.getElementById('splash').style.display='none';});</script>
+<script>window.addEventListener('load',function(){setTimeout(function(){document.getElementById('splash').style.display='none';},200);});</script>
+
 <nav>
-  <img src="/static/juice-logo.png" alt="Juice" style="height:32px">
+  <div class="brand">
+    <div class="brand-mark">&#x26A1;</div>
+    <div class="brand-name">Juice</div>
+  </div>
   <div class="nav-right">
     <div class="nav-status"><span class="nav-dot" id="dot"></span><span id="sl">Connecting</span></div>
   </div>
@@ -156,21 +213,39 @@ nav{display:flex;align-items:center;padding:0 24px;height:56px;background:rgba(2
 <div class="container">
   <!-- UPLOAD -->
   <div id="uploadArea">
-    <div style="text-align:center;margin-bottom:24px">
-      <div style="font-size:24px;font-weight:900;margin-bottom:6px">Scan your electricity bill &#x1F50D;</div>
-      <div style="font-size:15px;color:var(--text3)">Upload your bill and see how much you can save</div>
+    <div class="page-head">
+      <div class="page-kicker">Smart electricity</div>
+      <h1 class="page-title">Scan your bill. See what you're overpaying.</h1>
+      <div class="page-sub">Upload an electricity bill or a charge notice from any Israeli supplier — we'll tell you exactly how much you can save and how.</div>
     </div>
-    <div class="upload-zone" id="dz" ondragover="dzOver(event)" ondragleave="dzLeave()" ondrop="dzDrop(event)">
-      <input type="file" id="fileIn" accept="image/*,.heic,.heif,.pdf,application/pdf" capture="environment" onchange="fileChange(event)"/>
-      <div class="upload-icon">&#x1F4F8;</div>
-      <div class="upload-title">Take a photo or upload your bill</div>
-      <div class="upload-hint">PDF or photo of your electricity bill</div>
-      <div class="upload-formats">
-        <span class="fmt-tag">PDF</span><span class="fmt-tag">JPEG</span><span class="fmt-tag">PNG</span><span class="fmt-tag">HEIC</span>
+
+    <div class="card upload-card">
+      <div class="upload-zone" id="dz" ondragover="dzOver(event)" ondragleave="dzLeave()" ondrop="dzDrop(event)">
+        <input type="file" id="fileIn" accept="image/*,.heic,.heif,.pdf,application/pdf" onchange="fileChange(event)"/>
+        <div class="upload-icon">&#x2B06;</div>
+        <div class="upload-title">Upload your electricity bill</div>
+        <div class="upload-hint">Tap to choose a photo or file<br>or drag &amp; drop here</div>
+        <div class="upload-formats">
+          <span class="fmt-tag">PDF</span><span class="fmt-tag">JPEG</span><span class="fmt-tag">PNG</span><span class="fmt-tag">HEIC</span>
+        </div>
       </div>
+
+      <div class="upload-actions">
+        <label class="action-btn">
+          <input type="file" accept="image/*" capture="environment" onchange="fileChange(event)"/>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Take photo
+        </label>
+        <label class="action-btn">
+          <input type="file" accept="image/*,.heic,.heif,.pdf,application/pdf" onchange="fileChange(event)"/>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Choose file
+        </label>
+      </div>
+
+      <div id="filePreview"></div>
+      <button class="process-btn" id="runBtn" onclick="doRun()" disabled>&#x26A1; Analyze my bill</button>
     </div>
-    <div id="filePreview"></div>
-    <button class="process-btn" id="runBtn" onclick="doRun()" disabled>&#x26A1; Analyze my bill</button>
   </div>
 
   <!-- PROCESSING -->
@@ -198,7 +273,10 @@ var selFile=null, billData=null, savingsData=null;
 fetch('/health').then(function(r){if(r.ok){document.getElementById('dot').className='nav-dot on';document.getElementById('sl').textContent='Online';}}).catch(function(){});
 
 /* --- Upload --- */
-function fileChange(e){selFile=e.target.files[0]||null;renderPreview();}
+function fileChange(e){
+  var f=e.target.files&&e.target.files[0];
+  if(f){selFile=f;renderPreview();}
+}
 function dzOver(e){e.preventDefault();document.getElementById('dz').classList.add('over');}
 function dzLeave(){document.getElementById('dz').classList.remove('over');}
 function dzDrop(e){
@@ -210,10 +288,14 @@ function renderPreview(){
   var el=document.getElementById('filePreview');
   if(!selFile){el.innerHTML='';document.getElementById('runBtn').disabled=true;return;}
   var size=selFile.size>1024*1024?(selFile.size/1024/1024).toFixed(1)+' MB':(selFile.size/1024).toFixed(0)+' KB';
-  el.innerHTML='<div class="file-preview"><div class="file-preview-icon">&#x1F4C4;</div><div class="file-preview-name">'+esc(selFile.name)+'</div><div class="file-preview-size">'+size+'</div><button class="file-preview-remove" onclick="removeFile()">&#x2715;</button></div>';
+  el.innerHTML='<div class="file-preview"><div class="file-preview-icon">&#x1F4C4;</div><div class="file-preview-meta"><div class="file-preview-name">'+esc(selFile.name)+'</div><div class="file-preview-size">'+size+'</div></div><button class="file-preview-remove" onclick="removeFile()">&#x2715;</button></div>';
   document.getElementById('runBtn').disabled=false;
 }
-function removeFile(){selFile=null;document.getElementById('fileIn').value='';renderPreview();}
+function removeFile(){
+  selFile=null;
+  document.querySelectorAll('input[type=file]').forEach(function(i){i.value='';});
+  renderPreview();
+}
 
 /* --- Process --- */
 function doRun(){
@@ -225,7 +307,7 @@ function doRun(){
   runAsync().catch(function(e){
     document.getElementById('stepsArea').style.display='none';
     document.getElementById('resultsArea').style.display='block';
-    document.getElementById('resultsArea').innerHTML='<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:14px;padding:20px;color:#b91c1c;font-size:14px;margin-top:24px">'+esc(e.message)+'</div>';
+    document.getElementById('resultsArea').innerHTML='<div class="error-box"><div class="error-title">Couldn\'t process this file</div>'+esc(e.message)+'</div>';
   }).finally(function(){btn.disabled=false;btn.innerHTML='&#x26A1; Analyze my bill';});
 }
 
@@ -250,11 +332,11 @@ async function runAsync(){
 }
 
 function showSteps(){
-  var h='<div class="steps-card">';
+  var h='<div class="card steps-card">';
   h+='<div class="steps-title">Analyzing your bill</div>';
-  h+='<div class="step-row waiting" id="s1"><span class="step-icon">&#x1F4D6;</span> Reading electricity bill...</div>';
-  h+='<div class="step-row waiting" id="s2"><span class="step-icon">&#x1F9E0;</span> Extracting consumption data...</div>';
-  h+='<div class="step-row waiting" id="s3"><span class="step-icon">&#x1F4B0;</span> Calculating savings...</div>';
+  h+='<div class="step-row waiting" id="s1"><span class="step-icon">&#x1F4D6;</span> Reading document</div>';
+  h+='<div class="step-row waiting" id="s2"><span class="step-icon">&#x1F9E0;</span> Extracting consumption data</div>';
+  h+='<div class="step-row waiting" id="s3"><span class="step-icon">&#x1F4B0;</span> Calculating savings</div>';
   h+='</div>';
   document.getElementById('stepsArea').innerHTML=h;
   document.getElementById('stepsArea').style.display='block';
@@ -262,7 +344,7 @@ function showSteps(){
 function setStep(n,s){
   var el=document.getElementById('s'+n);if(!el)return;
   el.className='step-row '+s;
-  if(s==='active')el.querySelector('.step-icon').innerHTML='<span class="spinner"></span>';
+  if(s==='active')el.querySelector('.step-icon').innerHTML='<span class="spinner spinner-dark"></span>';
   if(s==='done')el.querySelector('.step-icon').innerHTML='&#x2705;';
 }
 
@@ -272,41 +354,41 @@ function renderResults(){
   var s=savingsData||{};
   var h='<div class="results" style="animation:tileIn .4s ease">';
 
-  // Title
-  h+='<div class="doc-title">&#x26A1; Bill Analysis</div>';
+  h+='<div class="doc-title">&#x26A1; Your bill analysis</div>';
 
-  // Lite-mode banner: charge notice without consumption details
+  // Lite-mode banner
   if(s.lite_mode){
-    var supplierName=esc(s.current_bill?.supplier||'your supplier');
-    h+='<div style="background:#fef3c7;border:1.5px solid #fcd34d;border-radius:14px;padding:16px;margin-bottom:16px;font-size:14px;color:#78350f;line-height:1.5">';
-    h+='<div style="font-weight:800;margin-bottom:4px">&#x1F4A1; We can only see the charge</div>';
-    h+='To unlock full optimization (Taoz tariff, smart-device savings tuned to your usage, solar ROI) — open the <b>'+supplierName+'</b> app, download your latest detailed bill (חשבונית מפורטת / קריאת מונה), and re-upload it here.';
+    var supplierName=esc(s.current_bill&&s.current_bill.supplier||'your supplier');
+    h+='<div class="lite-banner">';
+    h+='<div class="lite-banner-icon">&#x1F4A1;</div>';
+    h+='<div><div class="lite-banner-title">We can only see the charge</div>';
+    h+='To unlock full optimization (Taoz tariff, smart-device savings tuned to your usage, solar ROI) — open the <b>'+supplierName+'</b> app, download your latest detailed bill, and re-upload it here.</div>';
     h+='</div>';
   }
 
   // Current bill hero
-  h+='<div class="bill-hero">';
-  h+='<div class="savings-label">Your monthly cost</div>';
-  h+='<div class="savings-value">&#x20AA; '+fmt(s.current_bill?.monthly_cost||0)+'</div>';
+  h+='<div class="hero bill-hero">';
+  h+='<div class="hero-label">Current monthly cost</div>';
+  h+='<div class="hero-value"><span class="cur">&#x20AA;</span>'+fmt(s.current_bill&&s.current_bill.monthly_cost||0)+'</div>';
   if(s.lite_mode){
-    h+='<div class="savings-sub">monthly charge from '+esc(s.current_bill?.supplier||'supplier')+'</div>';
+    h+='<div class="hero-sub">Monthly charge from '+esc(s.current_bill&&s.current_bill.supplier||'supplier')+'</div>';
   } else {
-    h+='<div class="savings-sub">'+fmt(s.current_bill?.monthly_kwh||0)+' kWh/month &middot; '+(s.current_bill?.tariff_type==='flat'?'Flat tariff':'Taoz tariff')+'</div>';
+    h+='<div class="hero-sub">'+fmt(s.current_bill&&s.current_bill.monthly_kwh||0)+' kWh/month &middot; '+(s.current_bill&&s.current_bill.tariff_type==='flat'?'Flat tariff':'Taoz tariff')+'</div>';
   }
   h+='</div>';
 
   // Savings hero
   if(s.total_monthly_saving>0){
-    h+='<div class="savings-hero" onclick="showSavingsDetail()">';
-    h+='<div class="savings-label">You can save</div>';
-    h+='<div class="savings-value">&#x20AA; '+fmt(s.total_monthly_saving)+' / month</div>';
-    h+='<div class="savings-sub">&#x20AA; '+fmt(s.total_annual_saving)+' per year &middot; '+s.saving_percentage+'% reduction</div>';
+    h+='<div class="hero savings-hero" onclick="showSavingsDetail()">';
+    h+='<div class="hero-label">You can save</div>';
+    h+='<div class="hero-value"><span class="cur">&#x20AA;</span>'+fmt(s.total_monthly_saving)+'<span style="font-size:16px;font-weight:500;opacity:.85">&nbsp;/ mo</span></div>';
+    h+='<div class="hero-sub">&#x20AA;'+fmt(s.total_annual_saving)+' per year &middot; '+s.saving_percentage+'% reduction &middot; Tap for breakdown</div>';
     h+='</div>';
   }
 
-  // Bill details card
-  h+='<div class="section-label">Bill Details</div>';
-  h+='<div class="bill-card">';
+  // Bill details
+  h+='<div class="section-label">Bill details</div>';
+  h+='<div class="card bill-card">';
   if(b.recipient) h+=billRow('Customer',b.recipient);
   if(b.period) h+=billRow('Period',b.period);
   if(b.consumption_kwh) h+=billRow('Consumption',fmt(b.consumption_kwh)+' kWh');
@@ -315,46 +397,47 @@ function renderResults(){
   if(b.kva) h+=billRow('Connection',b.kva+' KVA'+(b.connection_type==='three'?' (3-phase)':' (1-phase)'));
   if(b.sender) h+=billRow('Supplier',b.sender);
   if(b.meter_number) h+=billRow('Meter',b.meter_number);
+  if(b.amount) h+=billRow('Amount','&#x20AA; '+esc(b.amount));
   h+='</div>';
 
   // Savings recommendations
   if(s.savings&&s.savings.length){
-    h+='<div class="section-label">Savings Recommendations</div>';
+    h+='<div class="section-label">Savings recommendations</div>';
     var icons={'supplier_switch':'&#x1F504;','taoz_switch':'&#x23F0;','smart_scheduling':'&#x1F4A7;','ac_optimization':'&#x2744;&#xFE0F;'};
     s.savings.forEach(function(item,i){
       var icon=icons[item.type]||'&#x1F4B0;';
-      h+='<div class="saving-item" style="animation:tileIn .3s ease '+(i*0.08)+'s both" onclick="showSavingDetail('+i+')">';
+      h+='<div class="card saving-item" style="animation:tileIn .3s ease '+(i*0.06)+'s both" onclick="showSavingDetail('+i+')">';
       h+='<div class="saving-icon">'+icon+'</div>';
       h+='<div class="saving-text">';
-      h+='<div class="saving-title">'+esc(item.title_he||item.title)+'</div>';
-      h+='<div class="saving-desc">'+esc(item.description)+' <span class="effort effort-'+item.effort+'">'+esc(item.effort_he||item.effort)+'</span></div>';
+      h+='<div class="saving-title">'+esc(item.title)+'</div>';
+      h+='<div class="saving-desc"><span class="effort effort-'+item.effort+'">'+esc(item.effort)+'</span> '+esc(item.description)+'</div>';
       h+='</div>';
-      h+='<div class="saving-amount"><div class="saving-nis">-&#x20AA;'+fmt(item.monthly_saving)+'</div><div class="saving-period">per month</div></div>';
+      h+='<div class="saving-amount"><div class="saving-nis">&#x20AA;'+fmt(item.monthly_saving)+'</div><div class="saving-period">per month</div></div>';
       h+='</div>';
     });
   }
 
   // Optimized bill
-  if(s.optimized_monthly_cost){
-    h+='<div class="section-label">After Optimization</div>';
-    h+='<div style="background:var(--green-light);border:1.5px solid #86efac;border-radius:var(--r);padding:24px;display:flex;justify-content:space-between;align-items:center">';
-    h+='<div><div style="font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em">New monthly cost</div>';
-    h+='<div style="font-size:28px;font-weight:900;color:var(--green)">&#x20AA; '+fmt(s.optimized_monthly_cost)+'</div></div>';
-    h+='<div style="text-align:left"><div style="font-size:12px;color:var(--text3)">vs. current</div>';
-    h+='<div style="font-size:20px;font-weight:800;color:var(--red);text-decoration:line-through">&#x20AA; '+fmt(s.current_bill?.monthly_cost||0)+'</div></div>';
+  if(s.optimized_monthly_cost!==undefined&&s.total_monthly_saving>0){
+    h+='<div class="section-label">After optimization</div>';
+    h+='<div class="card optimized">';
+    h+='<div><div class="opt-label">Your new monthly cost</div>';
+    h+='<div class="opt-value">&#x20AA; '+fmt(s.optimized_monthly_cost)+'</div></div>';
+    h+='<div class="opt-from"><div class="opt-from-label">vs. current</div>';
+    h+='<div class="opt-from-value">&#x20AA; '+fmt(s.current_bill&&s.current_bill.monthly_cost||0)+'</div></div>';
     h+='</div>';
   }
 
   // Solar card
   if(s.solar){
     h+='<div class="solar-card" onclick="showSolar()">';
-    h+='<div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-bottom:8px">&#x2600;&#xFE0F; Solar Panels</div>';
-    h+='<div style="font-size:24px;font-weight:900">Save &#x20AA;'+fmt(s.solar.monthly_saving)+'/month</div>';
-    h+='<div style="font-size:14px;opacity:.8;margin-top:4px">ROI in '+s.solar.payback_years+' years &middot; Tap for details</div>';
+    h+='<div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.8;margin-bottom:6px;position:relative;z-index:1">&#x2600;&#xFE0F; Solar panels</div>';
+    h+='<div style="font-size:24px;font-weight:800;letter-spacing:-.02em;position:relative;z-index:1">Save &#x20AA;'+fmt(s.solar.monthly_saving)+' / month</div>';
+    h+='<div style="font-size:13px;opacity:.88;margin-top:4px;position:relative;z-index:1">ROI in '+s.solar.payback_years+' years &middot; Tap for details</div>';
     h+='</div>';
   }
 
-  h+='<button class="reset-btn" onclick="doReset()">&#x1F4F8; Scan another bill</button>';
+  h+='<button class="reset-btn" onclick="doReset()">Scan another bill</button>';
   h+='</div>';
 
   document.getElementById('resultsArea').innerHTML=h;
@@ -369,39 +452,39 @@ function billRow(label,value){
 /* --- Modals --- */
 function showSavingsDetail(){
   var s=savingsData||{};
-  var h='<div style="font-size:32px;font-weight:900;color:var(--green);margin-bottom:8px">&#x20AA; '+fmt(s.total_annual_saving)+' / year</div>';
-  h+='<div style="color:var(--text2);margin-bottom:20px">That\'s &#x20AA;'+fmt(s.total_monthly_saving)+' every month back in your pocket.</div>';
+  var h='<div style="font-size:30px;font-weight:800;color:var(--green);margin-bottom:6px;letter-spacing:-.02em">&#x20AA; '+fmt(s.total_annual_saving)+' / year</div>';
+  h+='<div style="color:var(--text2);margin-bottom:18px;font-size:14px">That\'s &#x20AA;'+fmt(s.total_monthly_saving)+' every month back in your pocket.</div>';
   if(s.savings){
     s.savings.forEach(function(item){
-      h+='<div class="detail-row"><div class="detail-key">'+esc(item.title_he||item.title)+'</div><div class="detail-val" style="color:var(--green);font-weight:700">-&#x20AA;'+fmt(item.monthly_saving)+'/mo</div></div>';
+      h+='<div class="detail-row"><div class="detail-key">'+esc(item.title)+'</div><div class="detail-val" style="color:var(--green);font-weight:700">&#x20AA;'+fmt(item.monthly_saving)+'/mo</div></div>';
     });
   }
-  openModal('Total Savings',h);
+  openModal('Total savings',h);
 }
 
 function showSavingDetail(idx){
   var s=savingsData||{};
   var item=s.savings[idx];if(!item)return;
-  var h='<div style="font-size:28px;font-weight:900;color:var(--green);margin-bottom:4px">-&#x20AA;'+fmt(item.monthly_saving)+' / month</div>';
-  h+='<div style="color:var(--text2);margin-bottom:20px">=&#x20AA;'+fmt(item.annual_saving)+' per year</div>';
+  var h='<div style="font-size:26px;font-weight:800;color:var(--green);margin-bottom:4px;letter-spacing:-.02em">&#x20AA;'+fmt(item.monthly_saving)+' / month</div>';
+  h+='<div style="color:var(--text2);margin-bottom:16px;font-size:14px">&#x20AA;'+fmt(item.annual_saving)+' per year</div>';
   h+='<div class="detail-row"><div class="detail-key">How</div><div class="detail-val">'+esc(item.description)+'</div></div>';
-  h+='<div class="detail-row"><div class="detail-key">Effort</div><div class="detail-val"><span class="effort effort-'+item.effort+'">'+esc(item.effort_he||item.effort)+'</span></div></div>';
+  h+='<div class="detail-row"><div class="detail-key">Effort</div><div class="detail-val"><span class="effort effort-'+item.effort+'">'+esc(item.effort)+'</span></div></div>';
   if(item.device){
     h+='<div class="detail-row"><div class="detail-key">Device</div><div class="detail-val">'+esc(item.device)+' (~&#x20AA;'+item.device_cost+')</div></div>';
     var payback=item.device_cost/item.monthly_saving;
     h+='<div class="detail-row"><div class="detail-key">Payback</div><div class="detail-val">'+payback.toFixed(1)+' months</div></div>';
   }
-  openModal(item.title_he||item.title,h);
+  openModal(item.title,h);
 }
 
 function showSolar(){
-  var s=savingsData?.solar;if(!s)return;
-  var h='<div style="font-size:28px;font-weight:900;color:var(--blue);margin-bottom:16px">&#x2600;&#xFE0F; Solar Panel Estimate</div>';
+  var s=savingsData&&savingsData.solar;if(!s)return;
+  var h='<div style="font-size:26px;font-weight:800;color:var(--navy);margin-bottom:14px;letter-spacing:-.02em">&#x2600;&#xFE0F; Solar panel estimate</div>';
   h+='<div class="detail-row"><div class="detail-key">Monthly saving</div><div class="detail-val" style="font-weight:700;color:var(--green)">&#x20AA;'+fmt(s.monthly_saving)+'</div></div>';
   h+='<div class="detail-row"><div class="detail-key">Annual saving</div><div class="detail-val" style="font-weight:700;color:var(--green)">&#x20AA;'+fmt(s.annual_saving)+'</div></div>';
   h+='<div class="detail-row"><div class="detail-key">Est. installation</div><div class="detail-val">~&#x20AA;'+fmt(s.estimated_cost)+'</div></div>';
   h+='<div class="detail-row"><div class="detail-key">Payback period</div><div class="detail-val">'+s.payback_years+' years</div></div>';
-  openModal('Solar Panels',h);
+  openModal('Solar panels',h);
 }
 
 function openModal(title,bodyHtml){
@@ -419,7 +502,7 @@ function fmt(n){return Math.round(Number(n)||0).toLocaleString();}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function doReset(){
   selFile=null;billData=null;savingsData=null;
-  document.getElementById('fileIn').value='';
+  document.querySelectorAll('input[type=file]').forEach(function(i){i.value='';});
   document.getElementById('filePreview').innerHTML='';
   document.getElementById('runBtn').disabled=true;
   document.getElementById('runBtn').innerHTML='&#x26A1; Analyze my bill';
