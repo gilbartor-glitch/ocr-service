@@ -608,12 +608,13 @@ function renderResults(){
     s.savings.forEach(function(item,i){
       var icon=icons[item.type]||'&#x1F4B0;';
       var title=LANG==='he'&&item.title_he?item.title_he:item.title;
+      var desc=LANG==='he'&&item.description_he?item.description_he:item.description;
       var effortLabel=LANG==='he'?(item.effort_he||t('effort'+(item.effort==='easy'?'Easy':'Medium'))):(item.effort||'');
       h+='<div class="card saving-item" style="animation:tileIn .3s ease '+(i*0.06)+'s both" onclick="showSavingDetail('+i+')">';
       h+='<div class="saving-icon">'+icon+'</div>';
       h+='<div class="saving-text">';
       h+='<div class="saving-title">'+esc(title)+'</div>';
-      h+='<div class="saving-desc"><span class="effort effort-'+item.effort+'">'+esc(effortLabel)+'</span> '+esc(item.description)+'</div>';
+      h+='<div class="saving-desc"><span class="effort effort-'+item.effort+'">'+esc(effortLabel)+'</span> '+esc(desc)+'</div>';
       h+='</div>';
       h+='<div class="saving-amount"><div class="saving-nis">&#x20AA;'+fmt(item.monthly_saving)+'</div><div class="saving-period">'+t('perMonth')+'</div></div>';
       h+='</div>';
@@ -670,10 +671,11 @@ function showSavingDetail(idx){
   var s=savingsData||{};
   var item=s.savings[idx];if(!item)return;
   var itemTitle=LANG==='he'&&item.title_he?item.title_he:item.title;
+  var itemDesc=LANG==='he'&&item.description_he?item.description_he:item.description;
   var effortLabel=LANG==='he'?(item.effort_he||t('effort'+(item.effort==='easy'?'Easy':'Medium'))):(item.effort||'');
   var h='<div style="font-size:26px;font-weight:800;color:var(--green);margin-bottom:4px;letter-spacing:-.02em">&#x20AA;'+fmt(item.monthly_saving)+' '+t('perMo')+'</div>';
   h+='<div style="color:var(--text2);margin-bottom:16px;font-size:14px">&#x20AA;'+fmt(item.annual_saving)+' '+t('perYear')+'</div>';
-  h+='<div class="detail-row"><div class="detail-key">'+t('how')+'</div><div class="detail-val">'+esc(item.description)+'</div></div>';
+  h+='<div class="detail-row"><div class="detail-key">'+t('how')+'</div><div class="detail-val">'+esc(itemDesc)+'</div></div>';
   h+='<div class="detail-row"><div class="detail-key">'+t('effort')+'</div><div class="detail-val"><span class="effort effort-'+item.effort+'">'+esc(effortLabel)+'</span></div></div>';
   if(item.device){
     h+='<div class="detail-row"><div class="detail-key">'+t('device')+'</div><div class="detail-val">'+esc(item.device)+' (~&#x20AA;'+item.device_cost+')</div></div>';

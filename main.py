@@ -429,6 +429,7 @@ def calculate_savings(bill_data: dict) -> dict:
         "title": "Switch supplier",
         "title_he": "החלפת ספק",
         "description": f"Switch to {best_supplier[1]['name']} for {best_supplier[1]['discount']:.0%} discount",
+        "description_he": f"מעבר ל-{best_supplier[1]['name']} לקבלת הנחה של {best_supplier[1]['discount']:.0%}",
         "monthly_saving": round(supplier_saving, 0),
         "annual_saving": round(supplier_saving * 12, 0),
         "effort": "easy",
@@ -462,6 +463,7 @@ def calculate_savings(bill_data: dict) -> dict:
                 "title": "Switch to Taoz tariff",
                 "title_he": "מעבר לתעריף תע״ז",
                 "description": f"Shift {shiftable_pct:.0%} of usage to off-peak hours",
+                "description_he": f"העברת {shiftable_pct:.0%} מהצריכה לשעות שפל",
                 "monthly_saving": round(taoz_saving, 0),
                 "annual_saving": round(taoz_saving * 12, 0),
                 "effort": "medium",
@@ -477,6 +479,7 @@ def calculate_savings(bill_data: dict) -> dict:
         "title": "Smart water heater",
         "title_he": "דוד חשמל חכם",
         "description": "Heat water only during off-peak hours (Switcher device)",
+        "description_he": "חימום מים רק בשעות שפל (באמצעות Switcher)",
         "monthly_saving": round(water_heater_saving, 0),
         "annual_saving": round(water_heater_saving * 12, 0),
         "effort": "easy",
@@ -495,6 +498,7 @@ def calculate_savings(bill_data: dict) -> dict:
         "title": "Smart AC scheduling",
         "title_he": "ניהול מזגן חכם",
         "description": "Pre-cool before peak hours, auto-adjust temperature, turn off when nobody's home",
+        "description_he": "קירור מקדים לפני שעות פסגה, כוונון טמפרטורה אוטומטי וכיבוי כשאין אף אחד בבית",
         "monthly_saving": round(ac_saving, 0),
         "annual_saving": round(ac_saving * 12, 0),
         "effort": "medium",
@@ -568,12 +572,14 @@ def calculate_savings_lite(bill_data: dict) -> dict:
         new_cost = iec_equiv * (1 - best[1]["discount"])
         supplier_saving = monthly_cost - new_cost
         if supplier_saving > 0:
-            current_label = "IEC" if current_key in (None, "iec") else SUPPLIER_DISCOUNTS[current_key]["name"]
+            current_label_en = "IEC" if current_key in (None, "iec") else SUPPLIER_DISCOUNTS[current_key]["name"]
+            current_label_he = "חברת החשמל" if current_key in (None, "iec") else SUPPLIER_DISCOUNTS[current_key]["name"]
             savings.append({
                 "type": "supplier_switch",
                 "title": f"Switch to {best[1]['name']}",
-                "title_he": f"מעבר ל{best[1]['name']}",
-                "description": f"{best[1]['discount']:.0%} off IEC vs. your current {current_discount:.0%} ({current_label})",
+                "title_he": f"מעבר ל-{best[1]['name']}",
+                "description": f"{best[1]['discount']:.0%} off IEC vs. your current {current_discount:.0%} ({current_label_en})",
+                "description_he": f"הנחה של {best[1]['discount']:.0%} מתעריף חברת החשמל, לעומת {current_discount:.0%} כיום ({current_label_he})",
                 "monthly_saving": round(supplier_saving, 0),
                 "annual_saving": round(supplier_saving * 12, 0),
                 "effort": "easy",
@@ -588,6 +594,7 @@ def calculate_savings_lite(bill_data: dict) -> dict:
         "title": "Smart water heater",
         "title_he": "דוד חשמל חכם",
         "description": "Heat water only during off-peak hours (Switcher device)",
+        "description_he": "חימום מים רק בשעות שפל (באמצעות Switcher)",
         "monthly_saving": round(water_heater_saving, 0),
         "annual_saving": round(water_heater_saving * 12, 0),
         "effort": "easy",
@@ -604,6 +611,7 @@ def calculate_savings_lite(bill_data: dict) -> dict:
         "title": "Smart AC scheduling",
         "title_he": "ניהול מזגן חכם",
         "description": "Assuming you have AC — pre-cool before peak, auto-adjust, turn off when you're out (Sensibo)",
+        "description_he": "בהנחה שיש לך מזגן — קירור מקדים לפני שעות פסגה, כוונון אוטומטי וכיבוי כשאין אף אחד בבית (Sensibo)",
         "monthly_saving": round(ac_saving, 0),
         "annual_saving": round(ac_saving * 12, 0),
         "effort": "medium",
