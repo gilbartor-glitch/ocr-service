@@ -196,6 +196,16 @@ html[dir="rtl"] .file-preview-name,html[dir="rtl"] .file-preview-size{text-align
 
 @keyframes tileIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
+/* BEST WINDOW TILE */
+.bw-card{background:linear-gradient(135deg,#0070a8,#004977);border-radius:var(--r);padding:20px 22px;color:#fff;box-shadow:var(--shadow-md);position:relative;overflow:hidden}
+.bw-card::after{content:'';position:absolute;top:-40%;right:-10%;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 70%);border-radius:50%}
+.bw-kicker{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.8;margin-bottom:6px;position:relative;z-index:1}
+.bw-title{font-size:14px;font-weight:600;opacity:.9;margin-bottom:4px;position:relative;z-index:1}
+.bw-window{font-size:30px;font-weight:800;letter-spacing:-.02em;position:relative;z-index:1;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.bw-price{font-size:14px;font-weight:500;opacity:.85}
+.bw-badge{display:inline-block;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;margin-top:8px;position:relative;z-index:1}
+.bw-sub{font-size:12px;opacity:.8;margin-top:10px;line-height:1.4;position:relative;z-index:1}
+
 /* ERROR */
 .error-box{background:#fef2f2;border:1px solid #fecaca;border-radius:var(--r2);padding:16px 18px;color:var(--red-dark);font-size:14px;margin-top:16px;line-height:1.5}
 .error-title{font-weight:700;margin-bottom:4px;color:var(--red)}
@@ -265,6 +275,9 @@ html[dir="rtl"] .file-preview-name,html[dir="rtl"] .file-preview-size{text-align
       <div id="filePreview"></div>
       <button class="process-btn" id="runBtn" onclick="doRun()" disabled><span data-i18n="analyzeBtn">&#x26A1; Analyze my bill</span></button>
     </div>
+
+    <!-- Best window tile — shows without requiring a bill upload -->
+    <div id="bestWindowArea" style="margin-top:20px"></div>
   </div>
 
   <!-- PROCESSING -->
@@ -363,7 +376,14 @@ var I18N={
     // errors
     errorTitle:"Couldn't process this file",
     effortEasy:'easy',
-    effortMedium:'medium'
+    effortMedium:'medium',
+    // best window tile
+    bwKicker:'Smart scheduling',
+    bwTitleTomorrow:"Tomorrow's cheapest 2-hour window",
+    bwTitleToday:"Today's cheapest 2-hour window",
+    bwSubtitle:'Run your water heater, EV charger, or pool pump here — based on Israeli wholesale prices, past 12 months',
+    bwVsPeak:'vs. peak at {window} (₪{price}/MWh)',
+    bwSavingBadge:'{pct}% cheaper'
   },
   he:{
     kicker:'אנרגיה דיגיטלית',
@@ -433,7 +453,13 @@ var I18N={
     yearsUnit:'שנים',
     errorTitle:'לא הצלחנו לעבד את הקובץ',
     effortEasy:'קל',
-    effortMedium:'בינוני'
+    effortMedium:'בינוני',
+    bwKicker:'תזמון חכם',
+    bwTitleTomorrow:'החלון הזול ביותר מחר (שעתיים)',
+    bwTitleToday:'החלון הזול ביותר היום (שעתיים)',
+    bwSubtitle:'הזמן הטוב ביותר להפעיל דוד, טעינת רכב חשמלי או משאבת בריכה — מבוסס על מחירי השוק הסיטונאי ב-12 החודשים האחרונים',
+    bwVsPeak:'לעומת שעת הפסגה ב-{window} (₪{price}/MWh)',
+    bwSavingBadge:'חיסכון של {pct}%'
   }
 };
 
@@ -462,6 +488,8 @@ function setLang(l){
   if(sl){sl.textContent=sl.dataset.state==='on'?t('online'):t('connecting');}
   // Re-render results if present
   if(billData&&savingsData){renderResults();}
+  // Re-render best-window tile if loaded
+  if(typeof bestWindowData!=='undefined'&&bestWindowData){renderBestWindow();}
 }
 
 // Initial language bootstrap
@@ -472,6 +500,34 @@ try{
 setLang(LANG);
 
 fetch('/health').then(function(r){if(r.ok){var d=document.getElementById('dot'),sl=document.getElementById('sl');d.className='nav-dot on';sl.dataset.state='on';sl.textContent=t('online');}}).catch(function(){});
+
+/* --- Best-window tile (wholesale price prediction, no bill required) --- */
+var bestWindowData=null;
+function loadBestWindow(){
+  // Predict for "tomorrow" if local time is after 18:00, else "today"
+  var now=new Date();
+  var useTomorrow=now.getHours()>=18;
+  var target=new Date(now.getTime()+(useTomorrow?24*60*60*1000:0));
+  var ds=target.getFullYear()+'-'+String(target.getMonth()+1).padStart(2,'0')+'-'+String(target.getDate()).padStart(2,'0');
+  fetch('/electricity/best_window?date='+ds+'&hours=2')
+    .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+    .then(function(data){bestWindowData={...data,useTomorrow:useTomorrow};renderBestWindow();})
+    .catch(function(e){console.log('best_window unavailable:',e.message);});
+}
+function renderBestWindow(){
+  var el=document.getElementById('bestWindowArea');
+  if(!el||!bestWindowData)return;
+  var d=bestWindowData;
+  var h='<div class="bw-card">';
+  h+='<div class="bw-kicker">'+t('bwKicker')+'</div>';
+  h+='<div class="bw-title">'+t(d.useTomorrow?'bwTitleTomorrow':'bwTitleToday')+'</div>';
+  h+='<div class="bw-window">'+esc(d.best.start)+'–'+esc(d.best.end)+' <span class="bw-price">&#x20AA;'+d.best.predicted_price+'/MWh</span></div>';
+  h+='<div class="bw-badge">'+t('bwSavingBadge',{pct:d.saving_percentage})+'</div>';
+  h+='<div class="bw-sub">'+t('bwVsPeak',{window:esc(d.worst.start)+'–'+esc(d.worst.end),price:d.worst.predicted_price})+'<br>'+t('bwSubtitle')+'</div>';
+  h+='</div>';
+  el.innerHTML=h;
+}
+loadBestWindow();
 
 /* --- Upload --- */
 function fileChange(e){

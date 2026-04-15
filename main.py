@@ -403,6 +403,71 @@ SUPPLIER_DISCOUNTS = {
 }
 VAT_RATE = 0.18
 
+# ---------------------------------------------------------------------------
+# Wholesale price history (NOGA SMP) for best-window prediction
+# ---------------------------------------------------------------------------
+_SMP_HISTORY_PATH = os.path.join(os.path.dirname(__file__), "smp_history.json")
+try:
+    with open(_SMP_HISTORY_PATH) as _f:
+        SMP_HISTORY = json.load(_f)
+    log.info(f"SMP history loaded: {SMP_HISTORY['meta']['intervals']} intervals, {SMP_HISTORY['meta']['date_range']}")
+except FileNotFoundError:
+    SMP_HISTORY = None
+    log.warning("smp_history.json not found — /electricity/best_window will return 503")
+
+
+def predict_best_window(target_date: str, window_hours: float = 2.0) -> dict:
+    """Predict the cheapest contiguous N-hour window for a given date.
+
+    Uses a weighted blend: 70% same-weekday historical avg + 30% same-month avg.
+    Returns best window, worst window, saving %, and all ranked candidates.
+    """
+    if not SMP_HISTORY:
+        raise HTTPException(503, "Price history not available on this instance")
+
+    from datetime import datetime as _dt, timedelta as _td
+    try:
+        target = _dt.strptime(target_date, "%Y-%m-%d")
+    except ValueError:
+        raise HTTPException(400, "date must be YYYY-MM-DD")
+    if not (0.5 <= window_hours <= 12):
+        raise HTTPException(400, "hours must be between 0.5 and 12")
+
+    weekday = target.weekday()  # 0=Mon ... 6=Sun
+    month = target.month
+    slots: list[str] = SMP_HISTORY["slots"]
+    dow_arr = SMP_HISTORY["by_weekday"][str(weekday)]
+    month_arr = SMP_HISTORY["by_month"][str(month)]
+
+    # Weighted estimate per slot
+    estimates = [0.7 * dow_arr[i] + 0.3 * month_arr[i] for i in range(48)]
+
+    window_len = max(1, int(round(window_hours * 2)))
+    candidates = []
+    for i in range(48 - window_len + 1):
+        avg_p = sum(estimates[i:i + window_len]) / window_len
+        start = slots[i]
+        # End = slot start of last slot in window + 30 min
+        last = _dt.strptime(slots[i + window_len - 1], "%H:%M")
+        end = (last + _td(minutes=30)).strftime("%H:%M")
+        candidates.append({"start": start, "end": end, "predicted_price": round(avg_p, 1)})
+
+    candidates.sort(key=lambda c: c["predicted_price"])
+    best = candidates[0]
+    worst = candidates[-1]
+    saving_pct = round((worst["predicted_price"] - best["predicted_price"]) / worst["predicted_price"] * 100, 0)
+
+    return {
+        "target_date": target_date,
+        "weekday": target.strftime("%A"),
+        "window_hours": window_hours,
+        "best": best,
+        "worst": worst,
+        "saving_percentage": saving_pct,
+        "top_candidates": candidates[:5],
+        "data_range": SMP_HISTORY["meta"]["date_range"],
+    }
+
 def calculate_savings(bill_data: dict) -> dict:
     """Calculate potential savings from tariff switch, supplier switch, and smart scheduling."""
     consumption = bill_data.get("consumption_kwh") or 0
@@ -640,6 +705,20 @@ def calculate_savings_lite(bill_data: dict) -> dict:
         "optimized_monthly_cost": round(monthly_cost - total_monthly_saving, 0),
         "solar": None,
     }
+
+@app.get("/electricity/best_window", tags=["electricity"])
+async def best_window(
+    date: str = Query(..., description="Target date YYYY-MM-DD"),
+    hours: float = Query(2.0, ge=0.5, le=12.0, description="Window length in hours"),
+):
+    """Predict the cheapest N-hour wholesale window for a given date.
+
+    Based on NOGA SMP DAM historical prices (full year, 30-min resolution).
+    Useful for scheduling high-load appliances (water heater, EV charger,
+    pool pump, dishwasher) to run during the cheapest period.
+    """
+    return predict_best_window(date, hours)
+
 
 @app.post("/electricity/analyze", response_model=AIResponse, tags=["electricity"])
 async def analyze_electricity(file: Annotated[UploadFile, File()]):

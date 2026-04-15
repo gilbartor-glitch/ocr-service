@@ -1,4 +1,4 @@
-const CACHE = 'juice-v5-digital-energy';
+const CACHE = 'juice-v6-best-window';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
