@@ -630,7 +630,13 @@ function renderResults(){
   if(s.lite_mode){
     h+='<div class="hero-sub">'+t('monthlyChargeFrom',{supplier:esc(s.current_bill&&s.current_bill.supplier||'—')})+'</div>';
   } else {
-    h+='<div class="hero-sub">'+t('kwhMonth',{kwh:fmt(s.current_bill&&s.current_bill.monthly_kwh||0)})+' &middot; '+(s.current_bill&&s.current_bill.tariff_type==='flat'?t('flatTariff'):t('taozTariff'))+'</div>';
+    var kwh=s.current_bill&&s.current_bill.monthly_kwh;
+    var tariff=s.current_bill&&s.current_bill.tariff_type;
+    var parts=[];
+    if(kwh&&kwh>0) parts.push(t('kwhMonth',{kwh:fmt(kwh)}));
+    if(tariff) parts.push(tariff==='flat'?t('flatTariff'):t('taozTariff'));
+    if(s.current_bill&&s.current_bill.supplier) parts.push(esc(s.current_bill.supplier));
+    h+='<div class="hero-sub">'+(parts.join(' &middot; ')||'&nbsp;')+'</div>';
   }
   h+='</div>';
 

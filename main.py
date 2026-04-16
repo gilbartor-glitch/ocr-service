@@ -755,41 +755,44 @@ async def analyze_electricity(file: Annotated[UploadFile, File()]):
     if len(data) > MAX_BYTES: raise HTTPException(413, "File too large.")
     detected_type = _detect_type(data)
 
+    # Build list of image payloads (one per PDF page, or one for single image)
+    page_blobs: list[bytes] = []
+
     if detected_type == "application/pdf":
         try:
             import fitz
             doc = fitz.open(stream=data, filetype="pdf")
-            page_images = []
             for page in doc:
                 pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), colorspace=fitz.csRGB)
-                page_images.append(pix.tobytes("jpeg"))
-            data = page_images[0] if page_images else data
-            detected_type = "image/jpeg"
+                page_blobs.append(pix.tobytes("jpeg"))
+            if not page_blobs:
+                raise HTTPException(500, "PDF has no renderable pages")
         except Exception as e:
             raise HTTPException(500, f"PDF rendering failed: {e}")
+    else:
+        # HEIC -> JPEG
+        if detected_type == "image/heic":
+            try:
+                import subprocess, tempfile
+                with tempfile.NamedTemporaryFile(suffix='.heic', delete=False) as f:
+                    f.write(data); tmp_in = f.name
+                tmp_out = tmp_in.replace('.heic', '.jpg')
+                subprocess.run(['convert', tmp_in, tmp_out], check=True, timeout=10)
+                data = open(tmp_out, 'rb').read()
+                for p in [tmp_in, tmp_out]:
+                    try: os.unlink(p)
+                    except: pass
+            except Exception as e:
+                log.warning(f"HEIC conversion failed: {e}")
+        page_blobs.append(data)
 
-    # HEIC -> JPEG
-    if detected_type == "image/heic":
-        try:
-            import subprocess, tempfile
-            with tempfile.NamedTemporaryFile(suffix='.heic', delete=False) as f:
-                f.write(data); tmp_in = f.name
-            tmp_out = tmp_in.replace('.heic', '.jpg')
-            subprocess.run(['convert', tmp_in, tmp_out], check=True, timeout=10)
-            data = open(tmp_out, 'rb').read()
-            detected_type = "image/jpeg"
-            for p in [tmp_in, tmp_out]:
-                try: os.unlink(p)
-                except: pass
-        except Exception as e:
-            log.warning(f"HEIC conversion failed: {e}")
-
-    # Normalize image: fix EXIF orientation, resize if too large (Claude limit ~5MB)
-    if detected_type and detected_type.startswith("image/"):
+    # Normalize each page: fix EXIF, resize to max 2000px, re-encode as JPEG
+    normalized: list[bytes] = []
+    for blob in page_blobs[:5]:  # cap at 5 pages to stay within Claude's request-size limits
         try:
             from PIL import Image, ImageOps
             import io as _io
-            pil_img = Image.open(_io.BytesIO(data))
+            pil_img = Image.open(_io.BytesIO(blob))
             pil_img = ImageOps.exif_transpose(pil_img)
             if pil_img.mode not in ("RGB", "L"):
                 pil_img = pil_img.convert("RGB")
@@ -799,21 +802,36 @@ async def analyze_electricity(file: Annotated[UploadFile, File()]):
                 pil_img = pil_img.resize((int(pil_img.size[0]*ratio), int(pil_img.size[1]*ratio)), Image.LANCZOS)
             buf = _io.BytesIO()
             pil_img.save(buf, format="JPEG", quality=85)
-            data = buf.getvalue()
-            detected_type = "image/jpeg"
+            normalized.append(buf.getvalue())
         except Exception as e:
             log.warning(f"Image normalization failed: {e}")
+            normalized.append(blob)
 
-    b64 = base64.b64encode(data).decode()
-    content_block = {"type": "image", "source": {"type": "base64", "media_type": detected_type, "data": b64}}
+    # Build multi-image content array; Claude Vision accepts many images per message
+    content_blocks = []
+    for i, blob in enumerate(normalized):
+        content_blocks.append({
+            "type": "image",
+            "source": {"type": "base64", "media_type": "image/jpeg",
+                       "data": base64.b64encode(blob).decode()}
+        })
+    prompt_text = ANALYZE_PROMPT
+    if len(normalized) > 1:
+        prompt_text = (
+            f"The document has {len(normalized)} pages. Some pages may be payment receipts or "
+            f"credit-card confirmations (ignore those); the actual bill breakdown with kWh "
+            f"consumption, meter number, and tariff details is usually on a separate page. "
+            f"Extract from whichever page has the real bill data.\n\n" + ANALYZE_PROMPT
+        )
+    content_blocks.append({"type": "text", "text": prompt_text})
 
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with httpx.AsyncClient(timeout=90.0) as client:
             resp = await client.post(
                 "https://api.anthropic.com/v1/messages",
                 headers={"x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json"},
                 json={"model": "claude-sonnet-4-6", "max_tokens": 2048,
-                      "messages": [{"role": "user", "content": [content_block, {"type": "text", "text": ANALYZE_PROMPT}]}]}
+                      "messages": [{"role": "user", "content": content_blocks}]}
             )
         if resp.status_code != 200:
             log.warning(f"Claude Vision {resp.status_code}: {resp.text[:300]}")

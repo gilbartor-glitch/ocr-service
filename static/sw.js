@@ -1,4 +1,4 @@
-const CACHE = 'juice-v7-kva-reduction';
+const CACHE = 'juice-v8-multipage-pdf';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
