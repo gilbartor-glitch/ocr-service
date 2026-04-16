@@ -362,12 +362,12 @@ Extract whatever fields are present. Return a JSON object with null for missing 
 - sender: electricity supplier name (e.g. "חברת החשמל", "Bezeq Energy", "Cellcom Energy"). For credit-card notices, extract the merchant name shown.
 - recipient: customer name or null
 - account_number: contract or account number or null
-- meter_number: electricity meter number or null
+- meter_number: electricity meter number or null. This is a long identifier (typically 6-10 digits) printed near "מס׳ מונה" or "מונה" or "meter" on the bill. Do NOT confuse with kWh consumption or NIS amounts.
 - barcode: payment barcode number if visible or null
 - payment_required: true/false
 - tariff_type: "flat" if תעריף אחיד, "taoz" if תע״ז time-of-use, or null
-- consumption_kwh: total kWh consumed as number, or null if not shown
-- rate_per_kwh: rate in agorot per kWh as number, or null
+- consumption_kwh: total kWh consumed over the billing period as number, or null if not shown. CRITICAL: this is the actual energy used in kWh (typically between 200 and 8000 for residential bi-monthly bills). Do NOT put the NIS amount of the energy charge here — that's a separate field. On Israeli bills the label is usually "צריכה" or "קוטש" or "קוט״ש". Verify by checking: consumption_kwh × rate_per_kwh / 100 should roughly equal the energy charge in NIS.
+- rate_per_kwh: rate in agorot per kWh as number, or null (typically 40-60 for flat, or a per-period value for Taoz)
 - kva: KVA capacity as number or null
 - kva_charge: KVA charge amount in NIS as number or null
 - fixed_charges: total fixed charges in NIS as number or null
@@ -842,6 +842,30 @@ async def analyze_electricity(file: Annotated[UploadFile, File()]):
 
     clean = raw.replace('```json', '').replace('```', '').strip()
     bill_data = _safe_parse(clean)
+
+    # Sanity-check the extraction: does (consumption × rate) roughly equal the amount?
+    # If not, and the "meter_number" looks like a plausible kWh value, swap them.
+    try:
+        kwh = float(bill_data.get("consumption_kwh") or 0)
+        rate = float(bill_data.get("rate_per_kwh") or 0)
+        amt_raw = bill_data.get("amount")
+        amt = float(str(amt_raw).replace(",", "")) if amt_raw else 0
+        if kwh > 0 and rate > 0 and amt > 0:
+            expected_energy_nis = kwh * rate / 100.0
+            # If the expected energy charge is wildly off from the total bill (accounting for VAT + fixed),
+            # and meter_number looks like a plausible kWh value, try swapping
+            if expected_energy_nis < amt * 0.25:  # energy charge should typically be 50-80% of total
+                meter = bill_data.get("meter_number")
+                try:
+                    meter_as_num = float(str(meter).replace(",", "")) if meter else 0
+                except (ValueError, TypeError):
+                    meter_as_num = 0
+                if 200 < meter_as_num < 20000:  # plausible kWh range
+                    log.info(f"Detected consumption_kwh/meter_number swap; fixing: kwh={kwh}→{meter_as_num}, meter={meter}→(unknown)")
+                    bill_data["consumption_kwh"] = meter_as_num
+                    bill_data["meter_number"] = None  # we don't know the real meter
+    except (ValueError, TypeError) as e:
+        log.warning(f"Sanity check failed: {e}")
 
     has_consumption = bool(bill_data.get("consumption_kwh") or bill_data.get("rate_per_kwh") or bill_data.get("meter_number"))
     has_charge = bool(bill_data.get("amount") and bill_data.get("sender"))
