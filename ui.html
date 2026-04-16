@@ -660,7 +660,7 @@ function renderResults(){
   // Savings recommendations
   if(s.savings&&s.savings.length){
     h+='<div class="section-label">'+t('savingsRecs')+'</div>';
-    var icons={'supplier_switch':'&#x1F504;','taoz_switch':'&#x23F0;','smart_scheduling':'&#x1F4A7;','ac_optimization':'&#x2744;&#xFE0F;'};
+    var icons={'supplier_switch':'&#x1F504;','taoz_switch':'&#x23F0;','smart_scheduling':'&#x1F4A7;','ac_optimization':'&#x2744;&#xFE0F;','kva_reduction':'&#x1F4DE;'};
     s.savings.forEach(function(item,i){
       var icon=icons[item.type]||'&#x1F4B0;';
       var title=LANG==='he'&&item.title_he?item.title_he:item.title;

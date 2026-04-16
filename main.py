@@ -573,6 +573,34 @@ def calculate_savings(bill_data: dict) -> dict:
     })
     total_monthly_saving += ac_saving
 
+    # 4b. Reduce contracted KVA capacity — for customers with oversized connections
+    # Logic: if the bill's KVA is 3-phase (likely 3×25A = 17.32 KVA) but actual peak demand
+    # is low (inferred from low monthly_kwh), customer can downsize to 3×16A or single-phase.
+    # Savings are small (~₪30–60/yr at ₪5.19/KVA/yr rate) but zero-effort & no hardware.
+    kva = bill_data.get("kva") or 0
+    connection_type = bill_data.get("connection_type")
+    breaker_amps = bill_data.get("breaker_amps") or 0
+    # Target: if 3-phase 25A AND consumption < 1000 kWh/mo → recommend dropping to 3×16A
+    if (connection_type == "three" and breaker_amps >= 25 and monthly_kwh < 1000) or kva > 15:
+        # Savings: difference between current KVA and a 3×16A (11.09 KVA) contract
+        target_kva = 11.09  # 3-phase 16A
+        kva_annual_saving = max(0, (kva - target_kva) * 5.19) if kva > 0 else 32
+        kva_monthly_saving = kva_annual_saving / 12
+        savings.append({
+            "type": "kva_reduction",
+            "title": "Reduce contracted connection",
+            "title_he": "הקטנת גודל חיבור החשמל",
+            "description": f"Your contract is 3×{breaker_amps or 25}A but your usage is modest. "
+                           f"Call IEC to downsize to 3×16A — saves a small but guaranteed amount with zero effort.",
+            "description_he": f"החיבור שלך הוא 3×{breaker_amps or 25}A אבל הצריכה שלך צנועה. "
+                              f"טלפון ל-חברת החשמל להקטנה ל-3×16A — חיסכון קטן אבל מובטח ללא מאמץ.",
+            "monthly_saving": round(kva_monthly_saving, 1),
+            "annual_saving": round(kva_annual_saving, 0),
+            "effort": "easy",
+            "effort_he": "קל",
+        })
+        total_monthly_saving += kva_monthly_saving
+
     # 5. Solar recommendation (for high consumers)
     solar = None
     if monthly_kwh > 800:
